@@ -48,8 +48,8 @@ FORMS    += \
     views/syncview.ui
 
 CONFIG += c++11
-QMAKE_CXXFLAGS += -O3
-
+#QMAKE_CXXFLAGS += -O3
+QMAKE_CXXFLAGS += -O0 -g
 CONFIG += mobility
 MOBILITY = 
 

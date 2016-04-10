@@ -3,6 +3,10 @@
 DataManager::DataManager(QObject *parent) : QObject(parent)
 {
     setupLocalStorageDirectories();
+    sync();
+}
+
+void DataManager::sync() {
     // Maybe only do this if we're connected via WiFi so we're not burning someone's data plan without asking?
     if(manager.networkAccessible() == QNetworkAccessManager::Accessible) {
         syncStreamsToLocalStorage();
@@ -67,10 +71,12 @@ void DataManager::syncStreamsToLocalStorage()
 
     QXmlStreamReader xmlReader(result);
 
+    StreamHandler handler;
+
     while(!xmlReader.atEnd()) {
         xmlReader.readNextStartElement();
         if(xmlReader.name() == "text") {
-            qDebug() << xmlReader.readElementText();
+            handler.parse(xmlReader.readElementText());
         }
     }
 

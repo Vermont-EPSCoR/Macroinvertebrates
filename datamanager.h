@@ -18,29 +18,32 @@
 #include <QMetaObject>
 #include <QByteArray>
 #include <QXmlStreamReader>
+#include <QThread>
 
 #include <memory>
+
+#include "parsers/streamhandler.h"
 
 class DataManager : public QObject
 {
     Q_OBJECT
-    QNetworkAccessManager manager;
 
+    QNetworkAccessManager manager;
     QString imagePath;
+    bool isOk = true;
 
     void setupLocalStorageDirectories();
-    bool isOk = true;
+    void syncStreamsToLocalStorage();
+    void syncInvertebratesToLocalStorage();
+    void loadInvertebratesFromLocalStorage();
+    void loadStreamsFromLocalStorage();
 
     QByteArray synchronouslyFetchUrl(const QUrlQuery &query);
 
 public:
     explicit DataManager(QObject *parent = 0);
+    void sync();
 
-    void syncStreamsToLocalStorage();
-    void syncInvertebratesToLocalStorage();
-
-    void loadInvertebratesFromLocalStorage();
-    void loadStreamsFromLocalStorage();
 signals:
 
 public slots:

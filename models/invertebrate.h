@@ -1,14 +1,12 @@
 #ifndef INVERTEBRATE_H
 #define INVERTEBRATE_H
 
-#include <QObject>
 #include <QString>
 
-class Invertebrate : public QObject
+class Invertebrate
 {
-    Q_OBJECT
 public:
-    explicit Invertebrate(QObject *parent = 0);
+    Invertebrate();
 
     // Don't sort this
     QString order;
@@ -26,9 +24,6 @@ public:
     bool operator <(const Invertebrate& inv);
     bool operator >(const Invertebrate& inv);
     bool operator ==(const Invertebrate& inv);
-signals:
-
-public slots:
 };
 
 #endif // INVERTEBRATE_H
