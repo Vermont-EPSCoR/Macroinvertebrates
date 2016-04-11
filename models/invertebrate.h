@@ -3,9 +3,11 @@
 
 #include <QString>
 #include <QDataStream>
+#include <QDebug>
 
 class Invertebrate
 {
+
 public:
     Invertebrate();
 
@@ -25,12 +27,12 @@ public:
     bool imageIsUpToDate = false;
     bool imageIsReady = false;
 
-    bool operator <(const Invertebrate& inv);
-    bool operator >(const Invertebrate& inv);
-    bool operator ==(const Invertebrate& inv);
-
-//    QDataStream &operator<<(QDataStream &, const Invertebrate &);
-//    QDataStream &operator>>(QDataStream &, Invertebrate &);
+    bool operator <(const Invertebrate& inv) const;
+    bool operator >(const Invertebrate& inv) const;
+    bool operator ==(const Invertebrate& inv) const;
 };
+
+QDataStream &operator<<(QDataStream &dataStream, const Invertebrate &invertebrate);
+QDataStream &operator>>(QDataStream &dataStream, Invertebrate &invertebrate);
 
 #endif // INVERTEBRATE_H

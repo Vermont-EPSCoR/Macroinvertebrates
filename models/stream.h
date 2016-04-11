@@ -19,9 +19,9 @@ public:
     double longitude;
 
     QStringList invertebrateList;
-
-//    QDataStream &operator<<(QDataStream &dataStream, const Stream &stream);
-//    QDataStream &operator>>(QDataStream &dataStream, Stream &stream);
 };
+
+QDataStream &operator<<(QDataStream &dataStream, const Stream &stream);
+QDataStream &operator>>(QDataStream &dataStream, Stream &stream);
 
 #endif // STREAM_H

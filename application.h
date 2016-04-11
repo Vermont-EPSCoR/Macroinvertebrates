@@ -10,10 +10,15 @@
 #include <QNetworkReply>
 #include <QUrl>
 
+#include <algorithm>
+
 #include "datamanager.h"
 
 #include "views/homeview.h"
 #include "views/syncview.h"
+#include "views/streamview.h"
+#include "views/aboutview.h"
+#include "views/singlestreamview.h"
 
 class Application : public QApplication
 {
@@ -22,8 +27,11 @@ class Application : public QApplication
                                 "background-position: top center;"
                                 "background-color: rgb(255, 255, 255);";
 
+    AboutView aboutView;
     HomeView homeView;
     SyncView syncView;
+    StreamView streamView;
+    SingleStreamView singleStreamView;
 
     DataManager manager;
 public:
@@ -31,7 +39,15 @@ public:
 
 public slots:
     void replyReady(QNetworkReply* reply);
-    void transitionToSync();
+    void transitionHomeViewToSyncView();
+    void transitionHomeViewToStreamView();
+    void transitionStreamViewToHomeView();
+
+    void transitionAboutToHome();
+    void transitionHomeToAbout();
+
+    void transitionStreamsToSingleStream(const QString &streamName);
+    void transitionSingleStreamToStreams();
 };
 
 #endif // APPLICATION_H

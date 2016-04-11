@@ -38,9 +38,9 @@ void StreamHandler::parseInfoboxToStream(const QString &infoBox, Stream &stream)
     QString buffer(infoBox);
     buffer = buffer.replace("Infobox stream ", "");
     for(QString line: buffer.split("\n", QString::SkipEmptyParts)) {
-        QStringList pair = line.split(QRegularExpression(" ?= ?"));
+        QStringList pair = line.split(QRegularExpression("\\s*=\\s*"));
         if(pair.length() != 2) {
-            qDebug() << "Pair does not contain 2 elements" << pair;
+//            qDebug() << "Pair does not contain 2 elements" << pair;
         } else {
             QString key = pair.at(0).trimmed();
             QString value = pair.at(1).trimmed();

@@ -21,7 +21,7 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
     for(QString line: infoBox.split("\n", QString::SkipEmptyParts)) {
         QStringList pair = line.split(QRegularExpression(" ?= ?"));
         if(pair.length() != 2) {
-            qDebug() << "Pair does not contain 2 elements" << pair;
+//            qDebug() << "Pair does not contain 2 elements" << pair;
         } else {
             QString key = pair.at(0).trimmed();
             QString value = pair.at(1).trimmed();
@@ -42,7 +42,7 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
             } else if(key == "|order") {
                 invertebrate.order = value;
             } else if(key != "|text") {
-                qDebug() << "Key: " << key.trimmed() << " Value: " << value.trimmed();
+//                qDebug() << "Key: " << key << " Value: " << value;
             }
         }
     }

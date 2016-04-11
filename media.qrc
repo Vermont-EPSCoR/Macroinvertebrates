@@ -7,5 +7,6 @@
         <file>media/buttons/go.png</file>
         <file>media/buttons/start.png</file>
         <file>media/buttons/sync.png</file>
+        <file>media/invertebrate-placeholder.jpg</file>
     </qresource>
 </RCC>

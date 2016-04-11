@@ -25,7 +25,9 @@ SOURCES += main.cpp \
     models/invertebrate.cpp \
     datamanager.cpp \
     parsers/streamhandler.cpp \
-    parsers/invertebratehandler.cpp
+    parsers/invertebratehandler.cpp \
+    views/aboutview.cpp \
+    views/singlestreamview.cpp
 
 HEADERS  += \
     application.h \
@@ -40,18 +42,22 @@ HEADERS  += \
     models/invertebrate.h \
     datamanager.h \
     parsers/streamhandler.h \
-    parsers/invertebratehandler.h
+    parsers/invertebratehandler.h \
+    views/aboutview.h \
+    views/singlestreamview.h
 
 FORMS    += \
     views/homeview.ui \
     views/locationview.ui \
     views/streamview.ui \
     views/invertebrateview.ui \
-    views/syncview.ui
+    views/syncview.ui \
+    views/aboutview.ui \
+    views/singlestreamview.ui
 
 CONFIG += c++11
-#QMAKE_CXXFLAGS += -O3
-QMAKE_CXXFLAGS += -O0 -g
+QMAKE_CXXFLAGS += -O3
+#QMAKE_CXXFLAGS += -O0 -g
 CONFIG += mobility
 MOBILITY = 
 

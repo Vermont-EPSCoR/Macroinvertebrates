@@ -17,3 +17,13 @@ void HomeView::on_actionSync_triggered()
 {
     emit syncAction();
 }
+
+void HomeView::on_pushButton_clicked()
+{
+    emit startButtonClicked();
+}
+
+void HomeView::on_pushButton_2_clicked()
+{
+    emit aboutButtonClicked();
+}

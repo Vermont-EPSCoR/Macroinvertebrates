@@ -3,7 +3,9 @@
 DataManager::DataManager(QObject *parent) : QObject(parent)
 {
     setupLocalStorageDirectories();
-    sync();
+    loadStreamsFromLocalStorage();
+    loadInvertebratesFromLocalStorage();
+//    sync();
 }
 
 void DataManager::sync() {
@@ -18,11 +20,11 @@ void DataManager::sync() {
 
 void DataManager::setupLocalStorageDirectories()
 {
-    QDir directoryHelper;
     bool result;
     // Ensure image directory
-    QString dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     imagePath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "images");
+    qDebug() << dataPath;
     qDebug() << imagePath;
     result = directoryHelper.mkpath(imagePath);
 
@@ -61,6 +63,8 @@ void DataManager::syncStreamsToLocalStorage()
         streamTitles.append(value.toObject().value("title").toString());
     }
 
+    qSort(streamTitles);
+
     QUrlQuery streamInvertebratesQuery("http://wikieducator.org/api.php?");
     streamInvertebratesQuery.addQueryItem("titles", streamTitles.join("|"));
     streamInvertebratesQuery.addQueryItem("action", "query");
@@ -77,6 +81,18 @@ void DataManager::syncStreamsToLocalStorage()
             Stream stream = handler.parse(xmlReader.readElementText());
             streams.insert(stream.title, stream);
         }
+    }
+
+    QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
+    QFile dataFile(streamDataPath);
+
+    if(!dataFile.open(QFile::WriteOnly)) {
+        qDebug() << "Unable to open invertebrates.data";
+    } else {
+        QDataStream ds(&dataFile);
+        ds.setVersion(QDataStream::Qt_5_6);
+        ds << streams;
+        dataFile.close();
     }
 
     qDebug() << "STREAMS COMPLETE";
@@ -123,6 +139,16 @@ void DataManager::syncInvertebratesToLocalStorage()
         }
     }
 
+    QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "invertebrates.data");
+    QFile dataFile(invertebrateDataPath);
+    if(!dataFile.open(QFile::WriteOnly)) {
+        qDebug() << "Unable to open invertebrates.data";
+    } else {
+        QDataStream ds(&dataFile);
+        ds.setVersion(QDataStream::Qt_5_6);
+        ds << invertebrates;
+        dataFile.close();
+    }
     qDebug() << "Invertebrates completed";
 }
 
@@ -145,4 +171,47 @@ QByteArray DataManager::synchronouslyFetchUrl(const QUrlQuery &query)
     waiter.exec();
 
     return bytes;
+}
+
+void DataManager::loadInvertebratesFromLocalStorage()
+{
+    QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "invertebrates.data");
+    if(!directoryHelper.exists(invertebrateDataPath)) {
+        emit noLocalDataFound();
+        return;
+    } else {
+        QFile dataFile(invertebrateDataPath);
+        if(!dataFile.open(QFile::ReadOnly)) {
+            qDebug() << "Unable to open local invertebrate data";
+            emit noLocalDataFound();
+            return;
+        }
+
+        QDataStream loader(&dataFile);
+        loader.setVersion(QDataStream::Qt_5_6);
+        loader >> invertebrates;
+        emit localInvertebratesLoaded();
+    }
+}
+
+void DataManager::loadStreamsFromLocalStorage()
+{
+    QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
+    if(!directoryHelper.exists(streamDataPath)) {
+        emit noLocalDataFound();
+        return;
+    } else {
+        QFile dataFile(streamDataPath);
+        if(!dataFile.open(QFile::ReadOnly)) {
+            qDebug() << "Unable to open local invertebrate data";
+            emit noLocalDataFound();
+            return;
+        }
+
+        QDataStream loader(&dataFile);
+        loader >> streams;
+
+        qDebug() << "Streams count: " << streams.count();
+        emit localStreamsLoaded();
+    }
 }

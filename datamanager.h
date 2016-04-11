@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QEventLoop>
 #include <QStandardPaths>
-#include <QFileSystemModel>
 #include <QMap>
 #include <QNetworkConfiguration>
 #include <QNetworkAccessManager>
@@ -19,6 +18,7 @@
 #include <QByteArray>
 #include <QXmlStreamReader>
 #include <QThread>
+#include <QDir>
 
 #include <memory>
 
@@ -30,7 +30,9 @@ class DataManager : public QObject
     Q_OBJECT
 
     QNetworkAccessManager manager;
+    QDir directoryHelper;
     QString imagePath;
+    QString dataPath;
     bool isOk = true;
 
     void setupLocalStorageDirectories();
@@ -40,15 +42,18 @@ class DataManager : public QObject
     void loadStreamsFromLocalStorage();
 
     QByteArray synchronouslyFetchUrl(const QUrlQuery &query);
-    QMap<QString, Stream> streams;
-    QMap<QString, Invertebrate> invertebrates;
 
 public:
     explicit DataManager(QObject *parent = 0);
     void sync();
 
-signals:
+    QMap<QString, Stream> streams;
+    QMap<QString, Invertebrate> invertebrates;
 
+signals:
+    void noLocalDataFound();
+    void localInvertebratesLoaded();
+    void localStreamsLoaded();
 public slots:
 };
 
