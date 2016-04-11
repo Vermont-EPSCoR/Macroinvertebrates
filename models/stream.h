@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QDataStream>
 
 #include "invertebratelist.h"
 
@@ -18,6 +19,9 @@ public:
     double longitude;
 
     QStringList invertebrateList;
+
+//    QDataStream &operator<<(QDataStream &dataStream, const Stream &stream);
+//    QDataStream &operator>>(QDataStream &dataStream, Stream &stream);
 };
 
 #endif // STREAM_H

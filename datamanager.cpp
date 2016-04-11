@@ -68,15 +68,13 @@ void DataManager::syncStreamsToLocalStorage()
     streamInvertebratesQuery.addQueryItem("exportnowrap", "");
 
     QByteArray result = synchronouslyFetchUrl(streamInvertebratesQuery);
-
     QXmlStreamReader xmlReader(result);
-
     StreamHandler handler;
 
     while(!xmlReader.atEnd()) {
         xmlReader.readNextStartElement();
         if(xmlReader.name() == "text") {
-            handler.parse(xmlReader.readElementText());
+            streamList.append(handler.parse(xmlReader.readElementText()));
         }
     }
 
@@ -95,13 +93,31 @@ void DataManager::syncInvertebratesToLocalStorage()
     invertebrateQuery.addQueryItem("cmprop", "ids|title");
 
     QJsonDocument doc = doc.fromJson(synchronouslyFetchUrl(invertebrateQuery));
+    QStringList invertebrateTitles;
 
     if(doc.isNull()) {
         qDebug() << "Doc is null/invalid in inverts.";
     } else {
         QJsonArray invertebrateValues = doc.object().value("query").toObject().value("categorymembers").toArray();
         for(const QJsonValue &value: invertebrateValues) {
-            qDebug() << value;
+            invertebrateTitles.append(value.toObject().value("title").toString());
+        }
+    }
+
+    QUrlQuery streamInvertebratesQuery("http://wikieducator.org/api.php?");
+    streamInvertebratesQuery.addQueryItem("titles", invertebrateTitles.join("|"));
+    streamInvertebratesQuery.addQueryItem("action", "query");
+    streamInvertebratesQuery.addQueryItem("export", "");
+    streamInvertebratesQuery.addQueryItem("exportnowrap", "");
+
+    QByteArray result = synchronouslyFetchUrl(streamInvertebratesQuery);
+    QXmlStreamReader xmlReader(result);
+    InvertebrateHandler handler;
+
+    while(!xmlReader.atEnd()) {
+        xmlReader.readNextStartElement();
+        if(xmlReader.name() == "text") {
+            Invertebrate invertebrate = handler.parse(xmlReader.readElementText());
         }
     }
 

@@ -23,6 +23,7 @@
 #include <memory>
 
 #include "parsers/streamhandler.h"
+#include "parsers/invertebratehandler.h"
 
 class DataManager : public QObject
 {
@@ -39,6 +40,7 @@ class DataManager : public QObject
     void loadStreamsFromLocalStorage();
 
     QByteArray synchronouslyFetchUrl(const QUrlQuery &query);
+    QList<Stream> streamList;
 
 public:
     explicit DataManager(QObject *parent = 0);

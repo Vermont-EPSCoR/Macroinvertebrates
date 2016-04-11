@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     models/invertebratelist.cpp \
     models/invertebrate.cpp \
     datamanager.cpp \
-    parsers/streamhandler.cpp
+    parsers/streamhandler.cpp \
+    parsers/invertebratehandler.cpp
 
 HEADERS  += \
     application.h \
@@ -38,7 +39,8 @@ HEADERS  += \
     models/invertebratelist.h \
     models/invertebrate.h \
     datamanager.h \
-    parsers/streamhandler.h
+    parsers/streamhandler.h \
+    parsers/invertebratehandler.h
 
 FORMS    += \
     views/homeview.ui \
