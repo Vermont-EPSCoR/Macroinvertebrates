@@ -74,7 +74,8 @@ void DataManager::syncStreamsToLocalStorage()
     while(!xmlReader.atEnd()) {
         xmlReader.readNextStartElement();
         if(xmlReader.name() == "text") {
-            streamList.append(handler.parse(xmlReader.readElementText()));
+            Stream stream = handler.parse(xmlReader.readElementText());
+            streams.insert(stream.title, stream);
         }
     }
 
@@ -118,6 +119,7 @@ void DataManager::syncInvertebratesToLocalStorage()
         xmlReader.readNextStartElement();
         if(xmlReader.name() == "text") {
             Invertebrate invertebrate = handler.parse(xmlReader.readElementText());
+            invertebrates.insert(invertebrate.name, invertebrate);
         }
     }
 

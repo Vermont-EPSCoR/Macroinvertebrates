@@ -2,10 +2,10 @@
 
 InvertebrateHandler::InvertebrateHandler()
 {
-    curlyBraceElement.setPattern("{{(.+?)}}");
+    curlyBraceElement.setPattern("{{InsectSection(.+?)}}");
     curlyBraceElement.setPatternOptions(QRegularExpression::DotMatchesEverythingOption);
 
-    textBlock.setPattern("\|text\s*=\s*(.+?)<!--Stop-->");
+    textBlock.setPattern("\\|text\\s*=\\s*(.+?)<!--Stop-->");
     textBlock.setPatternOptions(QRegularExpression::DotMatchesEverythingOption);
 }
 
@@ -27,22 +27,16 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
             QString value = pair.at(1).trimmed();
 
             if(key == "|name") {
-                qDebug() << "name";
                 invertebrate.name = value;
             } else if(key == "|common name") {
-                qDebug() << "common name";
                 invertebrate.commonName = value;
             } else if(key == "|family") {
-                qDebug() << "family";
                 invertebrate.family = value;
             } else if(key == "|fly name") {
-                qDebug() << "fly name";
                 invertebrate.flyName = value;
             } else if(key == "|genus") {
-                qDebug() << "genus";
                 invertebrate.genus = value;
             } else if(key == "|image") {
-                qDebug() << "image";
                 invertebrate.imageFileRemote = value;  // write method to get url for this image
 //                invertebrate.imageFileLocal = ;  // TODO
             } else if(key == "|order") {

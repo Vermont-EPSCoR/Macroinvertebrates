@@ -5,7 +5,7 @@
 #include <QEventLoop>
 #include <QStandardPaths>
 #include <QFileSystemModel>
-#include <QList>
+#include <QMap>
 #include <QNetworkConfiguration>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -40,7 +40,8 @@ class DataManager : public QObject
     void loadStreamsFromLocalStorage();
 
     QByteArray synchronouslyFetchUrl(const QUrlQuery &query);
-    QList<Stream> streamList;
+    QMap<QString, Stream> streams;
+    QMap<QString, Invertebrate> invertebrates;
 
 public:
     explicit DataManager(QObject *parent = 0);
