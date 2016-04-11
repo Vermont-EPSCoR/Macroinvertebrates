@@ -38,10 +38,12 @@ class DataManager : public QObject
     void setupLocalStorageDirectories();
     void syncStreamsToLocalStorage();
     void syncInvertebratesToLocalStorage();
+    void syncInvertebrateImages();
     void loadInvertebratesFromLocalStorage();
     void loadStreamsFromLocalStorage();
 
-    QByteArray synchronouslyFetchUrl(const QUrlQuery &query);
+    QByteArray synchronouslyGetUrl(const QUrlQuery &query);
+    QString synchronouslyHeadEtag(const QString &url);
 
 public:
     explicit DataManager(QObject *parent = 0);
@@ -55,6 +57,7 @@ signals:
     void localInvertebratesLoaded();
     void localStreamsLoaded();
 public slots:
+    void cleanUpOldImages();
 };
 
 #endif // DATAMANAGER_H

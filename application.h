@@ -5,12 +5,7 @@
 #include <QObject>
 #include <QDebug>
 
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QUrl>
-
-#include <algorithm>
+#include <algorithm>  // std::sort
 
 #include "datamanager.h"
 
@@ -22,7 +17,7 @@
 
 class Application : public QApplication
 {
-    QString masterStylesheet = "background-repeat: no-repeat;"
+    QString masterStylesheet =  "background-repeat: no-repeat;"
                                 "background-image: url(:/media/background-plain.png);"
                                 "background-position: top center;"
                                 "background-color: rgb(255, 255, 255);";
@@ -38,10 +33,9 @@ public:
     Application(int argc, char *argv[]);
 
 public slots:
-    void replyReady(QNetworkReply* reply);
-    void transitionHomeViewToSyncView();
-    void transitionHomeViewToStreamView();
-    void transitionStreamViewToHomeView();
+    void transitionHomeToSync();
+    void transitionHomeToStream();
+    void transitionStreamToHome();
 
     void transitionAboutToHome();
     void transitionHomeToAbout();

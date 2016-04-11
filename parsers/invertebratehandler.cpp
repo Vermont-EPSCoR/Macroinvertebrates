@@ -37,8 +37,7 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
             } else if(key == "|genus") {
                 invertebrate.genus = value;
             } else if(key == "|image") {
-                invertebrate.imageFileRemote = value;  // write method to get url for this image
-//                invertebrate.imageFileLocal = ;  // TODO
+                invertebrate.imageFileRemote = value;
             } else if(key == "|order") {
                 invertebrate.order = value;
             } else if(key != "|text") {

@@ -4,9 +4,9 @@
 Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 {
     homeView.show();
-    connect(&homeView, &HomeView::syncAction, this, &Application::transitionHomeViewToSyncView);
-    connect(&homeView, &HomeView::startButtonClicked, this, &Application::transitionHomeViewToStreamView);
-    connect(&streamView, &StreamView::backButtonClicked, this, &Application::transitionStreamViewToHomeView);
+    connect(&homeView, &HomeView::syncAction, this, &Application::transitionHomeToSync);
+    connect(&homeView, &HomeView::startButtonClicked, this, &Application::transitionHomeToStream);
+    connect(&streamView, &StreamView::backButtonClicked, this, &Application::transitionStreamToHome);
 
     connect(&homeView, &HomeView::aboutButtonClicked, this, &Application::transitionHomeToAbout);
     connect(&aboutView, &AboutView::backButtonClicked, this, &Application::transitionAboutToHome);
@@ -20,31 +20,30 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
     singleStreamView.setStyleSheet(masterStylesheet);
 }
 
-void Application::replyReady(QNetworkReply *reply)
-{
-    qDebug() << reply->rawHeader("ETag");
-    qDebug() << reply->size();
-    reply->deleteLater();
-}
+//void Application::replyReady(QNetworkReply *reply)
+//{
+//    qDebug() << reply->rawHeader("ETag");
+//    qDebug() << reply->size();
+//    reply->deleteLater();
+//}
 
-void Application::transitionHomeViewToSyncView()
+void Application::transitionHomeToSync()
 {
     syncView.show();
     homeView.hide();
 }
 
-void Application::transitionHomeViewToStreamView()
+void Application::transitionHomeToStream()
 {
     streamView.setStreamList(manager.streams.values());
     streamView.show();
     homeView.hide();
 }
 
-void Application::transitionStreamViewToHomeView()
+void Application::transitionStreamToHome()
 {
     homeView.show();
     streamView.hide();
-
 }
 
 void Application::transitionAboutToHome()

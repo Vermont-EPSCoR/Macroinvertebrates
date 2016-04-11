@@ -5,7 +5,7 @@ DataManager::DataManager(QObject *parent) : QObject(parent)
     setupLocalStorageDirectories();
     loadStreamsFromLocalStorage();
     loadInvertebratesFromLocalStorage();
-//    sync();
+    sync();
 }
 
 void DataManager::sync() {
@@ -49,7 +49,7 @@ void DataManager::syncStreamsToLocalStorage()
     streamQuery.addQueryItem("action", "query");
     streamQuery.addQueryItem("cmprop", "ids|title");
 
-    QJsonDocument doc = doc.fromJson(synchronouslyFetchUrl(streamQuery));
+    QJsonDocument doc = doc.fromJson(synchronouslyGetUrl(streamQuery));
 
     if(doc.isNull()) {
         qDebug() << "Doc is null/invalid.";
@@ -71,7 +71,7 @@ void DataManager::syncStreamsToLocalStorage()
     streamInvertebratesQuery.addQueryItem("export", "");
     streamInvertebratesQuery.addQueryItem("exportnowrap", "");
 
-    QByteArray result = synchronouslyFetchUrl(streamInvertebratesQuery);
+    QByteArray result = synchronouslyGetUrl(streamInvertebratesQuery);
     QXmlStreamReader xmlReader(result);
     StreamHandler handler;
 
@@ -109,7 +109,7 @@ void DataManager::syncInvertebratesToLocalStorage()
     invertebrateQuery.addQueryItem("action", "query");
     invertebrateQuery.addQueryItem("cmprop", "ids|title");
 
-    QJsonDocument doc = doc.fromJson(synchronouslyFetchUrl(invertebrateQuery));
+    QJsonDocument doc = doc.fromJson(synchronouslyGetUrl(invertebrateQuery));
     QStringList invertebrateTitles;
 
     if(doc.isNull()) {
@@ -127,7 +127,7 @@ void DataManager::syncInvertebratesToLocalStorage()
     streamInvertebratesQuery.addQueryItem("export", "");
     streamInvertebratesQuery.addQueryItem("exportnowrap", "");
 
-    QByteArray result = synchronouslyFetchUrl(streamInvertebratesQuery);
+    QByteArray result = synchronouslyGetUrl(streamInvertebratesQuery);
     QXmlStreamReader xmlReader(result);
     InvertebrateHandler handler;
 
@@ -138,6 +138,8 @@ void DataManager::syncInvertebratesToLocalStorage()
             invertebrates.insert(invertebrate.name, invertebrate);
         }
     }
+
+    syncInvertebrateImages();
 
     QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "invertebrates.data");
     QFile dataFile(invertebrateDataPath);
@@ -152,12 +154,12 @@ void DataManager::syncInvertebratesToLocalStorage()
     qDebug() << "Invertebrates completed";
 }
 
-QByteArray DataManager::synchronouslyFetchUrl(const QUrlQuery &query)
+QByteArray DataManager::synchronouslyGetUrl(const QUrlQuery &query)
 {
     QByteArray bytes;
 
     QNetworkRequest request(query.toString());
-    // Use of a waiter isn't the most reliable method
+    // Use of a waiter isn't the most reliable method, but it does work...
     QEventLoop waiter;
     auto conn = std::make_shared<QMetaObject::Connection>();
     *conn = connect(&manager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
@@ -214,4 +216,98 @@ void DataManager::loadStreamsFromLocalStorage()
         qDebug() << "Streams count: " << streams.count();
         emit localStreamsLoaded();
     }
+}
+
+void DataManager::cleanUpOldImages()
+{
+    //! TODO this stuff
+    // Create a set of local image names from the invertebrates
+    // iterate over the image directory
+    // remove images that are not in the images we want
+}
+
+void DataManager::syncInvertebrateImages()
+{
+    QStringList imageList;
+    QMap<QString, Invertebrate*> invertebrateImages;
+    imageList.reserve(invertebrates.count());
+
+    for(Invertebrate &invertebrate: invertebrates) {
+        imageList.append(invertebrate.imageFileRemote);
+        invertebrateImages.insert(invertebrate.imageFileRemote, &invertebrate);
+    }
+
+    qSort(imageList);
+
+    QUrlQuery imageQuery("http://wikieducator.org/api.php?action=query&iiurlwidth=400&prop=imageinfo&iiprop=url&format=json&titles=%@");
+    imageQuery.addQueryItem("action", "query");
+    imageQuery.addQueryItem("iiurlwidth", "400");
+    imageQuery.addQueryItem("prop", "imageinfo");
+    imageQuery.addQueryItem("iiprop", "url");
+    imageQuery.addQueryItem("format", "json");
+    imageQuery.addQueryItem("titles", imageList.join("|"));
+
+    qDebug() << imageList;
+
+    QJsonDocument doc = doc.fromJson(synchronouslyGetUrl(imageQuery));
+
+    if(doc.isNull()) {
+        qDebug() << "Doc is null/invalid in inverts.";
+    } else {
+        QJsonObject images = doc.object().value("query").toObject().value("pages").toObject();
+        for(const QJsonValue &value: images) {
+            if(value.toString().contains("File:Mosquito larva.jpg")) {
+                qDebug() << value.toString();
+            }
+            QJsonObject obj =  value.toObject();
+            QString title = obj.value("title").toString();
+            QString extension = title.split(".").last();
+            QString thumbUrl = obj.value("imageinfo").toArray().at(0).toObject().value("thumburl").toString();
+            QString localFileName = QString("%1%2%3.%4").arg(imagePath, directoryHelper.separator(), synchronouslyHeadEtag(thumbUrl).replace("\"",""), extension);
+
+            Invertebrate *invertebrate = invertebrateImages[title];
+
+            if(invertebrate == nullptr) {
+                // File:Mosquito_larva.jpg does this where the underscore turns into a space
+                // that underscore to space behavior isn't universal. how to handle?
+                qDebug() << "Title " << title << " results in a nullptr on lookup";
+            } else {
+                invertebrate->imageFileLocal = localFileName;
+                if(directoryHelper.exists(localFileName)) {
+                    invertebrate->imageIsReady = true;
+                    invertebrate->imageIsUpToDate = true;
+                } else {
+                    invertebrate->imageIsReady = false;
+                    invertebrate->imageIsUpToDate = false;
+                }
+            }
+        }
+    }
+
+    for(auto &invertebrate: invertebrates) {
+        if(!invertebrate.imageIsReady) {
+            // do stuff
+        }
+    }
+}
+
+QString DataManager::synchronouslyHeadEtag(const QString &url)
+{
+    QString etag;
+
+    QNetworkRequest request(url);
+    // Use of a waiter isn't the most reliable method
+    QEventLoop waiter;
+    auto conn = std::make_shared<QMetaObject::Connection>();
+    *conn = connect(&manager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
+        etag.append(reply->rawHeader("ETag"));
+        reply->deleteLater();
+        QObject::disconnect(*conn);
+    });
+
+    connect(&manager, &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
+    manager.get(request);
+    waiter.exec();
+
+    return etag;
 }
