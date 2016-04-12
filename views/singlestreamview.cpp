@@ -23,7 +23,14 @@ void SingleStreamView::setInvertebrateList(const QList<Invertebrate> &invertebra
     ui->listWidget->clear();
 
     for(const Invertebrate& invertebrate: invertebrates) {
-        QListWidgetItem *item = new QListWidgetItem(QIcon(placeHolder), invertebrate.name);
+        QListWidgetItem *item;
+
+        if(invertebrate.imageIsReady) {
+            item = new QListWidgetItem(QIcon(invertebrate.imageFileLocal), invertebrate.name);
+        } else {
+            item = new QListWidgetItem(QIcon(placeHolder), invertebrate.name);
+        }
+
         item->setTextAlignment(Qt::AlignCenter);
         ui->listWidget->addItem(item);
     }

@@ -49,7 +49,7 @@ void DataManager::syncStreamsToLocalStorage()
     streamQuery.addQueryItem("action", "query");
     streamQuery.addQueryItem("cmprop", "ids|title");
 
-    QJsonDocument doc = doc.fromJson(synchronouslyGetUrl(streamQuery));
+    QJsonDocument doc = doc.fromJson(synchronouslyGetUrl(QString(streamQuery.toString())));
 
     if(doc.isNull()) {
         qDebug() << "Doc is null/invalid.";
@@ -71,7 +71,7 @@ void DataManager::syncStreamsToLocalStorage()
     streamInvertebratesQuery.addQueryItem("export", "");
     streamInvertebratesQuery.addQueryItem("exportnowrap", "");
 
-    QByteArray result = synchronouslyGetUrl(streamInvertebratesQuery);
+    QByteArray result = synchronouslyGetUrl(streamInvertebratesQuery.toString());
     QXmlStreamReader xmlReader(result);
     StreamHandler handler;
 
@@ -109,7 +109,7 @@ void DataManager::syncInvertebratesToLocalStorage()
     invertebrateQuery.addQueryItem("action", "query");
     invertebrateQuery.addQueryItem("cmprop", "ids|title");
 
-    QJsonDocument doc = doc.fromJson(synchronouslyGetUrl(invertebrateQuery));
+    QJsonDocument doc = doc.fromJson(synchronouslyGetUrl(invertebrateQuery.toString()));
     QStringList invertebrateTitles;
 
     if(doc.isNull()) {
@@ -127,7 +127,7 @@ void DataManager::syncInvertebratesToLocalStorage()
     streamInvertebratesQuery.addQueryItem("export", "");
     streamInvertebratesQuery.addQueryItem("exportnowrap", "");
 
-    QByteArray result = synchronouslyGetUrl(streamInvertebratesQuery);
+    QByteArray result = synchronouslyGetUrl(streamInvertebratesQuery.toString());
     QXmlStreamReader xmlReader(result);
     InvertebrateHandler handler;
 
@@ -154,22 +154,25 @@ void DataManager::syncInvertebratesToLocalStorage()
     qDebug() << "Invertebrates completed";
 }
 
-QByteArray DataManager::synchronouslyGetUrl(const QUrlQuery &query)
+QByteArray DataManager::synchronouslyGetUrl(const QString &query)
 {
     QByteArray bytes;
+    QNetworkAccessManager temporaryManager;
 
-    QNetworkRequest request(query.toString());
+    QNetworkRequest request(query);
+    request.setRawHeader("SetCookieHeader", "type=tmprequest");
+
     // Use of a waiter isn't the most reliable method, but it does work...
     QEventLoop waiter;
     auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = connect(&manager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
+    *conn = connect(&temporaryManager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
         bytes = reply->readAll();
         reply->deleteLater();
         QObject::disconnect(*conn);
     });
 
-    connect(&manager, &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
-    manager.get(request);
+    connect(&temporaryManager, &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
+    temporaryManager.get(request);
     waiter.exec();
 
     return bytes;
@@ -247,9 +250,9 @@ void DataManager::syncInvertebrateImages()
     imageQuery.addQueryItem("format", "json");
     imageQuery.addQueryItem("titles", imageList.join("|"));
 
-    qDebug() << imageList;
+//    qDebug() << imageList;
 
-    QJsonDocument doc = doc.fromJson(synchronouslyGetUrl(imageQuery));
+    QJsonDocument doc = doc.fromJson(synchronouslyGetUrl(imageQuery.toString()));
 
     if(doc.isNull()) {
         qDebug() << "Doc is null/invalid in inverts.";
@@ -273,6 +276,7 @@ void DataManager::syncInvertebrateImages()
                 qDebug() << "Title " << title << " results in a nullptr on lookup";
             } else {
                 invertebrate->imageFileLocal = localFileName;
+                invertebrate->imageFileRemote = thumbUrl;
                 if(directoryHelper.exists(localFileName)) {
                     invertebrate->imageIsReady = true;
                     invertebrate->imageIsUpToDate = true;
@@ -285,8 +289,26 @@ void DataManager::syncInvertebrateImages()
     }
 
     for(auto &invertebrate: invertebrates) {
+        qDebug() << invertebrate.name;
         if(!invertebrate.imageIsReady) {
-            // do stuff
+            qDebug() << invertebrate.imageFileRemote;
+            qDebug() << "About to request image";
+            QByteArray bytes = synchronouslyGetUrl(invertebrate.imageFileRemote);
+
+            if(!bytes.isEmpty()) {
+                qDebug() << "bytes is not empty: " << bytes.length();
+                QFile img(invertebrate.imageFileLocal);
+                if(img.open(QFile::WriteOnly)) {
+                    img.write(bytes);
+                    img.close();
+
+                    invertebrate.imageIsReady = true;
+                } else {
+                    qDebug() << "Unable to write file";
+                }
+            } else {
+                qDebug() << "bytes is empty";
+            }
         }
     }
 }
@@ -296,17 +318,18 @@ QString DataManager::synchronouslyHeadEtag(const QString &url)
     QString etag;
 
     QNetworkRequest request(url);
+    QNetworkAccessManager temporaryManager;
     // Use of a waiter isn't the most reliable method
     QEventLoop waiter;
     auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = connect(&manager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
+    *conn = connect(&temporaryManager, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
         etag.append(reply->rawHeader("ETag"));
         reply->deleteLater();
         QObject::disconnect(*conn);
     });
 
-    connect(&manager, &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
-    manager.get(request);
+    connect(&temporaryManager, &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
+    temporaryManager.get(request);
     waiter.exec();
 
     return etag;

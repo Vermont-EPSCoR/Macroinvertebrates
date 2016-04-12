@@ -42,7 +42,7 @@ class DataManager : public QObject
     void loadInvertebratesFromLocalStorage();
     void loadStreamsFromLocalStorage();
 
-    QByteArray synchronouslyGetUrl(const QUrlQuery &query);
+    QByteArray synchronouslyGetUrl(const QString &query);
     QString synchronouslyHeadEtag(const QString &url);
 
 public:
