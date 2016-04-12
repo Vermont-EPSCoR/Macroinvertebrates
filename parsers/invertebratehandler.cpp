@@ -39,6 +39,7 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
             } else if(key == "|image") {
                 invertebrate.imageFileRemote = value;
             } else if(key == "|order") {
+                qDebug() << "value: " << value;
                 invertebrate.order = value;
             } else if(key != "|text") {
 //                qDebug() << "Key: " << key << " Value: " << value;

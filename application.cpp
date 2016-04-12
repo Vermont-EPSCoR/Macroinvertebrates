@@ -26,12 +26,18 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 
 void Application::transitionHomeToSync()
 {
+    syncView.resize(homeView.size());
+    syncView.move(homeView.pos());
+
     syncView.show();
     homeView.hide();
 }
 
 void Application::transitionHomeToStream()
 {
+    streamView.resize(homeView.size());
+    streamView.move(homeView.pos());
+
     streamView.setStreamList(manager.streams.values());
     streamView.show();
     homeView.hide();
@@ -39,18 +45,27 @@ void Application::transitionHomeToStream()
 
 void Application::transitionStreamToHome()
 {
+    homeView.resize(streamView.size());
+    homeView.move(streamView.pos());
+
     homeView.show();
     streamView.hide();
 }
 
 void Application::transitionAboutToHome()
 {
+    homeView.resize(aboutView.size());
+    homeView.move(aboutView.pos());
+
     homeView.show();
     aboutView.hide();
 }
 
 void Application::transitionHomeToAbout()
 {
+    aboutView.resize(homeView.size());
+    aboutView.move(homeView.pos());
+
     aboutView.show();
     homeView.hide();
 }
@@ -70,6 +85,9 @@ void Application::transitionStreamsToSingleStream(const QString &streamName)
 
     std::sort(invertebrates.begin(), invertebrates.end());
 
+    singleStreamView.resize(streamView.size());
+    singleStreamView.move(streamView.pos());
+
     singleStreamView.setInfo(invertebrates, streamName);
     singleStreamView.show();
     streamView.hide();
@@ -77,12 +95,18 @@ void Application::transitionStreamsToSingleStream(const QString &streamName)
 
 void Application::transitionSingleStreamToStreams()
 {
+    streamView.resize(singleStreamView.size());
+    streamView.move(singleStreamView.pos());
+
     streamView.show();
     singleStreamView.hide();
 }
 
 void Application::transitionSingleStreamToInvertebrate(const QString &invertebrate)
 {
+    invertebrateView.resize(singleStreamView.size());
+    invertebrateView.move(singleStreamView.pos());
+
     invertebrateView.setInfo(manager.invertebrates.value(invertebrate), singleStreamView.getStreamName());
     invertebrateView.show();
     singleStreamView.hide();
@@ -90,6 +114,9 @@ void Application::transitionSingleStreamToInvertebrate(const QString &invertebra
 
 void Application::transitionInvertebrateToSingleStream(const QString &streamName)
 {
+    singleStreamView.resize(invertebrateView.size());
+    singleStreamView.move(invertebrateView.pos());
+
     //! TODO move to a function
     // Duplicate code
     QList<Invertebrate> invertebrates;
