@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     parsers/streamhandler.cpp \
     parsers/invertebratehandler.cpp \
     views/aboutview.cpp \
-    views/singlestreamview.cpp
+    views/singlestreamview.cpp \
+    webdatasynchronizer.cpp
 
 HEADERS  += \
     application.h \
@@ -44,7 +45,8 @@ HEADERS  += \
     parsers/streamhandler.h \
     parsers/invertebratehandler.h \
     views/aboutview.h \
-    views/singlestreamview.h
+    views/singlestreamview.h \
+    webdatasynchronizer.h
 
 FORMS    += \
     views/homeview.ui \

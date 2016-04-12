@@ -5,10 +5,12 @@
 #include <QObject>
 #include <QFont>
 #include <QDebug>
+#include <QThreadPool>
 
 #include <algorithm>  // std::sort
 
 #include "datamanager.h"
+#include "webdatasynchronizer.h"
 
 #include "views/homeview.h"
 #include "views/syncview.h"

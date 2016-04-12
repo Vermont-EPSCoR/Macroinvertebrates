@@ -15,7 +15,7 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
     if(match.hasMatch()) {
         invertebrate.description = match.captured(1);
     } else {
-        qDebug() << "Something went wrong with the match";
+        qDebug() << "Something went wrong with the match: " << infoBox;
     }
 
     for(QString line: infoBox.split("\n", QString::SkipEmptyParts)) {
