@@ -23,6 +23,7 @@ public:
     QString placeHolder = "://media/invertebrate-placeholder.jpg";
 
     void setInfo(const QList<Invertebrate> &invertebrates, const QString &streamName);
+    void setListFont(const QFont &font);
     const QString &getStreamName();
 signals:
     void backButtonClicked();

@@ -46,3 +46,8 @@ const QString &SingleStreamView::getStreamName()
 {
     return streamName;
 }
+
+void SingleStreamView::setListFont(const QFont &font)
+{
+    ui->listWidget->setFont(font);
+}

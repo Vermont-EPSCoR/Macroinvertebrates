@@ -46,21 +46,33 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>100</width>
-        <height>100</height>
+        <width>300</width>
+        <height>300</height>
        </size>
       </property>
       <property name="movement">
        <enum>QListView::Static</enum>
       </property>
       <property name="flow">
-       <enum>QListView::TopToBottom</enum>
+       <enum>QListView::LeftToRight</enum>
+      </property>
+      <property name="isWrapping" stdset="0">
+       <bool>true</bool>
       </property>
       <property name="resizeMode">
        <enum>QListView::Adjust</enum>
       </property>
+      <property name="layoutMode">
+       <enum>QListView::Batched</enum>
+      </property>
+      <property name="spacing">
+       <number>20</number>
+      </property>
       <property name="viewMode">
        <enum>QListView::IconMode</enum>
+      </property>
+      <property name="uniformItemSizes">
+       <bool>true</bool>
       </property>
      </widget>
     </item>

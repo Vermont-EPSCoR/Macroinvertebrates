@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QObject>
+#include <QFont>
 #include <QDebug>
 
 #include <algorithm>  // std::sort
@@ -22,6 +23,8 @@ class Application : public QApplication
                                 "background-image: url(:/media/background-plain.png);"
                                 "background-position: top center;"
                                 "background-color: rgb(255, 255, 255);";
+
+    QFont listFont;
 
     AboutView aboutView;
     HomeView homeView;

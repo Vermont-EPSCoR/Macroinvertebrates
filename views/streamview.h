@@ -19,7 +19,7 @@ public:
     ~StreamView();
 
     void setStreamList(const QList<Stream> &streamList);
-
+    void setListFont(const QFont& font);
 private slots:
     void on_pushButton_clicked();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);

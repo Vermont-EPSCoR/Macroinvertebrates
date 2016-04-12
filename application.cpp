@@ -3,6 +3,7 @@
 
 Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 {
+    listFont = QFont("Times", 20, QFont::Bold);
     homeView.show();
     connect(&homeView, &HomeView::syncAction, this, &Application::transitionHomeToSync);
     connect(&homeView, &HomeView::startButtonClicked, this, &Application::transitionHomeToStream);
@@ -22,6 +23,9 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
     streamView.setStyleSheet(masterStylesheet);
     singleStreamView.setStyleSheet(masterStylesheet);
     invertebrateView.setStyleSheet(masterStylesheet);
+
+    streamView.setListFont(listFont);
+    singleStreamView.setListFont(listFont);
 }
 
 void Application::transitionHomeToSync()
