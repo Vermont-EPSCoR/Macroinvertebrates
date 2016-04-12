@@ -15,18 +15,22 @@ class SingleStreamView;
 class SingleStreamView : public QMainWindow
 {
     Q_OBJECT
-
+    QString streamName;
 public:
     explicit SingleStreamView(QWidget *parent = 0);
     ~SingleStreamView();
 
     QString placeHolder = "://media/invertebrate-placeholder.jpg";
 
-    void setInvertebrateList(const QList<Invertebrate> &invertebrates);
+    void setInfo(const QList<Invertebrate> &invertebrates, const QString &streamName);
+    const QString &getStreamName();
 signals:
     void backButtonClicked();
+    void invertebrateDoubleClicked(const QString &invertebrate);
 private slots:
     void on_pushButton_clicked();
+
+    void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
 
 private:
     Ui::SingleStreamView *ui;

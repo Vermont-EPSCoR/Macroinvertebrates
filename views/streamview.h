@@ -14,7 +14,6 @@ class StreamView;
 class StreamView : public QMainWindow
 {
     Q_OBJECT
-
 public:
     explicit StreamView(QWidget *parent = 0);
     ~StreamView();

@@ -14,6 +14,7 @@
 #include "views/streamview.h"
 #include "views/aboutview.h"
 #include "views/singlestreamview.h"
+#include "views/invertebrateview.h"
 
 class Application : public QApplication
 {
@@ -27,6 +28,7 @@ class Application : public QApplication
     SyncView syncView;
     StreamView streamView;
     SingleStreamView singleStreamView;
+    InvertebrateView invertebrateView;
 
     DataManager manager;
 public:
@@ -42,6 +44,9 @@ public slots:
 
     void transitionStreamsToSingleStream(const QString &streamName);
     void transitionSingleStreamToStreams();
+
+    void transitionSingleStreamToInvertebrate(const QString &invertebrate);
+    void transitionInvertebrateToSingleStream(const QString &streamName);
 };
 
 #endif // APPLICATION_H

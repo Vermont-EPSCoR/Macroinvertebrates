@@ -18,9 +18,10 @@ void SingleStreamView::on_pushButton_clicked()
     emit backButtonClicked();
 }
 
-void SingleStreamView::setInvertebrateList(const QList<Invertebrate> &invertebrates)
+void SingleStreamView::setInfo(const QList<Invertebrate> &invertebrates, const QString& streamName)
 {
     ui->listWidget->clear();
+    this->streamName = streamName;
 
     for(const Invertebrate& invertebrate: invertebrates) {
         QListWidgetItem *item;
@@ -34,4 +35,14 @@ void SingleStreamView::setInvertebrateList(const QList<Invertebrate> &invertebra
         item->setTextAlignment(Qt::AlignCenter);
         ui->listWidget->addItem(item);
     }
+}
+
+void SingleStreamView::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
+{
+    emit invertebrateDoubleClicked(item->text());
+}
+
+const QString &SingleStreamView::getStreamName()
+{
+    return streamName;
 }

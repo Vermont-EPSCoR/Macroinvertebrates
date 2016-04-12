@@ -14,18 +14,15 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
     connect(&streamView, &StreamView::singleStreamDoubleClicked, this, &Application::transitionStreamsToSingleStream);
     connect(&singleStreamView, &SingleStreamView::backButtonClicked, this, &Application::transitionSingleStreamToStreams);
 
+    connect(&singleStreamView, &SingleStreamView::invertebrateDoubleClicked, this, &Application::transitionSingleStreamToInvertebrate);
+    connect(&invertebrateView, &InvertebrateView::backButtonClicked, this, &Application::transitionInvertebrateToSingleStream);
+
     aboutView.setStyleSheet(masterStylesheet);
     syncView.setStyleSheet(masterStylesheet);
     streamView.setStyleSheet(masterStylesheet);
     singleStreamView.setStyleSheet(masterStylesheet);
+    invertebrateView.setStyleSheet(masterStylesheet);
 }
-
-//void Application::replyReady(QNetworkReply *reply)
-//{
-//    qDebug() << reply->rawHeader("ETag");
-//    qDebug() << reply->size();
-//    reply->deleteLater();
-//}
 
 void Application::transitionHomeToSync()
 {
@@ -73,8 +70,7 @@ void Application::transitionStreamsToSingleStream(const QString &streamName)
 
     std::sort(invertebrates.begin(), invertebrates.end());
 
-    qDebug() << "Showing " << streamName;
-    singleStreamView.setInvertebrateList(invertebrates);
+    singleStreamView.setInfo(invertebrates, streamName);
     singleStreamView.show();
     streamView.hide();
 }
@@ -83,4 +79,34 @@ void Application::transitionSingleStreamToStreams()
 {
     streamView.show();
     singleStreamView.hide();
+}
+
+void Application::transitionSingleStreamToInvertebrate(const QString &invertebrate)
+{
+    invertebrateView.setInfo(manager.invertebrates.value(invertebrate), singleStreamView.getStreamName());
+    invertebrateView.show();
+    singleStreamView.hide();
+}
+
+void Application::transitionInvertebrateToSingleStream(const QString &streamName)
+{
+    //! TODO move to a function
+    // Duplicate code
+    QList<Invertebrate> invertebrates;
+    Stream &stream = manager.streams[streamName];
+    invertebrates.reserve(stream.invertebrateList.length());
+
+    for(QString &invertebrateName: stream.invertebrateList) {
+        Invertebrate invertebrate = manager.invertebrates[invertebrateName];
+        if(!invertebrate.name.isNull()) {
+            invertebrates.append(invertebrate);
+        }
+    }
+
+    std::sort(invertebrates.begin(), invertebrates.end());
+    // End duplicate code
+
+    singleStreamView.setInfo(invertebrates, streamName);
+    singleStreamView.show();
+    invertebrateView.hide();
 }

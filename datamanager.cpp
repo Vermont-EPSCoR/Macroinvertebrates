@@ -5,7 +5,7 @@ DataManager::DataManager(QObject *parent) : QObject(parent)
     setupLocalStorageDirectories();
     loadStreamsFromLocalStorage();
     loadInvertebratesFromLocalStorage();
-    sync();
+//    sync();
 }
 
 void DataManager::sync() {
