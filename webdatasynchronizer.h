@@ -49,6 +49,7 @@ class WebDataSynchronizer : public QObject, public QRunnable
     QMap<QString, Stream> *streamsFromLocal;
 
     // Owned properties
+    QEventLoop loop;
     QString imagePath;
     QDir directoryHelper;
     QNetworkAccessManager *network;
@@ -57,7 +58,15 @@ class WebDataSynchronizer : public QObject, public QRunnable
     QMap<QString, Invertebrate> invertebratesFromWeb;
     QMap<QString, Stream> streamsFromWeb;
 
-    QString synchronouslyHeadEtag(const QUrl &url);
+    QString synchronouslyHeadEtag(const QUrl &url, bool *ok);
+    QNetworkReply *synchronouslyGetUrl(const QUrl &url, bool *ok);
+
+    void handleNetworkReplyForStreamList(QNetworkReply* reply);
+    void handleNetworkReplyForStreamData(QNetworkReply* reply);
+    void handleNetworkReplyForInvertebrateList(QNetworkReply* reply);
+    void handleNetworkReplyForInvertebrateData(QNetworkReply* reply);
+    void handleNetworkReplyForImageList(QNetworkReply* reply);
+    void handleNetworkReplyForImageData(QNetworkReply* reply);
 public:
     explicit WebDataSynchronizer(QObject *parent = 0);
     void setData(QMutex *mutex, QMap<QString, Invertebrate> *invertebrates, QMap<QString, Stream> *streams);
@@ -70,13 +79,6 @@ signals:
     void invertebrateSyncComplete();
     void imageSyncComplete();
 private slots:
-    void handleNetworkReplyForStreamList(QNetworkReply* reply);
-    void handleNetworkReplyForStreamData(QNetworkReply* reply);
-    void handleNetworkReplyForInvertebrateListing(QNetworkReply* reply);
-    void handleNetworkReplyForInvertebrateData(QNetworkReply* reply);
-    void handleNetworkReplyForImageList(QNetworkReply* reply);
-    void handleNetworkReplyForImageData(QNetworkReply* reply);
-
     void syncInvertebrates();
     void syncStreams();
     void syncImages();

@@ -21,6 +21,7 @@ class InvertebrateHandler
     QDir fileSystemHelper;
     QRegularExpression curlyBraceElement;
     QRegularExpression textBlock;
+    QRegularExpression textBlockWithoutStop;
 
     QString getLocalFileUrl(const QString &remoteFileUrl);
     QString getRemoteFileUrl(const QString &imageName);

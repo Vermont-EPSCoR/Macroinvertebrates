@@ -7,6 +7,9 @@ InvertebrateHandler::InvertebrateHandler()
 
     textBlock.setPattern("\\|text\\s*=\\s*(.+?)<!--Stop-->");
     textBlock.setPatternOptions(QRegularExpression::DotMatchesEverythingOption);
+
+    textBlockWithoutStop("\\|text\\s*=\\s*(.+?)");
+    textBlockWithoutStop.setPatternOptions(QRegularExpression::DotMatchesEverythingOption);
 }
 
 void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Invertebrate &invertebrate)
@@ -15,7 +18,12 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
     if(match.hasMatch()) {
         invertebrate.description = match.captured(1);
     } else {
-        qDebug() << "Something went wrong with the match: " << infoBox;
+        match = textBlockWithoutStop.match(infoBox);
+        if(match.hasMatch()) {
+            invertebrate.description = match.captured(1);
+        } else {
+            qDebug() << "Something went wrong with the match: " << infoBox;
+        }
     }
 
     for(QString line: infoBox.split("\n", QString::SkipEmptyParts)) {
@@ -39,7 +47,6 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
             } else if(key == "|image") {
                 invertebrate.imageFileRemote = value;
             } else if(key == "|order") {
-                qDebug() << "value: " << value;
                 invertebrate.order = value;
             } else if(key != "|text") {
 //                qDebug() << "Key: " << key << " Value: " << value;
