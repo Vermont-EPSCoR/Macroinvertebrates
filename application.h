@@ -5,6 +5,9 @@
 #include <QObject>
 #include <QFont>
 #include <QDebug>
+#include <QMap>
+#include <QString>
+#include <QMutex>
 #include <QThreadPool>
 
 #include <algorithm>  // std::sort
@@ -35,7 +38,9 @@ class Application : public QApplication
     SingleStreamView singleStreamView;
     InvertebrateView invertebrateView;
 
-    DataManager manager;
+    QMap<QString, Invertebrate> invertebrates;
+    QMap<QString, Stream> streams;
+    QMutex mutex;
 public:
     Application(int argc, char *argv[]);
 
@@ -53,6 +58,9 @@ public slots:
     void transitionSingleStreamToInvertebrate(const QString &invertebrate);
     void transitionInvertebrateToSingleStream(const QString &streamName);
 
+    void startSync();
+    void loadDataFromDisk();
+    void saveDataToDisk();
 };
 
 #endif // APPLICATION_H
