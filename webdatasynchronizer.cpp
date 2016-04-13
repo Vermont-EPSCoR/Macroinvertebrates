@@ -15,7 +15,8 @@ void WebDataSynchronizer::setData(QMutex *mutex, QMap<QString, Invertebrate> *in
 
 void WebDataSynchronizer::run()
 {
-    if(network.networkAccessible() == QNetworkAccessManager::Accessible) {
+    network = new QNetworkAccessManager();
+    if(network->networkAccessible() == QNetworkAccessManager::Accessible) {
         syncStreams();
         syncInvertebrates();
     } else {
@@ -45,7 +46,7 @@ void WebDataSynchronizer::syncStreams()
     qDebug() << url;
 
     QNetworkRequest request(url);
-    QNetworkReply *reply = network.get(request);
+    QNetworkReply *reply = network->get(request);
     connect(reply, &QNetworkReply::finished, [&]() { handleNetworkReplyForStreamList(reply);});
 }
 
@@ -85,7 +86,7 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
     url.setQuery(query);
 
     QNetworkRequest request(url);
-    QNetworkReply *nextReply = network.get(request);
+    QNetworkReply *nextReply = network->get(request);
     connect(nextReply, &QNetworkReply::finished, [&]() { handleNetworkReplyForStreamData(nextReply); });
 }
 
@@ -131,7 +132,7 @@ void WebDataSynchronizer::syncInvertebrates()
     url.setQuery(query);
 
     QNetworkRequest request(url);
-    QNetworkReply *nextReply = network.get(request);
+    QNetworkReply *nextReply = network->get(request);
     connect(nextReply, &QNetworkReply::finished, [&]() {handleNetworkReplyForInvertebrateListing(nextReply); });
 }
 
@@ -167,7 +168,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateListing(QNetworkReply
     url.setQuery(query);
 
     QNetworkRequest request(url);
-    QNetworkReply *nextReply = network.get(request);
+    QNetworkReply *nextReply = network->get(request);
     connect(nextReply, &QNetworkReply::finished, [&]() { handleNetworkReplyForInvertebrateData(nextReply); });
 }
 
@@ -215,7 +216,7 @@ void WebDataSynchronizer::syncImages()
     url.setQuery(query);
 
     QNetworkRequest request(url);
-    QNetworkReply *reply = network.get(request);
+    QNetworkReply *reply = network->get(request);
     connect(reply, &QNetworkReply::finished, [&]() { handleNetworkReplyForImageList(reply); });
 }
 
@@ -256,7 +257,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
             if(!directoryHelper.exists(localFileName)) {
                 imageCounter++;
                 QNetworkRequest request(thumbUrl);
-                QNetworkReply *nextReply = network.get(request);
+                QNetworkReply *nextReply = network->get(request);
 
                 connect(nextReply, &QNetworkReply::finished, [&]() { handleNetworkReplyForImageData(nextReply); });
             } else {
@@ -343,4 +344,8 @@ void WebDataSynchronizer::finalize()
 }
 
 WebDataSynchronizer::~WebDataSynchronizer()
-{}
+{
+    if(network != nullptr) {
+        network->deleteLater();
+    }
+}

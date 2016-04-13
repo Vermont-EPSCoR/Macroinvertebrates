@@ -51,7 +51,7 @@ class WebDataSynchronizer : public QObject, public QRunnable
     // Owned properties
     QString imagePath;
     QDir directoryHelper;
-    QNetworkAccessManager network;
+    QNetworkAccessManager *network;
     QAtomicInt imageCounter = 0;
     bool isOk = true;
     QMap<QString, Invertebrate> invertebratesFromWeb;
