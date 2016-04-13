@@ -52,6 +52,7 @@ public slots:
 
     void transitionSingleStreamToInvertebrate(const QString &invertebrate);
     void transitionInvertebrateToSingleStream(const QString &streamName);
+
 };
 
 #endif // APPLICATION_H

@@ -1,6 +1,7 @@
 #ifndef WEBDATASYNCHRONIZER_H
 #define WEBDATASYNCHRONIZER_H
 
+#include <QAtomicInt>
 #include <QByteArray>
 #include <QDebug>
 #include <QDir>
@@ -33,7 +34,8 @@
 
 enum class WebDataSynchonizerExitStatus {
     SUCCEEDED,
-    FAILED
+    FAILED_RUNTIME,
+    FAILED_NETWORK_ACCESS
 };
 
 class WebDataSynchronizer : public QObject, public QRunnable
@@ -45,8 +47,10 @@ class WebDataSynchronizer : public QObject, public QRunnable
     QMap<QString, Stream> *streamsFromLocal;
 
     // Owned properties
+    QString imagePath;
     QDir directoryHelper;
     QNetworkAccessManager network;
+    QAtomicInt imageCounter = 0;
     bool isOk = true;
     QMap<QString, Invertebrate> invertebratesFromWeb;
     QMap<QString, Stream> streamsFromWeb;
@@ -64,11 +68,12 @@ signals:
     void invertebrateSyncComplete();
     void imageSyncComplete();
 private slots:
-    void handleNetworkReplyForStreamListing(QNetworkReply* reply);
+    void handleNetworkReplyForStreamList(QNetworkReply* reply);
     void handleNetworkReplyForStreamData(QNetworkReply* reply);
     void handleNetworkReplyForInvertebrateListing(QNetworkReply* reply);
     void handleNetworkReplyForInvertebrateData(QNetworkReply* reply);
-    void handleNetworkReplyForImage(QNetworkReply* reply);
+    void handleNetworkReplyForImageList(QNetworkReply* reply);
+    void handleNetworkReplyForImageData(QNetworkReply* reply);
 
     void syncInvertebrates();
     void syncStreams();
