@@ -19,6 +19,7 @@ void WebDataSynchronizer::run()
         syncStreams();
         syncInvertebrates();
     } else {
+        qDebug() << "No network access";
         emit finished(WebDataSynchonizerExitStatus::FAILED_NETWORK_ACCESS);
     }
 }
@@ -73,7 +74,7 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
     }
 
     // MediaWiki API recommends sorting so caching is more likely to occur
-    qSort(streamTitles);
+    std::sort(streamTitles.begin(), streamTitles.end());
 
     QUrl url("http://wikieducator.org/api.php");
     QUrlQuery query;

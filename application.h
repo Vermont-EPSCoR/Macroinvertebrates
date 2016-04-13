@@ -12,7 +12,6 @@
 
 #include <algorithm>  // std::sort
 
-#include "datamanager.h"
 #include "webdatasynchronizer.h"
 
 #include "views/homeview.h"
@@ -29,8 +28,6 @@ class Application : public QApplication
                                 "background-position: top center;"
                                 "background-color: rgb(255, 255, 255);";
 
-    QFont listFont;
-
     AboutView aboutView;
     HomeView homeView;
     SyncView syncView;
@@ -41,6 +38,11 @@ class Application : public QApplication
     QMap<QString, Invertebrate> invertebrates;
     QMap<QString, Stream> streams;
     QMutex mutex;
+
+    QString dataPath;
+    QString imagePath;
+
+    void setupUiTransitions();
 public:
     Application(int argc, char *argv[]);
 

@@ -26,6 +26,8 @@
 #include <QUrlQuery>
 #include <QXmlStreamReader>
 
+#include <algorithm>
+
 #include "models/invertebrate.h"
 #include "models/stream.h"
 
