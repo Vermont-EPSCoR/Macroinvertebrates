@@ -53,8 +53,19 @@ QDataStream &operator>>(QDataStream &ds, Invertebrate &obj) {
 QDebug operator<<(QDebug debug, const Invertebrate &invertebrate)
 {
     QDebugStateSaver saver(debug);
-    QStringList list{invertebrate.name, invertebrate.commonName, invertebrate.description, invertebrate.family, invertebrate.flyName, invertebrate.genus, invertebrate.imageFileLocal, invertebrate.imageFileRemote};
-    debug.nospace() << "(" << list.join(", ") << ")";
+    debug.nospace() << "(\n" <<
+                       "    commonName: " << invertebrate.commonName << ",\n" <<
+                       "    description: " << invertebrate.description << ",\n" <<
+                       "    family: " << invertebrate.family << ",\n" <<
+                       "    flyName: " << invertebrate.flyName << ",\n" <<
+                       "    genus: " << invertebrate.genus << ",\n" <<
+                       "    imageFileLocal: " << invertebrate.imageFileLocal << ",\n" <<
+                       "    imageFileRemote: " << invertebrate.imageFileRemote << ",\n" <<
+                       "    imageIsReady: " << invertebrate.imageIsReady << ",\n" <<
+                       "    imageIsUpToDate: " << invertebrate.imageIsUpToDate << ",\n" <<
+                       "    name: " << invertebrate.name << ",\n" <<
+                       "    order: " << invertebrate.order <<
+                       "\n)";
 
     return debug;
 }
