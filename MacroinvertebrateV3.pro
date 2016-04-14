@@ -19,11 +19,8 @@ SOURCES += main.cpp \
     views/streamview.cpp \
     views/invertebrateview.cpp \
     views/syncview.cpp \
-    models/streamlist.cpp \
     models/stream.cpp \
-    models/invertebratelist.cpp \
     models/invertebrate.cpp \
-    datamanager.cpp \
     parsers/streamhandler.cpp \
     parsers/invertebratehandler.cpp \
     views/aboutview.cpp \
@@ -37,11 +34,8 @@ HEADERS  += \
     views/streamview.h \
     views/invertebrateview.h \
     views/syncview.h \
-    models/streamlist.h \
     models/stream.h \
-    models/invertebratelist.h \
     models/invertebrate.h \
-    datamanager.h \
     parsers/streamhandler.h \
     parsers/invertebratehandler.h \
     views/aboutview.h \

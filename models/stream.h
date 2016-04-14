@@ -5,8 +5,6 @@
 #include <QStringList>
 #include <QDataStream>
 
-#include "invertebratelist.h"
-
 class Stream
 {
 public:

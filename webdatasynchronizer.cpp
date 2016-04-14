@@ -297,7 +297,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
             qDebug() << thumbUrl;
 
             bool ok;
-            QString etag = synchronouslyHeadEtag(thumbUrl, &ok).replace("\"","");
+            QString etag = synchronouslyHeadEtag(thumbUrl, &ok);
 
             if(!ok) {
                 qDebug() << "Unable to HEAD the ETag";
@@ -322,6 +322,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
                 }
             } else {
                 invertebrate->imageIsReady = true;
+                invertebrate->imageFileLocal = localFileName;
                 qDebug() << "Image: " << localFileName << " already exists";
             }
         } else {
@@ -375,7 +376,7 @@ QString WebDataSynchronizer::synchronouslyHeadEtag(const QUrl &url, bool *ok)
     network->get(request);
     waiter.exec();
 
-    return etag;
+    return etag.replace("\"","");
 }
 
 void WebDataSynchronizer::finalize()

@@ -16,6 +16,7 @@ InvertebrateView::~InvertebrateView()
 void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamName)
 {
     this->streamName = streamName;
+    qDebug() << invertebrate;
     ui->label_description->setText(invertebrate.description);
     ui->label_family->setText(invertebrate.family);
     ui->label_genus->setText(invertebrate.genus);

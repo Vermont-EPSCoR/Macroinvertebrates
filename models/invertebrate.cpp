@@ -49,3 +49,12 @@ QDataStream &operator>>(QDataStream &ds, Invertebrate &obj) {
 
     return ds;
 }
+
+QDebug operator<<(QDebug debug, const Invertebrate &invertebrate)
+{
+    QDebugStateSaver saver(debug);
+    QStringList list{invertebrate.name, invertebrate.commonName, invertebrate.description, invertebrate.family, invertebrate.flyName, invertebrate.genus, invertebrate.imageFileLocal, invertebrate.imageFileRemote};
+    debug.nospace() << "(" << list.join(", ") << ")";
+
+    return debug;
+}

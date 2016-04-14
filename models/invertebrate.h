@@ -34,5 +34,6 @@ public:
 
 QDataStream &operator<<(QDataStream &dataStream, const Invertebrate &invertebrate);
 QDataStream &operator>>(QDataStream &dataStream, Invertebrate &invertebrate);
+QDebug operator<<(QDebug debug, const Invertebrate &invertebrate);
 
 #endif // INVERTEBRATE_H

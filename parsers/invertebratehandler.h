@@ -32,6 +32,8 @@ public:
     ~InvertebrateHandler();
     void parseInfoboxToInvertebrate(const QString &infoBox, Invertebrate &invertebrate);
     Invertebrate parse(const QString &text);
+
+    static bool validate(const Invertebrate& invertebrate);
 };
 
 #endif // INVERTEBRATEHANDLER_H

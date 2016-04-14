@@ -53,6 +53,53 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
             }
         }
     }
+
+#ifndef QT_NO_DEBUG_OUTPUT
+    if(!validate(invertebrate)) {
+        qDebug() << "INFOBOX FOLLOWS" << "\n" << infoBox;
+    }
+#endif
+}
+
+bool InvertebrateHandler::validate(const Invertebrate &invertebrate)
+{
+    QStringList nullAttributes;
+
+//    commonName is commonly missing and may not be an error?
+//    if(invertebrate.commonName.isEmpty()) {
+//        nullAttributes << "commonName";
+//    }
+
+    if(invertebrate.description.isEmpty()) {
+        nullAttributes << "description/title";
+    }
+
+    if(invertebrate.imageFileRemote.isEmpty()) {
+        nullAttributes << "image";
+    }
+
+    if(invertebrate.family.isEmpty()) {
+        nullAttributes << "family";
+    }
+
+    if(invertebrate.genus.isEmpty()) {
+        nullAttributes << "genus";
+    }
+
+    if(invertebrate.name.isEmpty()) {
+        nullAttributes << "name";
+    }
+
+    if(invertebrate.order.isEmpty()) {
+        nullAttributes << "family";
+    }
+
+    if(nullAttributes.count() > 0) {
+        qDebug() << "INVALID INVERTEBRATE: " << invertebrate.name << " IS MISSING: " << nullAttributes;
+        return false;
+    }
+
+    return true;
 }
 
 Invertebrate InvertebrateHandler::parse(const QString &text)
@@ -62,7 +109,7 @@ Invertebrate InvertebrateHandler::parse(const QString &text)
     QRegularExpressionMatchIterator iter = curlyBraceElement.globalMatch(text);
     while(iter.hasNext()) {
         QRegularExpressionMatch match = iter.next();
-        QString matchingString = match.captured(1);
+        QString matchingString = match.captured(1).replace("''", "\"");
 
         parseInfoboxToInvertebrate(matchingString, invertebrate);
     }

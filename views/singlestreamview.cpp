@@ -21,6 +21,7 @@ void SingleStreamView::on_pushButton_clicked()
 void SingleStreamView::setInfo(const QList<Invertebrate> &invertebrates, const QString& streamName)
 {
     ui->listWidget->clear();
+    ui->listWidget->scrollToTop();
     this->streamName = streamName;
 
     for(const Invertebrate& invertebrate: invertebrates) {

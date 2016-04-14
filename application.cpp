@@ -20,8 +20,6 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 
     streamView.setListFont(listFont);
     singleStreamView.setListFont(listFont);
-
-    startSync();
 }
 
 void Application::transitionHomeToSync()
@@ -142,27 +140,28 @@ void Application::loadDataFromDisk()
 {
     QDir directoryHelper;
     bool result = directoryHelper.mkpath(imagePath);
+    bool needToSync = false;
 
     QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
     if(!directoryHelper.exists(streamDataPath)) {
 //        emit noLocalDataFound();
-        return;
+        needToSync = true;
     } else {
         QFile dataFile(streamDataPath);
         if(!dataFile.open(QFile::ReadOnly)) {
             qDebug() << "Unable to open local invertebrate data";
 //            emit noLocalDataFound();
             return;
+        } else {
+            QDataStream loader(&dataFile);
+            loader >> streams;
         }
-
-        QDataStream loader(&dataFile);
-        loader >> streams;
     }
 
     QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "invertebrate.data");
-    if(!directoryHelper.exists(streamDataPath)) {
+    if(!directoryHelper.exists(invertebrateDataPath) || needToSync) {
 //        emit noLocalDataFound();
-        return;
+        needToSync = true;
     } else {
         QFile dataFile(invertebrateDataPath);
         if(!dataFile.open(QFile::ReadOnly)) {
@@ -173,18 +172,16 @@ void Application::loadDataFromDisk()
 
         QDataStream loader(&dataFile);
         loader >> invertebrates;
+    }
 
-        for(const Invertebrate& i: invertebrates) {
-            qDebug() << i.name << " : " << i.imageFileLocal;
-        }
+    if(needToSync) {
+        qDebug() << "Starting Sync";
+        startSync();
     }
 }
 
 void Application::saveDataToDisk()
 {
-    qDebug() << streams.count();
-    qDebug() << invertebrates.count();
-
     QDir directoryHelper;
     QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
     QFile streamDataFile(streamDataPath);
