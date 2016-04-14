@@ -173,7 +173,38 @@ void Application::loadDataFromDisk()
 
         QDataStream loader(&dataFile);
         loader >> invertebrates;
+
+        for(const Invertebrate& i: invertebrates) {
+            qDebug() << i.name << " : " << i.imageFileLocal;
+        }
     }
+}
+
+void Application::saveDataToDisk()
+{
+    qDebug() << streams.count();
+    qDebug() << invertebrates.count();
+
+    QDir directoryHelper;
+    QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
+    QFile streamDataFile(streamDataPath);
+    if(!streamDataFile.open(QFile::WriteOnly)) {
+        qDebug() << "Unable to open local invertebrate data";
+        return;
+    }
+
+    QDataStream streamSaver(&streamDataFile);
+    streamSaver << streams;
+
+    QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "invertebrate.data");
+    QFile invertebrateDataFile(invertebrateDataPath);
+    if(!invertebrateDataFile.open(QFile::WriteOnly)) {
+        qDebug() << "Unable to open local invertebrate data";
+        return;
+    }
+
+    QDataStream invertebrateSaver(&invertebrateDataFile);
+    invertebrateSaver << invertebrates;
 }
 
 void Application::setupUiTransitions()
@@ -194,8 +225,14 @@ void Application::setupUiTransitions()
 
 void Application::startSync()
 {
-    WebDataSynchronizer *syncer = new WebDataSynchronizer();
+    syncer = new WebDataSynchronizer();
     syncer->setData(&mutex, &invertebrates, &streams);
-
+    connect(syncer, &WebDataSynchronizer::finished, [&](WebDataSynchonizerExitStatus status) {
+        if(status == WebDataSynchonizerExitStatus::SUCCEEDED) {
+            saveDataToDisk();
+        } else {
+            qDebug() << "NOT savingToDisk";
+        }
+    });
     QThreadPool::globalInstance()->start(syncer);
 }

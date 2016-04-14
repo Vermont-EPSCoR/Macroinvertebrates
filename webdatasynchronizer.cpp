@@ -20,14 +20,13 @@ void WebDataSynchronizer::run()
     if(network->networkAccessible() == QNetworkAccessManager::Accessible) {
         syncStreams();
         syncInvertebrates();
+        finalize();
     } else {
         qDebug() << "No network access";
         emit finished(WebDataSynchonizerExitStatus::FAILED_NETWORK_ACCESS);
     }
 
-    connect(this, &WebDataSynchronizer::finished, [&]() { loop.quit(); });
-    loop.processEvents();
-    qDebug() << "Stopping";
+    network->deleteLater();
 }
 
 void WebDataSynchronizer::syncStreams()
@@ -163,15 +162,16 @@ void WebDataSynchronizer::syncInvertebrates()
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *reply)
 {
     qDebug() << "handleNetworkReplyForInvertebrateList";
-    reply->deleteLater();
     if(reply->error() != QNetworkReply::NoError || !isOk) {
         qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
+        reply->deleteLater();
         isOk = false;
         return;
     }
 
     QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
     QStringList invertebrateTitles;
+    reply->deleteLater();
 
     if(doc.isNull()) {
         qDebug() << "Doc is null/invalid in inverts.";
@@ -198,6 +198,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
     if(ok) {
         handleNetworkReplyForInvertebrateData(nextReply);
     } else {
+        qDebug() << "get FAILED for " << url;
         isOk = false;
         nextReply->deleteLater();
     }
@@ -205,15 +206,16 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
 
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *reply)
 {
-    reply->deleteLater();
     if(reply->error() != QNetworkReply::NoError || !isOk) {
         qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
+        reply->deleteLater();
         isOk = false;
         return;
     }
 
     QXmlStreamReader xmlReader(reply->readAll());
     InvertebrateHandler handler;
+    reply->deleteLater();
 
     while(!xmlReader.atEnd()) {
         xmlReader.readNextStartElement();
@@ -230,7 +232,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *r
 void WebDataSynchronizer::syncImages()
 {
     // if this method is only ever called from the end of the invertebrate sync there's no need to check for isOk
-
+    qDebug() << "syncing images?";
     QStringList titles;
     for(Invertebrate &invertebrate: invertebratesFromWeb) {
         titles.append(invertebrate.imageFileRemote);
@@ -246,24 +248,31 @@ void WebDataSynchronizer::syncImages()
     query.addQueryItem("titles", titles.join("|"));
     url.setQuery(query);
 
-    QNetworkRequest request(url);
-    QNetworkReply *reply = network->get(request);
-    connect(reply, &QNetworkReply::finished, [&]() { handleNetworkReplyForImageList(reply); });
+    bool ok;
+    QNetworkReply *reply = synchronouslyGetUrl(url, &ok);
+
+    if(ok) {
+        handleNetworkReplyForImageList(reply);
+    } else {
+        isOk = false;
+        reply->deleteLater();
+    }
 }
 
 void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
 {
-    reply->deleteLater();
     if(reply->error() != QNetworkReply::NoError || !isOk) {
         qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
+        reply->deleteLater();
         isOk = false;
         return;
     }
 
     QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+    reply->deleteLater();
 
     if(doc.isNull()) {
-        qDebug() << "Doc is null/invalid in inverts.";
+        qDebug() << "Doc is null/invalid in ImageList.";
         isOk = false;
         return;
     }
@@ -281,28 +290,38 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
         Invertebrate* invertebrate = invertebrateImages[title];
 
         if(invertebrate != nullptr) {
+            qDebug() << "Getting image for " << invertebrate->name;
             QString extension = title.split(".").last();
             QUrl thumbUrl(obj.value("imageinfo").toArray().at(0).toObject().value("thumburl").toString());
+
+            qDebug() << thumbUrl;
+
             bool ok;
             QString etag = synchronouslyHeadEtag(thumbUrl, &ok).replace("\"","");
 
             if(!ok) {
+                qDebug() << "Unable to HEAD the ETag";
                 continue;
             }
 
             QString localFileName = QString("%1%2%3.%4").arg(imagePath, directoryHelper.separator(), etag, extension);
 
             if(!directoryHelper.exists(localFileName)) {
-                imageCounter++;
-
                 QNetworkReply *nextReply = synchronouslyGetUrl(thumbUrl, &ok);
 
                 if(ok) {
-                    handleNetworkReplyForImageData(nextReply);
+                    if(handleNetworkReplyForImageData(nextReply, localFileName)) {
+                        invertebrate->imageIsReady = true;
+                        invertebrate->imageFileLocal = localFileName;
+                    } else {
+                        invertebrate->imageIsReady = false;
+                    }
                 } else {
-                    // pass
+                    qDebug() << "Request was not ok";
+                    invertebrate->imageIsReady = false;
                 }
             } else {
+                invertebrate->imageIsReady = true;
                 qDebug() << "Image: " << localFileName << " already exists";
             }
         } else {
@@ -311,38 +330,25 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
     }
 }
 
-void WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply)
+bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, QString localFileName)
 {
-    imageCounter--;
-
     if(reply->error() != QNetworkReply::NoError || reply->bytesAvailable() == 0) {
-        if(imageCounter == 0) {
-            finalize();
-        }
         qDebug() << "Something went wrong in image request: " << reply->url().toString();
-        return;
+        return false;
     }
 
-    QString contentType = reply->rawHeader("Content-Type");
-    QString extension = "jpg";
-    if(contentType.contains("png")) {
-        extension = "png";
-    }
-
-    QString localFileName = QString("%1%2%3.%4").arg(imagePath, directoryHelper.separator(), reply->rawHeader("ETag").replace("\"",""), extension);
     QFile imageFile(localFileName);
     if(!imageFile.open(QFile::WriteOnly)) {
         qDebug() << "Unable to open image file: " << localFileName;
-        return;
+        return false;
     }
 
     imageFile.write(reply->readAll());
     imageFile.close();
+    reply->deleteLater();
     qDebug() << "Image updated: " << localFileName;
 
-    if(imageCounter == 0) {
-        finalize();
-    }
+    return true;
 }
 
 QString WebDataSynchronizer::synchronouslyHeadEtag(const QUrl &url, bool *ok)
@@ -352,19 +358,21 @@ QString WebDataSynchronizer::synchronouslyHeadEtag(const QUrl &url, bool *ok)
     QNetworkRequest request(url);
     // Use of an event loop waiter isn't the most reliable method
     QEventLoop waiter;
-    QNetworkReply *reply = nullptr;
-    connect(reply, &QNetworkReply::finished, [&]() {
+    auto conn = std::make_shared<QMetaObject::Connection>();
+    *conn = connect(network, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
         if(reply->error() != QNetworkReply::NoError) {
             *ok = false;
         } else {
             *ok = true;
             etag.append(reply->rawHeader("ETag"));
-            reply->deleteLater();
         }
+
+        reply->deleteLater();
+        QObject::disconnect(*conn);
     });
 
-    connect(reply, &QNetworkReply::finished, &waiter, &QEventLoop::quit);
-    reply = network->get(request);
+    connect(network, &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
+    network->get(request);
     waiter.exec();
 
     return etag;
@@ -378,22 +386,19 @@ void WebDataSynchronizer::finalize()
         return;
     }
 
-    qDebug() << "Finalizing ok";
     QMutexLocker locker(mutex);
     streamsFromLocal->clear();
     streamsFromLocal->unite(streamsFromWeb);
 
     invertebratesFromLocal->clear();
     invertebratesFromLocal->unite(invertebratesFromWeb);
+    locker.unlock();
 
     emit finished(WebDataSynchonizerExitStatus::SUCCEEDED);
 }
 
 WebDataSynchronizer::~WebDataSynchronizer()
 {
-    if(network != nullptr) {
-        network->deleteLater();
-    }
 }
 
 QNetworkReply *WebDataSynchronizer::synchronouslyGetUrl(const QUrl &url, bool *ok)

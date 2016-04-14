@@ -35,6 +35,7 @@ class Application : public QApplication
     SingleStreamView singleStreamView;
     InvertebrateView invertebrateView;
 
+    WebDataSynchronizer *syncer; // owned by the threadpool's global instance. don't delete
     QMap<QString, Invertebrate> invertebrates;
     QMap<QString, Stream> streams;
     QMutex mutex;

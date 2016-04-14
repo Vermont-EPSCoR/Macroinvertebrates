@@ -1,7 +1,6 @@
 #ifndef WEBDATASYNCHRONIZER_H
 #define WEBDATASYNCHRONIZER_H
 
-#include <QAtomicInt>
 #include <QByteArray>
 #include <QDebug>
 #include <QDir>
@@ -34,27 +33,27 @@
 #include "parsers/invertebratehandler.h"
 #include "parsers/streamhandler.h"
 
+
 enum class WebDataSynchonizerExitStatus {
     SUCCEEDED,
     FAILED_RUNTIME,
     FAILED_NETWORK_ACCESS
 };
 
+
 class WebDataSynchronizer : public QObject, public QRunnable
 {
     Q_OBJECT
     // Owned by the application instance
-    QMutex* mutex;
-    QMap<QString, Invertebrate> *invertebratesFromLocal;
-    QMap<QString, Stream> *streamsFromLocal;
+    QMutex* mutex = nullptr;
+    QMap<QString, Invertebrate> *invertebratesFromLocal = nullptr;
+    QMap<QString, Stream> *streamsFromLocal = nullptr;
 
     // Owned properties
     QEventLoop loop;
     QString imagePath;
     QDir directoryHelper;
-    QNetworkAccessManager *network;
-    QAtomicInt imageCounter = 0;
-    bool isOk = true;
+    QNetworkAccessManager *network = nullptr;
     QMap<QString, Invertebrate> invertebratesFromWeb;
     QMap<QString, Stream> streamsFromWeb;
 
@@ -66,12 +65,14 @@ class WebDataSynchronizer : public QObject, public QRunnable
     void handleNetworkReplyForInvertebrateList(QNetworkReply* reply);
     void handleNetworkReplyForInvertebrateData(QNetworkReply* reply);
     void handleNetworkReplyForImageList(QNetworkReply* reply);
-    void handleNetworkReplyForImageData(QNetworkReply* reply);
+    bool handleNetworkReplyForImageData(QNetworkReply* reply, QString localFileName);
 public:
     explicit WebDataSynchronizer(QObject *parent = 0);
-    void setData(QMutex *mutex, QMap<QString, Invertebrate> *invertebrates, QMap<QString, Stream> *streams);
     ~WebDataSynchronizer();
+    void setData(QMutex *mutex, QMap<QString, Invertebrate> *invertebrates, QMap<QString, Stream> *streams);
     void run();
+
+    bool isOk = true;
 signals:
     void statusUpdateMessage(const QString &status);
     void finished(WebDataSynchonizerExitStatus status);  // on SUCCEEDED Application should serialize, and optionally notify the user

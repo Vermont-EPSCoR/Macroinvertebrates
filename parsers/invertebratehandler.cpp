@@ -8,7 +8,7 @@ InvertebrateHandler::InvertebrateHandler()
     textBlock.setPattern("\\|text\\s*=\\s*(.+?)<!--Stop-->");
     textBlock.setPatternOptions(QRegularExpression::DotMatchesEverythingOption);
 
-    textBlockWithoutStop("\\|text\\s*=\\s*(.+?)");
+    textBlockWithoutStop.setPattern("\\|text\\s*=\\s*(.+?)");
     textBlockWithoutStop.setPatternOptions(QRegularExpression::DotMatchesEverythingOption);
 }
 
