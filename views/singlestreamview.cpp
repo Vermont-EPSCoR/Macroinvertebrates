@@ -52,3 +52,8 @@ void SingleStreamView::setListFont(const QFont &font)
 {
     ui->listWidget->setFont(font);
 }
+
+void SingleStreamView::on_listWidget_itemClicked(QListWidgetItem *item)
+{
+    emit invertebrateDoubleClicked(item->text());
+}

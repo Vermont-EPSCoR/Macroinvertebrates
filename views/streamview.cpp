@@ -36,3 +36,8 @@ void StreamView::setListFont(const QFont &font)
 {
     ui->listWidget->setFont(font);
 }
+
+void StreamView::on_listWidget_itemClicked(QListWidgetItem *item)
+{
+    emit singleStreamDoubleClicked(item->text());
+}

@@ -24,6 +24,8 @@ private slots:
     void on_pushButton_clicked();
     void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
 
+    void on_listWidget_itemClicked(QListWidgetItem *item);
+
 signals:
     void backButtonClicked();
     void singleStreamDoubleClicked(const QString& streamName);
