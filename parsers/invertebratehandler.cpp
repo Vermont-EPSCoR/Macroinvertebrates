@@ -16,11 +16,11 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
 {
     QRegularExpressionMatch match = textBlock.match(infoBox);
     if(match.hasMatch()) {
-        invertebrate.description = match.captured(1);
+        invertebrate.description = match.captured(1).trimmed();
     } else {
         match = textBlockWithoutStop.match(infoBox);
         if(match.hasMatch()) {
-            invertebrate.description = match.captured(1);
+            invertebrate.description = match.captured(1).trimmed();
         } else {
             qDebug() << "Something went wrong with the match: " << infoBox;
         }
