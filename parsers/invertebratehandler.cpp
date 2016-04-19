@@ -55,9 +55,9 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
     }
 
 #ifndef QT_NO_DEBUG_OUTPUT
-    if(!validate(invertebrate)) {
-        qDebug() << "INFOBOX FOLLOWS" << "\n" << infoBox;
-    }
+//    if(!validate(invertebrate)) {
+//        qDebug() << "INFOBOX FOLLOWS" << "\n" << infoBox;
+//    }
 #endif
 }
 

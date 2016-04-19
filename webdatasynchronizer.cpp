@@ -92,21 +92,33 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
     QUrl url("http://wikieducator.org/api.php");
     QUrlQuery query;
-    query.addQueryItem("titles", streamTitles.join("|"));
     query.addQueryItem("action", "query");
     query.addQueryItem("export", "");
     query.addQueryItem("exportnowrap", "");
-    url.setQuery(query);
 
+    int i = 0;
     bool ok;
-    QNetworkReply *nextReply = synchronouslyGetUrl(url, &ok);
 
-    if(ok) {
-        handleNetworkReplyForStreamData(nextReply);
-    } else {
-        isOk = false;
-        nextReply->deleteLater();
-    }
+    do {
+        int batchStart = i * batchSize;
+        int batchEnd = batchStart + batchSize;
+        QStringList streamTitlesBatch = streamTitles.mid(batchStart, batchEnd);
+
+        query.removeAllQueryItems("titles");
+        query.addQueryItem("titles", streamTitlesBatch.join("|"));
+        url.setQuery(query);
+
+        QNetworkReply *nextReply = synchronouslyGetUrl(url, &ok);
+
+        if(ok) {
+            handleNetworkReplyForStreamData(nextReply);
+        } else {
+            isOk = false;
+            nextReply->deleteLater();
+        }
+
+        i++;
+    } while((i * batchSize) <= streamTitles.count());
 }
 
 void WebDataSynchronizer::handleNetworkReplyForStreamData(QNetworkReply *reply)
@@ -184,27 +196,43 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
 
     QJsonArray invertebrateValues = doc.object().value("query").toObject().value("categorymembers").toArray();
     for(const QJsonValue &value: invertebrateValues) {
-        invertebrateTitles.append(value.toObject().value("title").toString());
+        QString streamName = value.toObject().value("title").toString().trimmed();
+        if(!streamName.isEmpty()) {
+            invertebrateTitles.append(streamName);
+        }
     }
+
+    std::sort(invertebrateTitles.begin(), invertebrateTitles.end());
 
     QUrl url("http://wikieducator.org/api.php");
     QUrlQuery query;
-    query.addQueryItem("titles", invertebrateTitles.join("|"));
     query.addQueryItem("action", "query");
     query.addQueryItem("export", "");
     query.addQueryItem("exportnowrap", "");
-    url.setQuery(query);
 
+    int i = 0;
     bool ok;
-    QNetworkReply *nextReply = synchronouslyGetUrl(url, &ok);
 
-    if(ok) {
-        handleNetworkReplyForInvertebrateData(nextReply);
-    } else {
-        qDebug() << "get FAILED for " << url;
-        isOk = false;
-        nextReply->deleteLater();
-    }
+    do {
+        int batchStart = i * batchSize;
+        int batchEnd = batchStart + batchSize;
+        QStringList invertebrateTitlesBatch = invertebrateTitles.mid(batchStart, batchEnd);
+
+        query.removeAllQueryItems("titles");
+        query.addQueryItem("titles", invertebrateTitlesBatch.join("|"));
+        url.setQuery(query);
+        QNetworkReply *nextReply = synchronouslyGetUrl(url, &ok);
+
+        if(ok) {
+            handleNetworkReplyForInvertebrateData(nextReply);
+        } else {
+            qDebug() << "get FAILED for " << url;
+            isOk = false;
+            nextReply->deleteLater();
+        }
+
+        i++;
+    } while((i * batchSize) <= invertebrateTitles.count());
 }
 
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *reply)
