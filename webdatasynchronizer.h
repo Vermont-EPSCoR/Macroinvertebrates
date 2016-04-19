@@ -2,7 +2,9 @@
 #define WEBDATASYNCHRONIZER_H
 
 #include <QByteArray>
+#include <QCryptographicHash>
 #include <QDebug>
+#include <QDateTime>
 #include <QDir>
 #include <QEventLoop>
 #include <QJsonArray>
@@ -18,6 +20,7 @@
 #include <QNetworkRequest>
 #include <QObject>
 #include <QRunnable>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QString>
 #include <QThread>
@@ -44,6 +47,8 @@ enum class WebDataSynchonizerExitStatus {
 class WebDataSynchronizer : public QObject, public QRunnable
 {
     Q_OBJECT
+    int batchSize = 50;
+
     // Owned by the application instance
     QMutex* mutex = nullptr;
     QMap<QString, Invertebrate> *invertebratesFromLocal = nullptr;
@@ -56,8 +61,8 @@ class WebDataSynchronizer : public QObject, public QRunnable
     QNetworkAccessManager *network = nullptr;
     QMap<QString, Invertebrate> invertebratesFromWeb;
     QMap<QString, Stream> streamsFromWeb;
+    QDateTime lastUpdate;
 
-    QString synchronouslyHeadEtag(const QUrl &url, bool *ok);
     QNetworkReply *synchronouslyGetUrl(const QUrl &url, bool *ok);
 
     void handleNetworkReplyForStreamList(QNetworkReply* reply);

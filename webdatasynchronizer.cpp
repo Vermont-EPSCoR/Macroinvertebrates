@@ -4,6 +4,9 @@ WebDataSynchronizer::WebDataSynchronizer(QObject *parent) : QObject(parent)
 {
     QString dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     imagePath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "images");
+
+    QSettings settings;
+    lastUpdate = settings.value("lastUpdate").toDateTime();
 }
 
 void WebDataSynchronizer::setData(QMutex *mutex, QMap<QString, Invertebrate> *invertebrates, QMap<QString, Stream> *streams)
@@ -243,7 +246,7 @@ void WebDataSynchronizer::syncImages()
     query.addQueryItem("action", "query");
     query.addQueryItem("iiurlwidth", "400");
     query.addQueryItem("prop", "imageinfo");
-    query.addQueryItem("iiprop", "url");
+    query.addQueryItem("iiprop", "url|timestamp|sha1");
     query.addQueryItem("format", "json");
     query.addQueryItem("titles", titles.join("|"));
     url.setQuery(query);
@@ -283,6 +286,9 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
     }
 
     QJsonObject images = doc.object().value("query").toObject().value("pages").toObject();
+    QCryptographicHash hasher(QCryptographicHash::Sha256);
+    bool ok;
+
     for(const QJsonValue &value: images) {
         QJsonObject obj =  value.toObject();
         QString title = obj.value("title").toString();
@@ -291,20 +297,16 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
 
         if(invertebrate != nullptr) {
             qDebug() << "Getting image for " << invertebrate->name;
-            QString extension = title.split(".").last();
-            QUrl thumbUrl(obj.value("imageinfo").toArray().at(0).toObject().value("thumburl").toString());
+            QString extension = title.split(".").last().toLower();
+            QJsonObject imageInfo = obj.value("imageinfo").toArray().at(0).toObject();
+            QUrl thumbUrl(imageInfo.value("thumburl").toString());
+            QString sha = imageInfo.value("sha1").toString();
 
-            qDebug() << thumbUrl;
+            hasher.reset();
+            hasher.addData(title.toUtf8());
+            hasher.addData(sha.toUtf8());
 
-            bool ok;
-            QString etag = synchronouslyHeadEtag(thumbUrl, &ok);
-
-            if(!ok) {
-                qDebug() << "Unable to HEAD the ETag";
-                continue;
-            }
-
-            QString localFileName = QString("%1%2%3.%4").arg(imagePath, directoryHelper.separator(), etag, extension);
+            QString localFileName = QString("%1%2%3.%4").arg(imagePath, directoryHelper.separator(), hasher.result().toHex(), extension);
 
             if(!directoryHelper.exists(localFileName)) {
                 QNetworkReply *nextReply = synchronouslyGetUrl(thumbUrl, &ok);
@@ -340,7 +342,7 @@ bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, Q
 
     QFile imageFile(localFileName);
     if(!imageFile.open(QFile::WriteOnly)) {
-        qDebug() << "Unable to open image file: " << localFileName;
+        qDebug() << "Unable to open image file: " << localFileName << " | " << imageFile.errorString();
         return false;
     }
 
@@ -350,33 +352,6 @@ bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, Q
     qDebug() << "Image updated: " << localFileName;
 
     return true;
-}
-
-QString WebDataSynchronizer::synchronouslyHeadEtag(const QUrl &url, bool *ok)
-{
-    QString etag;
-
-    QNetworkRequest request(url);
-    // Use of an event loop waiter isn't the most reliable method
-    QEventLoop waiter;
-    auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = connect(network, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
-        if(reply->error() != QNetworkReply::NoError) {
-            *ok = false;
-        } else {
-            *ok = true;
-            etag.append(reply->rawHeader("ETag"));
-        }
-
-        reply->deleteLater();
-        QObject::disconnect(*conn);
-    });
-
-    connect(network, &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
-    network->get(request);
-    waiter.exec();
-
-    return etag.replace("\"","");
 }
 
 void WebDataSynchronizer::finalize()

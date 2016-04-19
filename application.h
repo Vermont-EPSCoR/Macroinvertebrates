@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QMap>
 #include <QString>
+#include <QSettings>
 #include <QMutex>
 #include <QThreadPool>
 
@@ -34,6 +35,8 @@ class Application : public QApplication
     StreamView streamView;
     SingleStreamView singleStreamView;
     InvertebrateView invertebrateView;
+
+    QSettings settings;
 
     WebDataSynchronizer *syncer; // owned by the threadpool's global instance. don't delete
     QMap<QString, Invertebrate> invertebrates;

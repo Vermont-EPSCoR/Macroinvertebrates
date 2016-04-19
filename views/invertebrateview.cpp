@@ -23,7 +23,7 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamN
     if(invertebrate.imageIsReady) {
         ui->label_image->setPixmap(QPixmap(invertebrate.imageFileLocal));
     } else {
-        // Nothing to do because the placeholder is the default image
+        ui->label_image->setPixmap(QPixmap(":/media/invertebrate-placeholder.jpg"));
     }
     ui->label_order->setText(invertebrate.order);
     ui->label_title->setText(invertebrate.name);

@@ -3,10 +3,15 @@
 
 Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 {
+    setOrganizationDomain("epscor.uvm.edu");
+    setOrganizationName("EPSCOR");
+    setApplicationName("Macroinvertebrates");
+
     dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     imagePath = QString("%1%2%3").arg(dataPath, QDir::separator(), "images");
 
     loadDataFromDisk();
+    startSync();
     setupUiTransitions();
 
     QFont listFont("Times", 20);
