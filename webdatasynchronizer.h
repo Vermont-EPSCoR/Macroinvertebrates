@@ -20,6 +20,7 @@
 #include <QNetworkRequest>
 #include <QObject>
 #include <QRunnable>
+#include <QScopedPointerDeleteLater>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QString>

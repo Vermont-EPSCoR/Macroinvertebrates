@@ -20,6 +20,8 @@ InvertebrateHandler::InvertebrateHandler()
 
 void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Invertebrate &invertebrate)
 {
+//    if(infoBox.contains())
+
     QRegularExpressionMatch match = textBlock.match(infoBox);
     if(match.hasMatch()) {
         invertebrate.description = match.captured(1).trimmed();

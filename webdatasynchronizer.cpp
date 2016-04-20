@@ -23,6 +23,10 @@ void WebDataSynchronizer::run()
     if(network->networkAccessible() == QNetworkAccessManager::Accessible) {
         syncStreams();
         syncInvertebrates();
+
+        emit invertebrateSyncComplete();
+        syncImages();
+
         finalize();
     } else {
         qDebug() << "No network access";
@@ -51,13 +55,12 @@ void WebDataSynchronizer::syncStreams()
     url.setQuery(query);
 
     bool ok;
-    QNetworkReply *reply = synchronouslyGetUrl(url, &ok);
+    QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(url, &ok));
 
     if(ok) {
-        handleNetworkReplyForStreamList(reply);
+        handleNetworkReplyForStreamList(reply.data());
     } else {
         isOk = false;
-        reply->deleteLater();
     }
 }
 
@@ -65,12 +68,10 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 {
     if(isOk == false) {
         qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
-        reply->deleteLater();
         return;
     }
 
     QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-    reply->deleteLater();
 
     if(doc.isNull()) {
         qDebug() << "Doc is null/invalid.";
@@ -84,10 +85,15 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
     for(const QJsonValue &value: streamValues) {
         streamTitles.append(value.toObject().value("title").toString());
+
+        if(streamTitles.last().contains("Blepharicera")) {
+            qDebug() << streamTitles.last();
+        }
     }
 
     // MediaWiki API recommends sorting so caching is more likely to occur
     std::sort(streamTitles.begin(), streamTitles.end());
+    std::unique(streamTitles.begin(), streamTitles.end());
 
     QUrl url("http://wikieducator.org/api.php");
     QUrlQuery query;
@@ -107,13 +113,12 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
         query.addQueryItem("titles", streamTitlesBatch.join("|"));
         url.setQuery(query);
 
-        QNetworkReply *nextReply = synchronouslyGetUrl(url, &ok);
+        QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> nextReply(synchronouslyGetUrl(url, &ok));
 
         if(ok) {
-            handleNetworkReplyForStreamData(nextReply);
+            handleNetworkReplyForStreamData(nextReply.data());
         } else {
             isOk = false;
-            nextReply->deleteLater();
         }
 
         i++;
@@ -122,7 +127,6 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
 void WebDataSynchronizer::handleNetworkReplyForStreamData(QNetworkReply *reply)
 {
-    reply->deleteLater();
     if(reply->error() != QNetworkReply::NoError || !isOk) {
         qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
         isOk = false;
@@ -163,29 +167,25 @@ void WebDataSynchronizer::syncInvertebrates()
     url.setQuery(query);
 
     bool ok;
-    QNetworkReply *nextReply = synchronouslyGetUrl(url, &ok);
+    QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> nextReply(synchronouslyGetUrl(url, &ok));
 
     if(ok) {
-        handleNetworkReplyForInvertebrateList(nextReply);
+        handleNetworkReplyForInvertebrateList(nextReply.data());
     } else {
         isOk = false;
-        nextReply->deleteLater();
     }
 }
 
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *reply)
 {
-    qDebug() << "handleNetworkReplyForInvertebrateList";
     if(reply->error() != QNetworkReply::NoError || !isOk) {
         qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
-        reply->deleteLater();
         isOk = false;
         return;
     }
 
     QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
     QStringList invertebrateTitles;
-    reply->deleteLater();
 
     if(doc.isNull()) {
         qDebug() << "Doc is null/invalid in inverts.";
@@ -202,6 +202,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
     }
 
     std::sort(invertebrateTitles.begin(), invertebrateTitles.end());
+    std::unique(invertebrateTitles.begin(), invertebrateTitles.end());
 
     QUrl url("http://wikieducator.org/api.php");
     QUrlQuery query;
@@ -220,14 +221,13 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
         query.removeAllQueryItems("titles");
         query.addQueryItem("titles", invertebrateTitlesBatch.join("|"));
         url.setQuery(query);
-        QNetworkReply *nextReply = synchronouslyGetUrl(url, &ok);
+        QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> nextReply(synchronouslyGetUrl(url, &ok));
 
         if(ok) {
-            handleNetworkReplyForInvertebrateData(nextReply);
+            handleNetworkReplyForInvertebrateData(nextReply.data());
         } else {
             qDebug() << "get FAILED for " << url;
             isOk = false;
-            nextReply->deleteLater();
         }
 
         i++;
@@ -238,14 +238,12 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *r
 {
     if(reply->error() != QNetworkReply::NoError || !isOk) {
         qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
-        reply->deleteLater();
         isOk = false;
         return;
     }
 
     QXmlStreamReader xmlReader(reply->readAll());
     InvertebrateHandler handler;
-    reply->deleteLater();
 
     while(!xmlReader.atEnd()) {
         xmlReader.readNextStartElement();
@@ -254,9 +252,6 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *r
             invertebratesFromWeb.insert(invertebrate.name, invertebrate);
         }
     }
-
-    emit invertebrateSyncComplete();
-    syncImages();
 }
 
 void WebDataSynchronizer::syncImages()
@@ -268,6 +263,9 @@ void WebDataSynchronizer::syncImages()
         titles.append(invertebrate.imageFileRemote);
     }
 
+    std::sort(titles.begin(), titles.end());
+    std::unique(titles.begin(), titles.end());
+
     QUrl url("http://wikieducator.org/api.php");
     QUrlQuery query;
     query.addQueryItem("action", "query");
@@ -275,31 +273,41 @@ void WebDataSynchronizer::syncImages()
     query.addQueryItem("prop", "imageinfo");
     query.addQueryItem("iiprop", "url|timestamp|sha1");
     query.addQueryItem("format", "json");
-    query.addQueryItem("titles", titles.join("|"));
-    url.setQuery(query);
 
+    int i = 0;
     bool ok;
-    QNetworkReply *reply = synchronouslyGetUrl(url, &ok);
 
-    if(ok) {
-        handleNetworkReplyForImageList(reply);
-    } else {
-        isOk = false;
-        reply->deleteLater();
-    }
+    do {
+        int batchStart = i * batchSize;
+        int batchEnd = batchStart + batchSize;
+
+        QStringList imageTitlesBatch = titles.mid(batchStart, batchEnd);
+
+        query.removeAllQueryItems("titles");
+        query.addQueryItem("titles", imageTitlesBatch.join("|"));
+        url.setQuery(query);
+
+        QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(url, &ok));
+
+        if(ok) {
+            handleNetworkReplyForImageList(reply.data());
+        } else {
+            isOk = false;
+        }
+
+        i++;
+    } while((i * batchSize) <= titles.count());
 }
 
 void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
 {
     if(reply->error() != QNetworkReply::NoError || !isOk) {
         qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
-        reply->deleteLater();
         isOk = false;
         return;
     }
 
     QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-    reply->deleteLater();
 
     if(doc.isNull()) {
         qDebug() << "Doc is null/invalid in ImageList.";
@@ -320,10 +328,11 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
         QJsonObject obj =  value.toObject();
         QString title = obj.value("title").toString();
 
+        qDebug() << "TITLE: " << title;
+
         Invertebrate* invertebrate = invertebrateImages[title];
 
         if(invertebrate != nullptr) {
-//            qDebug() << "Getting image for " << invertebrate->name;
             QString extension = title.split(".").last().toLower();
             QJsonObject imageInfo = obj.value("imageinfo").toArray().at(0).toObject();
             QUrl thumbUrl(imageInfo.value("thumburl").toString());
@@ -346,14 +355,18 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
                         invertebrate->imageIsReady = false;
                     }
                 } else {
-                    qDebug() << "Request was not ok";
+                    qDebug() << "Request was not ok: " << thumbUrl << " " << nextReply->errorString();
                     invertebrate->imageIsReady = false;
                 }
             } else {
                 invertebrate->imageIsReady = true;
                 invertebrate->imageFileLocal = localFileName;
-//                qDebug() << "Image: " << localFileName << " already exists";
             }
+
+//            if(invertebrate->name == "Blepharicera" || invertebrate->name == "Blephariceridae") {
+//                qDebug() << invertebrate;
+//                qDebug() << "\nEND Blepharicera\n\n\n";
+//            }
         } else {
             qDebug() << "Unable to load Invertebrate with image: " << title;
         }
@@ -362,6 +375,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
 
 bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, QString localFileName)
 {
+    QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> replyPtr(reply);
     if(reply->error() != QNetworkReply::NoError || reply->bytesAvailable() == 0) {
         qDebug() << "Something went wrong in image request: " << reply->url().toString();
         return false;
@@ -375,7 +389,6 @@ bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, Q
 
     imageFile.write(reply->readAll());
     imageFile.close();
-    reply->deleteLater();
 
     return true;
 }
