@@ -4,12 +4,18 @@ InvertebrateHandler::InvertebrateHandler()
 {
     curlyBraceElement.setPattern("{{InsectSection(.+?)}}");
     curlyBraceElement.setPatternOptions(QRegularExpression::DotMatchesEverythingOption);
+    curlyBraceElement.optimize();
 
     textBlock.setPattern("\\|text\\s*=\\s*(.+?)<!--Stop-->");
     textBlock.setPatternOptions(QRegularExpression::DotMatchesEverythingOption);
+    textBlock.optimize();
 
-    textBlockWithoutStop.setPattern("\\|text\\s*=\\s*(.+?)");
+    textBlockWithoutStop.setPattern("\\|text\\s*=\\s*(.+?)$");
     textBlockWithoutStop.setPatternOptions(QRegularExpression::DotMatchesEverythingOption);
+    textBlockWithoutStop.optimize();
+
+    wikiStyleLink.setPattern("\\[http[^ ]+ ([^]]+)\\]");
+    wikiStyleLink.optimize();
 }
 
 void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Invertebrate &invertebrate)
@@ -25,6 +31,8 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
             qDebug() << "Something went wrong with the match: " << infoBox;
         }
     }
+
+    fixWikiLinks(invertebrate);
 
     for(QString line: infoBox.split("\n", QString::SkipEmptyParts)) {
         QStringList pair = line.split(QRegularExpression(" ?= ?"));
@@ -119,3 +127,12 @@ Invertebrate InvertebrateHandler::parse(const QString &text)
 
 InvertebrateHandler::~InvertebrateHandler()
 {}
+
+void InvertebrateHandler::fixWikiLinks(Invertebrate &invertebrate)
+{
+    QRegularExpressionMatchIterator iter = wikiStyleLink.globalMatch(invertebrate.description);
+    while(iter.hasNext()) {
+        QRegularExpressionMatch match = iter.next();
+        invertebrate.description = invertebrate.description.replace(match.captured(0), match.captured(1));
+    }
+}

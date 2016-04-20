@@ -54,7 +54,6 @@ void WebDataSynchronizer::syncStreams()
     QNetworkReply *reply = synchronouslyGetUrl(url, &ok);
 
     if(ok) {
-        qDebug() << url;
         handleNetworkReplyForStreamList(reply);
     } else {
         isOk = false;
@@ -324,7 +323,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
         Invertebrate* invertebrate = invertebrateImages[title];
 
         if(invertebrate != nullptr) {
-            qDebug() << "Getting image for " << invertebrate->name;
+//            qDebug() << "Getting image for " << invertebrate->name;
             QString extension = title.split(".").last().toLower();
             QJsonObject imageInfo = obj.value("imageinfo").toArray().at(0).toObject();
             QUrl thumbUrl(imageInfo.value("thumburl").toString());
@@ -353,7 +352,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
             } else {
                 invertebrate->imageIsReady = true;
                 invertebrate->imageFileLocal = localFileName;
-                qDebug() << "Image: " << localFileName << " already exists";
+//                qDebug() << "Image: " << localFileName << " already exists";
             }
         } else {
             qDebug() << "Unable to load Invertebrate with image: " << title;
@@ -377,7 +376,6 @@ bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, Q
     imageFile.write(reply->readAll());
     imageFile.close();
     reply->deleteLater();
-    qDebug() << "Image updated: " << localFileName;
 
     return true;
 }

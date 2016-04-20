@@ -22,11 +22,14 @@ class InvertebrateHandler
     QRegularExpression curlyBraceElement;
     QRegularExpression textBlock;
     QRegularExpression textBlockWithoutStop;
+    QRegularExpression wikiStyleLink;
 
     QString getLocalFileUrl(const QString &remoteFileUrl);
     QString getRemoteFileUrl(const QString &imageName);
 
     bool localFileIsPresent(const QString &localFileUrl);
+
+    void fixWikiLinks(Invertebrate &invertebrate);
 public:
     InvertebrateHandler();
     ~InvertebrateHandler();
