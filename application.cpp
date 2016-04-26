@@ -220,6 +220,7 @@ void Application::startSync()
         }
     });
 
+    connect(syncer, &WebDataSynchronizer::aboutStringParsed, &aboutView, &AboutView::updateAbout);
     connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
     QThreadPool::globalInstance()->start(syncer);
 }

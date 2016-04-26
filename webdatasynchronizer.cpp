@@ -27,6 +27,12 @@ void WebDataSynchronizer::run()
         emit invertebrateSyncComplete();
         syncImages();
 
+        bool ok;
+        QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(QUrl("http://wikieducator.org/api.php?action=parse&page=AboutStreamsApp&format=xml"), &ok));
+        if(ok) {
+            handleNetworkReplyForAbout(reply.data());
+        }
+
         finalize();
     } else {
         qDebug() << "No network access";
@@ -454,4 +460,36 @@ void WebDataSynchronizer::stop()
 {
     qDebug() << "Setting isOk to false";
     isOk = false;
+}
+
+void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
+{
+    if(reply->error() != QNetworkReply::NoError || !isOk) {
+        return;
+    }
+
+    QXmlStreamReader xmlReader(reply->readAll());
+    QString htmlStub;
+
+    while(!xmlReader.atEnd()) {
+        xmlReader.readNextStartElement();
+        if(xmlReader.name() == "text") {
+            htmlStub = xmlReader.readElementText();
+        }
+    }
+
+    QGumboDocument doc = QGumboDocument::parse(htmlStub);
+    QGumboNodes paragraphs = doc.rootNode().getElementsByTagName(HtmlTag::P);
+    QStringList paragraphList;
+    for(QGumboNode node: paragraphs) {
+        QString trimmed = node.innerText().trimmed();
+
+        if(!trimmed.isEmpty()) {
+            paragraphList << trimmed.prepend('\t');
+        }
+    }
+
+    if(!paragraphList.isEmpty()) {
+        emit aboutStringParsed(paragraphList.join("\n\n"));
+    }
 }

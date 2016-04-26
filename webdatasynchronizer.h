@@ -32,12 +32,14 @@
 
 #include <algorithm>
 
+#include <qgumbodocument.h>
+#include <qgumbonode.h>
+
 #include "models/invertebrate.h"
 #include "models/stream.h"
 
 #include "parsers/invertebratehandler.h"
 #include "parsers/streamhandler.h"
-
 
 enum class WebDataSynchonizerExitStatus {
     SUCCEEDED,
@@ -73,6 +75,7 @@ class WebDataSynchronizer : public QObject, public QRunnable
     void handleNetworkReplyForInvertebrateData(QNetworkReply* reply);
     void handleNetworkReplyForImageList(QNetworkReply* reply);
     bool handleNetworkReplyForImageData(QNetworkReply* reply, QString localFileName);
+    void handleNetworkReplyForAbout(QNetworkReply* reply);
 public:
     explicit WebDataSynchronizer(QObject *parent = 0);
     ~WebDataSynchronizer();
@@ -88,6 +91,7 @@ signals:
     void streamSyncComplete();
     void invertebrateSyncComplete();
     void imageSyncComplete();
+    void aboutStringParsed(const QString& about);
 private slots:
     void syncInvertebrates();
     void syncStreams();

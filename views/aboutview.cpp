@@ -17,3 +17,8 @@ void AboutView::on_pushButton_clicked()
 {
     emit backButtonClicked();
 }
+
+void AboutView::updateAbout(const QString &about)
+{
+    ui->label->setText(about);
+}

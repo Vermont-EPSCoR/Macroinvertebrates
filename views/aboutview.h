@@ -15,6 +15,9 @@ public:
     explicit AboutView(QWidget *parent = 0);
     ~AboutView();
 
+public slots:
+    void updateAbout(const QString& about);
+
 private slots:
     void on_pushButton_clicked();
 
