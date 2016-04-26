@@ -120,23 +120,6 @@ void Application::transitionInvertebrateToSingleStream(const QString &streamName
     singleStreamView.resize(invertebrateView.size());
     singleStreamView.move(invertebrateView.pos());
 
-    //! TODO move to a function
-    // Duplicate code
-    QList<Invertebrate> invertebratesList;
-    Stream &stream = streams[streamName];
-    invertebratesList.reserve(stream.invertebrateList.length());
-
-    for(QString &invertebrateName: stream.invertebrateList) {
-        Invertebrate invertebrate = invertebrates[invertebrateName];
-        if(!invertebrate.name.isNull()) {
-            invertebratesList.append(invertebrate);
-        }
-    }
-
-    std::sort(invertebratesList.begin(), invertebratesList.end());
-    // End duplicate code
-
-    singleStreamView.setInfo(invertebratesList, streamName);
     singleStreamView.show();
     invertebrateView.hide();
 }

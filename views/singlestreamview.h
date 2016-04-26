@@ -30,11 +30,7 @@ signals:
     void invertebrateDoubleClicked(const QString &invertebrate);
 private slots:
     void on_pushButton_clicked();
-
-    void on_listWidget_itemDoubleClicked(QListWidgetItem *item);
-
     void on_listWidget_itemClicked(QListWidgetItem *item);
-
 private:
     Ui::SingleStreamView *ui;
 };

@@ -38,11 +38,6 @@ void SingleStreamView::setInfo(const QList<Invertebrate> &invertebrates, const Q
     }
 }
 
-void SingleStreamView::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
-{
-    emit invertebrateDoubleClicked(item->text());
-}
-
 const QString &SingleStreamView::getStreamName()
 {
     return streamName;
