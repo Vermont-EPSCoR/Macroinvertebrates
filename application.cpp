@@ -236,5 +236,7 @@ void Application::startSync()
             qDebug() << "NOT savingToDisk";
         }
     });
+
+    connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
     QThreadPool::globalInstance()->start(syncer);
 }

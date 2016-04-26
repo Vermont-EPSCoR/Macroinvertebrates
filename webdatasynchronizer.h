@@ -7,6 +7,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QEventLoop>
+
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -79,6 +80,8 @@ public:
     void run();
 
     bool isOk = true;
+public slots:
+    void stop();
 signals:
     void statusUpdateMessage(const QString &status);
     void finished(WebDataSynchonizerExitStatus status);  // on SUCCEEDED Application should serialize, and optionally notify the user

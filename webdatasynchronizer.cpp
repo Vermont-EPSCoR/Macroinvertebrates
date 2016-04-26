@@ -66,7 +66,7 @@ void WebDataSynchronizer::syncStreams()
 
 void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 {
-    if(isOk == false) {
+    if(!isOk) {
         qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
         return;
     }
@@ -115,10 +115,11 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
         QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> nextReply(synchronouslyGetUrl(url, &ok));
 
-        if(ok) {
+        if(ok && isOk) {
             handleNetworkReplyForStreamData(nextReply.data());
         } else {
             isOk = false;
+            return;
         }
 
         i++;
@@ -201,6 +202,11 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
         }
     }
 
+    if(!isOk) {
+        qDebug() << "Not ok";
+        return;
+    }
+
     std::sort(invertebrateTitles.begin(), invertebrateTitles.end());
     std::unique(invertebrateTitles.begin(), invertebrateTitles.end());
 
@@ -223,11 +229,12 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
         url.setQuery(query);
         QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> nextReply(synchronouslyGetUrl(url, &ok));
 
-        if(ok) {
+        if(ok && isOk) {
             handleNetworkReplyForInvertebrateData(nextReply.data());
         } else {
             qDebug() << "get FAILED for " << url;
             isOk = false;
+            return;
         }
 
         i++;
@@ -256,6 +263,9 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *r
 
 void WebDataSynchronizer::syncImages()
 {
+    if(!isOk) {
+        return;
+    }
     // if this method is only ever called from the end of the invertebrate sync there's no need to check for isOk
     qDebug() << "syncing images?";
     QStringList titles;
@@ -362,11 +372,6 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
                 invertebrate->imageIsReady = true;
                 invertebrate->imageFileLocal = localFileName;
             }
-
-//            if(invertebrate->name == "Blepharicera" || invertebrate->name == "Blephariceridae") {
-//                qDebug() << invertebrate;
-//                qDebug() << "\nEND Blepharicera\n\n\n";
-//            }
         } else {
             qDebug() << "Unable to load Invertebrate with image: " << title;
         }
@@ -375,6 +380,10 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
 
 bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, QString localFileName)
 {
+    if(!isOk) {
+        return false;
+    }
+
     QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> replyPtr(reply);
     if(reply->error() != QNetworkReply::NoError || reply->bytesAvailable() == 0) {
         qDebug() << "Something went wrong in image request: " << reply->url().toString();
@@ -439,4 +448,10 @@ QNetworkReply *WebDataSynchronizer::synchronouslyGetUrl(const QUrl &url, bool *o
     waiter.exec();
 
     return theReply;
+}
+
+void WebDataSynchronizer::stop()
+{
+    qDebug() << "Setting isOk to false";
+    isOk = false;
 }
