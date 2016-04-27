@@ -54,14 +54,16 @@ void StreamHandler::parseInfoboxToStream(const QString &infoBox, Stream &stream)
                 stream.latitude = value.toDouble(&convertedOk);
 
                 if(!convertedOk) {
-                    qDebug() << "String to double conversion error for: " << value;
+//                    qDebug() << "String to double conversion error for: " << value;
+                    stream.latitude = 0.0;
                 }
             } else if(key == "|Longitude") {
                 bool convertedOk = true;
                 stream.longitude = value.toDouble(&convertedOk);
 
                 if(!convertedOk) {
-                    qDebug() << "String to double conversion error for: " << value;
+//                    qDebug() << "String to double conversion error for: " << value;
+                    stream.longitude = 0.0;
                 }
             } else if(key == "|State or Province") {
                 stream.state_or_province = value;

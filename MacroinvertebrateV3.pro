@@ -39,7 +39,8 @@ SOURCES += main.cpp \
     deps/gumbo-parser/vector.c \
     deps/QGumboParser/qgumboattribute.cpp \
     deps/QGumboParser/qgumbodocument.cpp \
-    deps/QGumboParser/qgumbonode.cpp
+    deps/QGumboParser/qgumbonode.cpp \
+    views/settingsview.cpp
 
 HEADERS  += \
     application.h \
@@ -64,10 +65,6 @@ HEADERS  += \
     deps/gumbo-parser/parser.h \
     deps/gumbo-parser/string_buffer.h \
     deps/gumbo-parser/string_piece.h \
-    deps/gumbo-parser/tag_enum.h \
-    deps/gumbo-parser/tag_gperf.h \
-    deps/gumbo-parser/tag_sizes.h \
-    deps/gumbo-parser/tag_strings.h \
     deps/gumbo-parser/token_type.h \
     deps/gumbo-parser/tokenizer_states.h \
     deps/gumbo-parser/tokenizer.h \
@@ -77,7 +74,8 @@ HEADERS  += \
     deps/QGumboParser/HtmlTag.h \
     deps/QGumboParser/qgumboattribute.h \
     deps/QGumboParser/qgumbodocument.h \
-    deps/QGumboParser/qgumbonode.h
+    deps/QGumboParser/qgumbonode.h \
+    views/settingsview.h
 
 FORMS    += \
     views/homeview.ui \
@@ -86,7 +84,8 @@ FORMS    += \
     views/invertebrateview.ui \
     views/syncview.ui \
     views/aboutview.ui \
-    views/singlestreamview.ui
+    views/singlestreamview.ui \
+    views/settingsview.ui
 
 INCLUDEPATH += "$$PWD/deps/gumbo-parser"
 INCLUDEPATH += "$$PWD/deps/QGumboParser"

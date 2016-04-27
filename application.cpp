@@ -7,75 +7,64 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
     setOrganizationName("EPSCOR");
     setApplicationName("Macroinvertebrates");
 
+    aboutView = new AboutView();
+    homeView = new HomeView();
+    invertebrateView = new InvertebrateView();
+    settingsView = new SettingsView();
+    singleStreamView = new SingleStreamView();
+    streamView = new StreamView();
+
     dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     imagePath = QString("%1%2%3").arg(dataPath, QDir::separator(), "images");
 
     loadDataFromDisk();
-    startSync();
     setupUiTransitions();
 
     QFont listFont("Times", 20);
-    homeView.show();
+    homeView->show();
 
-    aboutView.setStyleSheet(masterStylesheet);
-    syncView.setStyleSheet(masterStylesheet);
-    streamView.setStyleSheet(masterStylesheet);
-    singleStreamView.setStyleSheet(masterStylesheet);
-    invertebrateView.setStyleSheet(masterStylesheet);
+    aboutView->setStyleSheet(masterStylesheet);
+    streamView->setStyleSheet(masterStylesheet);
+    singleStreamView->setStyleSheet(masterStylesheet);
+    invertebrateView->setStyleSheet(masterStylesheet);
 
-    streamView.setListFont(listFont);
-    singleStreamView.setListFont(listFont);
-}
+    streamView->setListFont(listFont);
+    singleStreamView->setListFont(listFont);
 
-void Application::transitionHomeToSync()
-{
-    syncView.resize(homeView.size());
-    syncView.move(homeView.pos());
+    QSettings settings;
+    qDebug() << "syncingPreference: " << settings.value("syncingPreference").toInt();
 
-    syncView.show();
-    homeView.hide();
+    connect(settingsView, &SettingsView::syncButtonClicked, this, &Application::startSync);
 }
 
 void Application::transitionHomeToStream()
 {
-    streamView.resize(homeView.size());
-    streamView.move(homeView.pos());
+    QMutexLocker locker(&mutex);
+    streamView->setStreamList(streams.values());
+    locker.unlock();
 
-    streamView.setStreamList(streams.values());
-    streamView.show();
-    homeView.hide();
+    transitionWidgets(homeView, streamView);
 }
 
 void Application::transitionStreamToHome()
 {
-    homeView.resize(streamView.size());
-    homeView.move(streamView.pos());
-
-    homeView.show();
-    streamView.hide();
+    transitionWidgets(streamView, homeView);
 }
 
 void Application::transitionAboutToHome()
 {
-    homeView.resize(aboutView.size());
-    homeView.move(aboutView.pos());
-
-    homeView.show();
-    aboutView.hide();
+    transitionWidgets(aboutView, homeView);
 }
 
 void Application::transitionHomeToAbout()
 {
-    aboutView.resize(homeView.size());
-    aboutView.move(homeView.pos());
-
-    aboutView.show();
-    homeView.hide();
+    transitionWidgets(homeView, aboutView);
 }
 
 void Application::transitionStreamsToSingleStream(const QString &streamName)
 {
     QList<Invertebrate> invertebratesList;
+    QMutexLocker locker(&mutex);
     Stream &stream = streams[streamName];
     invertebratesList.reserve(stream.invertebrateList.length());
 
@@ -86,42 +75,31 @@ void Application::transitionStreamsToSingleStream(const QString &streamName)
         }
     }
 
+    locker.unlock();
+
     std::sort(invertebratesList.begin(), invertebratesList.end());
+    singleStreamView->setInfo(invertebratesList, streamName);
 
-    singleStreamView.resize(streamView.size());
-    singleStreamView.move(streamView.pos());
-
-    singleStreamView.setInfo(invertebratesList, streamName);
-    singleStreamView.show();
-    streamView.hide();
+    transitionWidgets(streamView, singleStreamView);
 }
 
 void Application::transitionSingleStreamToStreams()
-{
-    streamView.resize(singleStreamView.size());
-    streamView.move(singleStreamView.pos());
-
-    streamView.show();
-    singleStreamView.hide();
+{   
+    transitionWidgets(singleStreamView, streamView);
 }
 
 void Application::transitionSingleStreamToInvertebrate(const QString &invertebrate)
 {
-    invertebrateView.resize(singleStreamView.size());
-    invertebrateView.move(singleStreamView.pos());
+    QMutexLocker locker(&mutex);
+    invertebrateView->setInfo(invertebrates.value(invertebrate), singleStreamView->getStreamName());
+    locker.unlock();
 
-    invertebrateView.setInfo(invertebrates.value(invertebrate), singleStreamView.getStreamName());
-    invertebrateView.show();
-    singleStreamView.hide();
+    transitionWidgets(singleStreamView, invertebrateView);
 }
 
 void Application::transitionInvertebrateToSingleStream(const QString &streamName)
 {
-    singleStreamView.resize(invertebrateView.size());
-    singleStreamView.move(invertebrateView.pos());
-
-    singleStreamView.show();
-    invertebrateView.hide();
+    transitionWidgets(invertebrateView, singleStreamView);
 }
 
 void Application::loadDataFromDisk()
@@ -194,18 +172,20 @@ void Application::saveDataToDisk()
 
 void Application::setupUiTransitions()
 {
-    connect(&homeView, &HomeView::syncAction, this, &Application::transitionHomeToSync);
-    connect(&homeView, &HomeView::startButtonClicked, this, &Application::transitionHomeToStream);
-    connect(&streamView, &StreamView::backButtonClicked, this, &Application::transitionStreamToHome);
+    connect(homeView, &HomeView::startButtonClicked, this, &Application::transitionHomeToStream);
+    connect(streamView, &StreamView::backButtonClicked, this, &Application::transitionStreamToHome);
 
-    connect(&homeView, &HomeView::aboutButtonClicked, this, &Application::transitionHomeToAbout);
-    connect(&aboutView, &AboutView::backButtonClicked, this, &Application::transitionAboutToHome);
+    connect(homeView, &HomeView::aboutButtonClicked, this, &Application::transitionHomeToAbout);
+    connect(aboutView, &AboutView::backButtonClicked, this, &Application::transitionAboutToHome);
 
-    connect(&streamView, &StreamView::singleStreamDoubleClicked, this, &Application::transitionStreamsToSingleStream);
-    connect(&singleStreamView, &SingleStreamView::backButtonClicked, this, &Application::transitionSingleStreamToStreams);
+    connect(streamView, &StreamView::singleStreamDoubleClicked, this, &Application::transitionStreamsToSingleStream);
+    connect(singleStreamView, &SingleStreamView::backButtonClicked, this, &Application::transitionSingleStreamToStreams);
 
-    connect(&singleStreamView, &SingleStreamView::invertebrateDoubleClicked, this, &Application::transitionSingleStreamToInvertebrate);
-    connect(&invertebrateView, &InvertebrateView::backButtonClicked, this, &Application::transitionInvertebrateToSingleStream);
+    connect(singleStreamView, &SingleStreamView::invertebrateDoubleClicked, this, &Application::transitionSingleStreamToInvertebrate);
+    connect(invertebrateView, &InvertebrateView::backButtonClicked, this, &Application::transitionInvertebrateToSingleStream);
+
+    connect(homeView, &HomeView::syncButtonClicked, this, &Application::transitionHomeToSettings);
+    connect(settingsView, &SettingsView::backButtonClicked, this, &Application::transitionSettingsToHome);
 }
 
 void Application::startSync()
@@ -220,7 +200,36 @@ void Application::startSync()
         }
     });
 
-    connect(syncer, &WebDataSynchronizer::aboutStringParsed, &aboutView, &AboutView::updateAbout);
+    connect(syncer, &WebDataSynchronizer::aboutStringParsed, aboutView, &AboutView::updateAbout);
     connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
     QThreadPool::globalInstance()->start(syncer);
+    settingsView->updateLastSync();
+}
+
+void Application::transitionHomeToSettings()
+{
+    settingsView->updateLastSync();
+    transitionWidgets(homeView, settingsView);
+}
+
+void Application::transitionSettingsToHome()
+{
+    transitionWidgets(settingsView, homeView);
+}
+
+void Application::transitionWidgets(QWidget *origin, QWidget *destination)
+{
+    destination->move(origin->pos());
+    destination->resize(origin->size());
+    destination->show();
+    origin->hide();
+}
+
+Application::~Application() {
+    aboutView->deleteLater();
+    homeView->deleteLater();
+    invertebrateView->deleteLater();
+    settingsView->deleteLater();
+    singleStreamView->deleteLater();
+    streamView->deleteLater();
 }

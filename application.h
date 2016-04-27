@@ -11,16 +11,16 @@
 #include <QMutex>
 #include <QThreadPool>
 
-#include <algorithm>  // std::sort
+#include <algorithm>
 
 #include "webdatasynchronizer.h"
 
 #include "views/homeview.h"
-#include "views/syncview.h"
 #include "views/streamview.h"
 #include "views/aboutview.h"
 #include "views/singlestreamview.h"
 #include "views/invertebrateview.h"
+#include "views/settingsview.h"
 
 class Application : public QApplication
 {
@@ -29,14 +29,12 @@ class Application : public QApplication
                                 "background-position: top center;"
                                 "background-color: rgb(255, 255, 255);";
 
-    AboutView aboutView;
-    HomeView homeView;
-    SyncView syncView;
-    StreamView streamView;
-    SingleStreamView singleStreamView;
-    InvertebrateView invertebrateView;
-
-    QSettings settings;
+    AboutView *aboutView;
+    HomeView *homeView;
+    StreamView *streamView;
+    SettingsView *settingsView;
+    SingleStreamView *singleStreamView;
+    InvertebrateView *invertebrateView;
 
     WebDataSynchronizer *syncer; // owned by the threadpool's global instance. don't delete
     QMap<QString, Invertebrate> invertebrates;
@@ -47,11 +45,12 @@ class Application : public QApplication
     QString imagePath;
 
     void setupUiTransitions();
+    void transitionWidgets(QWidget *origin, QWidget *destination);
 public:
     Application(int argc, char *argv[]);
+    ~Application();
 
 public slots:
-    void transitionHomeToSync();
     void transitionHomeToStream();
     void transitionStreamToHome();
 
@@ -63,6 +62,9 @@ public slots:
 
     void transitionSingleStreamToInvertebrate(const QString &invertebrate);
     void transitionInvertebrateToSingleStream(const QString &streamName);
+
+    void transitionHomeToSettings();
+    void transitionSettingsToHome();
 
     void startSync();
     void loadDataFromDisk();

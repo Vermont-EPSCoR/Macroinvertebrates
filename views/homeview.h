@@ -16,14 +16,14 @@ public:
     ~HomeView();
 
 signals:
-    void syncAction();
+    void syncButtonClicked();
     void startButtonClicked();
     void aboutButtonClicked();
 
 private slots:
-    void on_actionSync_triggered();
     void on_pushButton_clicked();
     void on_pushButton_2_clicked();
+    void on_pushButton_3_clicked();
 
 private:
     Ui::HomeView *ui;

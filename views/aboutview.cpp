@@ -6,6 +6,12 @@ AboutView::AboutView(QWidget *parent) :
     ui(new Ui::AboutView)
 {
     ui->setupUi(this);
+    QSettings settings;
+    QString about = settings.value("aboutText").toString();
+
+    if(!about.isEmpty()) {
+        ui->label->setText(about);
+    }
 }
 
 AboutView::~AboutView()

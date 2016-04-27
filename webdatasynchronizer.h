@@ -92,10 +92,12 @@ signals:
     void invertebrateSyncComplete();
     void imageSyncComplete();
     void aboutStringParsed(const QString& about);
+    void shouldStop();
 private slots:
     void syncInvertebrates();
     void syncStreams();
     void syncImages();
+    void syncAbout();
 
     void finalize();
 };

@@ -6,7 +6,7 @@ WebDataSynchronizer::WebDataSynchronizer(QObject *parent) : QObject(parent)
     imagePath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "images");
 
     QSettings settings;
-    lastUpdate = settings.value("lastUpdate").toDateTime();
+    settings.setValue("lastUpdate", QDateTime::currentDateTime());
 }
 
 void WebDataSynchronizer::setData(QMutex *mutex, QMap<QString, Invertebrate> *invertebrates, QMap<QString, Stream> *streams)
@@ -23,15 +23,8 @@ void WebDataSynchronizer::run()
     if(network->networkAccessible() == QNetworkAccessManager::Accessible) {
         syncStreams();
         syncInvertebrates();
-
-        emit invertebrateSyncComplete();
         syncImages();
-
-        bool ok;
-        QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(QUrl("http://wikieducator.org/api.php?action=parse&page=AboutStreamsApp&format=xml"), &ok));
-        if(ok) {
-            handleNetworkReplyForAbout(reply.data());
-        }
+        syncAbout();
 
         finalize();
     } else {
@@ -91,13 +84,9 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
     for(const QJsonValue &value: streamValues) {
         streamTitles.append(value.toObject().value("title").toString());
-
-        if(streamTitles.last().contains("Blepharicera")) {
-            qDebug() << streamTitles.last();
-        }
     }
 
-    // MediaWiki API recommends sorting so caching is more likely to occur
+    // MediaWiki API recommends sorting so caching is more likely to occur, and of course uniqueing
     std::sort(streamTitles.begin(), streamTitles.end());
     std::unique(streamTitles.begin(), streamTitles.end());
 
@@ -181,6 +170,8 @@ void WebDataSynchronizer::syncInvertebrates()
     } else {
         isOk = false;
     }
+
+    emit invertebrateSyncComplete();
 }
 
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *reply)
@@ -270,6 +261,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *r
 void WebDataSynchronizer::syncImages()
 {
     if(!isOk) {
+        qDebug() << "Exiting sync images";
         return;
     }
     // if this method is only ever called from the end of the invertebrate sync there's no need to check for isOk
@@ -294,6 +286,10 @@ void WebDataSynchronizer::syncImages()
     bool ok;
 
     do {
+        if(!isOk) {
+            qDebug() << "Exiting sync images";
+            return;
+        }
         int batchStart = i * batchSize;
         int batchEnd = batchStart + batchSize;
 
@@ -341,10 +337,15 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
     bool ok;
 
     for(const QJsonValue &value: images) {
+        if(!isOk) {
+            qDebug() << "Exiting from handleNetworkReplyForImageList";
+            return;
+        }
+
         QJsonObject obj =  value.toObject();
         QString title = obj.value("title").toString();
 
-        qDebug() << "TITLE: " << title;
+//        qDebug() << "TITLE: " << title;
 
         Invertebrate* invertebrate = invertebrateImages[title];
 
@@ -410,6 +411,7 @@ bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, Q
 
 void WebDataSynchronizer::finalize()
 {
+    qDebug() << "Finalizing";
     if(!isOk) {
         qDebug() << "Finalizing busted";
         emit finished(WebDataSynchonizerExitStatus::FAILED_RUNTIME);
@@ -445,12 +447,12 @@ QNetworkReply *WebDataSynchronizer::synchronouslyGetUrl(const QUrl &url, bool *o
             *ok = false;
         }
 
-        theReply = reply;
         QObject::disconnect(*conn);
     });
 
     connect(network, &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
-    network->get(request);
+    theReply = network->get(request);
+    connect(this, &WebDataSynchronizer::shouldStop, theReply, &QNetworkReply::abort);
     waiter.exec();
 
     return theReply;
@@ -460,11 +462,13 @@ void WebDataSynchronizer::stop()
 {
     qDebug() << "Setting isOk to false";
     isOk = false;
+    emit shouldStop();
 }
 
 void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
 {
     if(reply->error() != QNetworkReply::NoError || !isOk) {
+        qDebug() << "exiting handleNetworkReplyForAbout";
         return;
     }
 
@@ -490,6 +494,22 @@ void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
     }
 
     if(!paragraphList.isEmpty()) {
+        QSettings settings;
+        settings.setValue("aboutText", paragraphList.join("\n\n"));
         emit aboutStringParsed(paragraphList.join("\n\n"));
+    }
+}
+
+void WebDataSynchronizer::syncAbout()
+{
+    if(!isOk) {
+        return;
+    }
+
+    bool ok;
+    QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(QUrl("http://wikieducator.org/api.php?action=parse&page=AboutStreamsApp&format=xml"), &ok));
+    if(ok) {
+        qDebug() << "About reply ok";
+        handleNetworkReplyForAbout(reply.data());
     }
 }
