@@ -36,7 +36,8 @@ void SettingsView::on_pushButton_clicked()
 void SettingsView::on_comboBox_currentIndexChanged(int index)
 {
     QSettings settings;
-    settings.setValue("syncingPreference", static_cast<int>(index));
+    settings.setValue("syncingPreference", index);
+    settings.sync();
 }
 
 void SettingsView::updateLastSync()

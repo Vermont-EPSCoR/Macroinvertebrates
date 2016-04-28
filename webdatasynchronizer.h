@@ -78,7 +78,7 @@ class WebDataSynchronizer : public QObject, public QRunnable
     void handleNetworkReplyForStreamData(QNetworkReply* reply);
     void handleNetworkReplyForInvertebrateList(QNetworkReply* reply);
     void handleNetworkReplyForInvertebrateData(QNetworkReply* reply);
-    void handleNetworkReplyForImageList(QNetworkReply* reply);
+    void handleNetworkReplyForImageList(QNetworkReply* reply, QMap<QString, QList<Invertebrate *>> *invertebrateImages);
     bool handleNetworkReplyForImageData(QNetworkReply* reply, QString localFileName);
     void handleNetworkReplyForAbout(QNetworkReply* reply);
 public:

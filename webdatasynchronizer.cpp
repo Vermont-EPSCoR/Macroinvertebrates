@@ -284,50 +284,6 @@ void WebDataSynchronizer::syncImages()
     int i = 0;
     bool ok;
 
-    do {
-        if(!isOk) {
-            qDebug() << "Exiting sync images";
-            return;
-        }
-
-        int batchStart = i * batchSize;
-        int batchEnd = batchStart + batchSize;
-
-        QStringList imageTitlesBatch = titles.mid(batchStart, batchEnd);
-
-        query.removeAllQueryItems("titles");
-        query.addQueryItem("titles", imageTitlesBatch.join("|"));
-        url.setQuery(query);
-
-        QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(url, &ok));
-
-        if(ok) {
-            handleNetworkReplyForImageList(reply.data());
-        } else {
-            isOk = false;
-        }
-
-        i++;
-    } while((i * batchSize) <= titles.count());
-}
-
-void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
-{
-    if(reply->error() != QNetworkReply::NoError || !isOk) {
-        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
-        isOk = false;
-        return;
-    }
-
-    QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
-
-    if(doc.isNull()) {
-        qDebug() << "Doc is null/invalid in ImageList.";
-        isOk = false;
-        return;
-    }
-
-    //!TODO move this out of this scope
     QMap<QString, QList<Invertebrate*>> invertebrateImages;
     for(Invertebrate& invertebrate: invertebratesFromWeb) {
         QString storedFileName = invertebrate.imageFileRemote;
@@ -346,6 +302,49 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
         invertebrateImages[underscoresToSpaces].append(&invertebrate);
     }
 
+    do {
+        if(!isOk) {
+            qDebug() << "Exiting sync images";
+            return;
+        }
+
+        int batchStart = i * batchSize;
+        int batchEnd = batchStart + batchSize;
+
+        QStringList imageTitlesBatch = titles.mid(batchStart, batchEnd);
+
+        query.removeAllQueryItems("titles");
+        query.addQueryItem("titles", imageTitlesBatch.join("|"));
+        url.setQuery(query);
+
+        QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(url, &ok));
+
+        if(ok) {
+            handleNetworkReplyForImageList(reply.data(), &invertebrateImages);
+        } else {
+            isOk = false;
+        }
+
+        i++;
+    } while((i * batchSize) <= titles.count());
+}
+
+void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply, QMap<QString, QList<Invertebrate*>> *invertebrateImages)
+{
+    if(reply->error() != QNetworkReply::NoError || !isOk) {
+        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
+        isOk = false;
+        return;
+    }
+
+    QJsonDocument doc = QJsonDocument::fromJson(reply->readAll());
+
+    if(doc.isNull()) {
+        qDebug() << "Doc is null/invalid in ImageList.";
+        isOk = false;
+        return;
+    }
+
     QJsonObject images = doc.object().value("query").toObject().value("pages").toObject();
     QCryptographicHash hasher(QCryptographicHash::Sha256);
     bool ok;
@@ -358,7 +357,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
 
         QJsonObject obj =  value.toObject();
         QString title = obj.value("title").toString();
-        const QList<Invertebrate*> invertebrates = invertebrateImages.value(title);
+        const QList<Invertebrate*> invertebrates = invertebrateImages->value(title);
 
         for(Invertebrate *invertebrate: invertebrates) {
             QString extension = title.split(".").last().toLower();
