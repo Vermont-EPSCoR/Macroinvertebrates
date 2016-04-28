@@ -11,6 +11,8 @@
 #include <QMutex>
 #include <QThreadPool>
 
+#include <QNetworkConfigurationManager>
+
 #include <algorithm>
 
 #include "webdatasynchronizer.h"

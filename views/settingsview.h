@@ -6,15 +6,11 @@
 #include <QDebug>
 #include <QDateTime>
 
+#include "../webdatasynchronizer.h"
+
 namespace Ui {
 class SettingsView;
 }
-
-enum class SyncOptions {
-    MANUAL_ONLY = 0,
-    ON_STARTUP,
-    WIFI
-};
 
 class SettingsView : public QMainWindow
 {

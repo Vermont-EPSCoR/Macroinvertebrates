@@ -291,10 +291,9 @@ void WebDataSynchronizer::syncImages()
         }
 
         int batchStart = i * batchSize;
-        int batchEnd = batchStart + batchSize + 1;
+        int batchEnd = batchStart + batchSize;
 
         QStringList imageTitlesBatch = titles.mid(batchStart, batchEnd);
-        qDebug() << "Slice:[" << batchStart << ":" << batchEnd << "]";
 
         query.removeAllQueryItems("titles");
         query.addQueryItem("titles", imageTitlesBatch.join("|"));
@@ -328,13 +327,23 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
         return;
     }
 
+    //!TODO move this out of this scope
     QMap<QString, QList<Invertebrate*>> invertebrateImages;
     for(Invertebrate& invertebrate: invertebratesFromWeb) {
+        QString storedFileName = invertebrate.imageFileRemote;
+        QString spacesToUnderscores = invertebrate.imageFileRemote.replace(" ", "_");
+        QString underscoresToSpaces = invertebrate.imageFileRemote.replace("_", " ");
+
         if(!invertebrateImages.contains(invertebrate.imageFileRemote)) {
-            invertebrateImages.insert(invertebrate.imageFileRemote, QList<Invertebrate *>());
+            invertebrateImages.insert(storedFileName, QList<Invertebrate *>());
+            // It bothers me that this is necessary, but there is some bad data here
+            invertebrateImages.insert(spacesToUnderscores, QList<Invertebrate *>());
+            invertebrateImages.insert(underscoresToSpaces, QList<Invertebrate *>());
         }
 
-        invertebrateImages[invertebrate.imageFileRemote].append(&invertebrate);
+        invertebrateImages[storedFileName].append(&invertebrate);
+        invertebrateImages[spacesToUnderscores].append(&invertebrate);
+        invertebrateImages[underscoresToSpaces].append(&invertebrate);
     }
 
     QJsonObject images = doc.object().value("query").toObject().value("pages").toObject();
@@ -349,14 +358,6 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
 
         QJsonObject obj =  value.toObject();
         QString title = obj.value("title").toString();
-
-        qDebug() << "TITLE: " << title;
-
-        if(!invertebrateImages.contains(title)) {
-            qDebug() << "Skipping";
-            continue;
-        }
-
         const QList<Invertebrate*> invertebrates = invertebrateImages.value(title);
 
         for(Invertebrate *invertebrate: invertebrates) {

@@ -11,8 +11,8 @@ SettingsView::SettingsView(QWidget *parent) :
 
     QStringList syncingOptions({
                                    "Manual Only",  // SyncOptions::MANUAL_ONLY
-                                   "Always On Startup",  // SyncOptions::ON_STARTUP
-                                   "Always On Startup (WiFi)",  // SyncOptions::WIFI
+                                   "On Startup (Always)",  // SyncOptions::ON_STARTUP
+                                   "On Startup (WiFi)",  // SyncOptions::WIFI
                                });
     ui->comboBox->addItems(syncingOptions);
     ui->comboBox->setCurrentIndex(syncingPreference);

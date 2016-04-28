@@ -47,6 +47,11 @@ enum class WebDataSynchonizerExitStatus {
     FAILED_NETWORK_ACCESS
 };
 
+enum class SyncOptions {
+    MANUAL_ONLY = 0,
+    ON_STARTUP,
+    WIFI
+};
 
 class WebDataSynchronizer : public QObject, public QRunnable
 {

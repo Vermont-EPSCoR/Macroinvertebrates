@@ -32,7 +32,34 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
     singleStreamView->setListFont(listFont);
 
     QSettings settings;
-    qDebug() << "syncingPreference: " << settings.value("syncingPreference").toInt();
+    SyncOptions option = (SyncOptions)settings.value("syncingPreference").toInt();
+    if(option != SyncOptions::MANUAL_ONLY) {
+        if(option == SyncOptions::ON_STARTUP) {
+            startSync();
+        }
+
+        // ELSE TEST FOR WIRELESS
+//        QNetworkConfiguration cfg;
+//        QNetworkConfigurationManager ncm;
+//        auto nc = ncm.allConfigurations();
+
+//        for (auto &x : nc) {
+//            qDebug() << x.name();
+//    //        qDebug() << x.bearerTypeName();
+//    //        qDebug() << x.bearerTypeFamily();
+//    //        qDebug() << x.state();
+//            qDebug() << x.state().testFlag(QNetworkConfiguration::Active);
+//            qDebug() << x.isValid();
+//            if (x.bearerType() == QNetworkConfiguration::BearerWLAN) {
+//                qDebug() << x.name();
+//                if (x.name() == "YouDesiredNetwork")
+//                    cfg = x;
+//            } else if(x.bearerType() == QNetworkConfiguration::BearerEthernet) {
+//                qDebug() << x.name();
+//            }
+//        }
+
+    }
 
     connect(settingsView, &SettingsView::syncButtonClicked, this, &Application::startSync);
 }
