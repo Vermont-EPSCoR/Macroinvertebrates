@@ -15,6 +15,7 @@ SettingsView::SettingsView(QWidget *parent) :
                                    "On Startup (WiFi)",  // SyncOptions::WIFI
                                });
     ui->comboBox->addItems(syncingOptions);
+    ui->comboBox->setItemData(2, QVariant(0), Qt::UserRole - 1);  // Horrible hack according to peppe
     ui->comboBox->setCurrentIndex(syncingPreference);
 }
 
