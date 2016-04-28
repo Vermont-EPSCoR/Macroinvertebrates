@@ -265,7 +265,6 @@ void WebDataSynchronizer::syncImages()
         return;
     }
     // if this method is only ever called from the end of the invertebrate sync there's no need to check for isOk
-    qDebug() << "syncing images?";
     QStringList titles;
     for(Invertebrate &invertebrate: invertebratesFromWeb) {
         titles.append(invertebrate.imageFileRemote);
@@ -290,10 +289,12 @@ void WebDataSynchronizer::syncImages()
             qDebug() << "Exiting sync images";
             return;
         }
+
         int batchStart = i * batchSize;
-        int batchEnd = batchStart + batchSize;
+        int batchEnd = batchStart + batchSize + 1;
 
         QStringList imageTitlesBatch = titles.mid(batchStart, batchEnd);
+        qDebug() << "Slice:[" << batchStart << ":" << batchEnd << "]";
 
         query.removeAllQueryItems("titles");
         query.addQueryItem("titles", imageTitlesBatch.join("|"));
@@ -327,9 +328,13 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
         return;
     }
 
-    QMap<QString, Invertebrate*> invertebrateImages;
+    QMap<QString, QList<Invertebrate*>> invertebrateImages;
     for(Invertebrate& invertebrate: invertebratesFromWeb) {
-        invertebrateImages.insert(invertebrate.imageFileRemote, &invertebrate);
+        if(!invertebrateImages.contains(invertebrate.imageFileRemote)) {
+            invertebrateImages.insert(invertebrate.imageFileRemote, QList<Invertebrate *>());
+        }
+
+        invertebrateImages[invertebrate.imageFileRemote].append(&invertebrate);
     }
 
     QJsonObject images = doc.object().value("query").toObject().value("pages").toObject();
@@ -345,11 +350,16 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
         QJsonObject obj =  value.toObject();
         QString title = obj.value("title").toString();
 
-//        qDebug() << "TITLE: " << title;
+        qDebug() << "TITLE: " << title;
 
-        Invertebrate* invertebrate = invertebrateImages[title];
+        if(!invertebrateImages.contains(title)) {
+            qDebug() << "Skipping";
+            continue;
+        }
 
-        if(invertebrate != nullptr) {
+        const QList<Invertebrate*> invertebrates = invertebrateImages.value(title);
+
+        for(Invertebrate *invertebrate: invertebrates) {
             QString extension = title.split(".").last().toLower();
             QJsonObject imageInfo = obj.value("imageinfo").toArray().at(0).toObject();
             QUrl thumbUrl(imageInfo.value("thumburl").toString());
@@ -379,8 +389,6 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply)
                 invertebrate->imageIsReady = true;
                 invertebrate->imageFileLocal = localFileName;
             }
-        } else {
-            qDebug() << "Unable to load Invertebrate with image: " << title;
         }
     }
 }
