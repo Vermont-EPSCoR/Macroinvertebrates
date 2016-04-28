@@ -1,5 +1,5 @@
 #include "settingsview.h"
-#include "ui_settings.h"
+#include "ui_settingsview.h"
 
 SettingsView::SettingsView(QWidget *parent) :
     QMainWindow(parent),
@@ -44,5 +44,5 @@ void SettingsView::on_comboBox_currentIndexChanged(int index)
 void SettingsView::updateLastSync()
 {
     QSettings settings;
-    ui->label->setText(settings.value("lastUpdate").toString());
+    ui->lastUpdateLabel->setText(settings.value("lastUpdate").toString());
 }
