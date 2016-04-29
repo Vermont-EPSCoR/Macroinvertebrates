@@ -1,11 +1,12 @@
 #include "application.h"
-#include <QEventLoop>
 
 Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 {
     setOrganizationDomain("epscor.uvm.edu");
     setOrganizationName("EPSCOR");
     setApplicationName("Macroinvertebrates");
+
+    setStyleSheet(masterStylesheet);
 
     aboutView = new AboutView();
     homeView = new HomeView();
@@ -23,11 +24,6 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
     QFont listFont("Times", 20);
     homeView->show();
 
-    aboutView->setStyleSheet(masterStylesheet);
-    streamView->setStyleSheet(masterStylesheet);
-    singleStreamView->setStyleSheet(masterStylesheet);
-    invertebrateView->setStyleSheet(masterStylesheet);
-
     streamView->setListFont(listFont);
     singleStreamView->setListFont(listFont);
 
@@ -39,29 +35,27 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
         }
 
         // ELSE TEST FOR WIRELESS
-//        QNetworkConfiguration cfg;
-//        QNetworkConfigurationManager ncm;
-//        auto nc = ncm.allConfigurations();
+        QNetworkConfigurationManager ncm;
+        auto nc = ncm.allConfigurations();
 
-//        for (auto &x : nc) {
-//            qDebug() << x.name();
-//    //        qDebug() << x.bearerTypeName();
-//    //        qDebug() << x.bearerTypeFamily();
-//    //        qDebug() << x.state();
-//            qDebug() << x.state().testFlag(QNetworkConfiguration::Active);
-//            qDebug() << x.isValid();
-//            if (x.bearerType() == QNetworkConfiguration::BearerWLAN) {
-//                qDebug() << x.name();
-//                if (x.name() == "YouDesiredNetwork")
-//                    cfg = x;
-//            } else if(x.bearerType() == QNetworkConfiguration::BearerEthernet) {
-//                qDebug() << x.name();
-//            }
-//        }
+        for (auto &x : nc) {
+            qDebug() << x.name();
+            qDebug() << x.bearerTypeName();
+            qDebug() << x.bearerTypeFamily();
+            qDebug() << x.state();
+            qDebug() << x.state().testFlag(QNetworkConfiguration::Active);
+            qDebug() << x.isValid();
+
+            if(x.isValid() && x.state().testFlag(QNetworkConfiguration::Active)) {
+                homeView->statusBar()->showMessage("We're actively connected to some kind of internets", 10000);
+                qDebug() << "Should be showing";
+            }
+        }
 
     }
 
     connect(settingsView, &SettingsView::syncButtonClicked, this, &Application::startSync);
+    connect(settingsView, &SettingsView::reloadStylesClicked, this, &Application::reloadStyles);
 }
 
 void Application::transitionHomeToStream()
@@ -259,4 +253,18 @@ Application::~Application() {
     settingsView->deleteLater();
     singleStreamView->deleteLater();
     streamView->deleteLater();
+}
+
+void Application::reloadStyles()
+{
+    QFile styles("/Users/morganrodgers/Desktop/Macroinvertebrate-Field-Guide/styles/app.css");
+    if(styles.open(QFile::ReadOnly)) {
+        setStyleSheet("/* /");
+        QString loadedStyles = styles.readAll();
+        qDebug() << loadedStyles;
+        setStyleSheet(loadedStyles);
+    } else {
+        qDebug() << "Unable to open styles.css";
+        setStyleSheet("/* /");
+    }
 }

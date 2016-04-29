@@ -10,10 +10,10 @@
 #include <QSettings>
 #include <QMutex>
 #include <QThreadPool>
+#include <QMessageBox>
+#include <QStatusBar>
 
 #include <QNetworkConfigurationManager>
-
-#include <algorithm>
 
 #include "webdatasynchronizer.h"
 
@@ -67,6 +67,8 @@ public slots:
 
     void transitionHomeToSettings();
     void transitionSettingsToHome();
+
+    void reloadStyles();
 
     void startSync();
     void loadDataFromDisk();

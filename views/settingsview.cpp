@@ -46,3 +46,8 @@ void SettingsView::updateLastSync()
     QSettings settings;
     ui->lastUpdateLabel->setText(settings.value("lastUpdate").toString());
 }
+
+void SettingsView::on_pushButton_3_clicked()
+{
+    emit reloadStylesClicked();
+}
