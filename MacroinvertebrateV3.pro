@@ -102,5 +102,17 @@ RESOURCES += \
     media.qrc
 
 DISTFILES += \
-    deps/gumbo-parser/tag.in
+    deps/gumbo-parser/tag.in \
+    android/AndroidManifest.xml \
+    android/gradle/wrapper/gradle-wrapper.jar \
+    android/gradlew \
+    android/res/values/libs.xml \
+    android/build.gradle \
+    android/gradle/wrapper/gradle-wrapper.properties \
+    android/gradlew.bat \
+    media/vbig.icns
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+ICON = media/OSX.icns
 
