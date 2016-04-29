@@ -36,3 +36,19 @@ void StreamView::on_listWidget_itemClicked(QListWidgetItem *item)
 {
     emit singleStreamDoubleClicked(item->text());
 }
+
+void StreamView::on_lineEdit_textEdited(const QString &arg1)
+{
+    int rowCount = ui->listWidget->model()->rowCount();
+    for(int i = 0; i < rowCount; i++) {
+        QListWidgetItem *item = ui->listWidget->item(i);
+
+        if(arg1.isEmpty()) {
+            item->setHidden(false);
+        } else if(item->text().contains(arg1, Qt::CaseInsensitive)) {
+            item->setHidden(false);
+        } else {
+            item->setHidden(true);
+        }
+    }
+}
