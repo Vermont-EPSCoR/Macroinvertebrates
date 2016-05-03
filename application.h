@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QString>
 #include <QSettings>
+#include <QMessageBox>
 #include <QMutex>
 #include <QThreadPool>
 

@@ -18,7 +18,6 @@ SOURCES += main.cpp \
     views/locationview.cpp \
     views/streamview.cpp \
     views/invertebrateview.cpp \
-    views/syncview.cpp \
     models/stream.cpp \
     models/invertebrate.cpp \
     parsers/streamhandler.cpp \
@@ -48,7 +47,6 @@ HEADERS  += \
     views/locationview.h \
     views/streamview.h \
     views/invertebrateview.h \
-    views/syncview.h \
     models/stream.h \
     models/invertebrate.h \
     parsers/streamhandler.h \
@@ -82,7 +80,6 @@ FORMS    += \
     views/locationview.ui \
     views/streamview.ui \
     views/invertebrateview.ui \
-    views/syncview.ui \
     views/aboutview.ui \
     views/singlestreamview.ui \
     views/settingsview.ui

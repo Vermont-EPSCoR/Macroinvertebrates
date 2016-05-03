@@ -231,6 +231,11 @@ void Application::startSync()
     connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
     QThreadPool::globalInstance()->start(syncer);
     settingsView->updateLastSync();
+
+    QMessageBox msgBox;
+    msgBox.setText("Data syncing has begun!\nEtcetera and so forth.");
+    msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
+    msgBox.exec();
 }
 
 void Application::transitionHomeToSettings()
