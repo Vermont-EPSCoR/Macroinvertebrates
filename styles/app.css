@@ -60,4 +60,36 @@ QComboBox, QPushButton {
   font-weight: bold;
   max-height: 30px; }
 
+QScrollBar:vertical {
+  width: 7px;
+  margin: 16px 0 16px 0;
+  border: 1px solid #222222; }
+
+QScrollBar::handle:vertical {
+  min-height: 20px;
+  border-radius: 2px; }
+
+QScrollBar::add-line:vertical {
+  border: 1px solid #1b1b19;
+  border-radius: 2px;
+  height: 14px;
+  subcontrol-position: bottom;
+  subcontrol-origin: margin; }
+
+QScrollBar::sub-line:vertical {
+  border: 1px solid #1b1b19;
+  border-radius: 2px;
+  height: 14px;
+  subcontrol-position: top;
+  subcontrol-origin: margin; }
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+  border: 1px solid black;
+  width: 1px;
+  height: 1px;
+  background: white; }
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+  background: none; }
+
 /*# sourceMappingURL=app.css.map */

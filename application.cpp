@@ -7,7 +7,10 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
     setApplicationName("Macroinvertebrates");
 
     setStyle("plastique");
-    setStyleSheet(masterStylesheet);
+    QFile file(":/styles/app.css");
+    file.open(QFile::ReadOnly);
+    setStyleSheet(file.readAll());
+    file.close();
 
     aboutView = new AboutView();
     homeView = new HomeView();

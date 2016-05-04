@@ -8,5 +8,6 @@
         <file>media/buttons/start.png</file>
         <file>media/buttons/sync.png</file>
         <file>media/invertebrate-placeholder.jpg</file>
+        <file>styles/app.css</file>
     </qresource>
 </RCC>

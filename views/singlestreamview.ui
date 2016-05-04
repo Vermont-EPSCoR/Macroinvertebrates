@@ -46,9 +46,12 @@
       </property>
       <property name="iconSize">
        <size>
-        <width>300</width>
-        <height>300</height>
+        <width>350</width>
+        <height>350</height>
        </size>
+      </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideNone</enum>
       </property>
       <property name="movement">
        <enum>QListView::Static</enum>

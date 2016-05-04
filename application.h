@@ -26,11 +26,6 @@
 
 class Application : public QApplication
 {
-    QString masterStylesheet =  "background-repeat: no-repeat;"
-                                "background-image: url(:/media/background-plain.png);"
-                                "background-position: top center;"
-                                "background-color: rgb(255, 255, 255);";
-
     AboutView *aboutView;
     HomeView *homeView;
     StreamView *streamView;

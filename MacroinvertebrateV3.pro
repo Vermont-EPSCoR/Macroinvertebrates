@@ -94,7 +94,7 @@ INCLUDEPATH += "$$PWD/deps/QGumboParser"
 
 CONFIG += c++11
 QMAKE_CXXFLAGS += -O3
-QMAKE_CFLAGS += -std=c99  # For Gumbo
+QMAKE_CFLAGS += -std=c99 -O3  # For Gumbo
 CONFIG += mobility
 MOBILITY = 
 
