@@ -6,6 +6,7 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
     setOrganizationName("EPSCOR");
     setApplicationName("Macroinvertebrates");
 
+    setStyle("plastique");
     setStyleSheet(masterStylesheet);
 
     aboutView = new AboutView();
@@ -257,7 +258,7 @@ Application::~Application() {
 
 void Application::reloadStyles()
 {
-    QFile styles("/Users/morganrodgers/Desktop/Macroinvertebrate-Field-Guide/styles/app.css");
+    QFile styles("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
     if(styles.open(QFile::ReadOnly)) {
         setStyleSheet("/* /");
         QString loadedStyles = styles.readAll();

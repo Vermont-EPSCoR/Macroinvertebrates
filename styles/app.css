@@ -1,1 +1,63 @@
-QMainWindow{background-repeat:no-repeat;background-image:url(:/media/background-plain.png);background-position:top center;background-color:#fff}QListView{background-color:transparent}QListWidgetItem:hover{background-color:#5ecde8}InvertebrateView #widget{background-color:#fff}QPushButton[text="Reload Styles"]{border:2px solid #8f8f91;border-radius:10px;min-width:80px}QPushButton[text="Reload Styles"]:pressed{background-color:#2ed03c}QPushButton[text="Reload Styles"]:hover{background-color:#2ed03c}QPushButton[text="Reload Styles"]:flat{border:none;background-color:#2ed03c}QPushButton[text="Reload Styles"]:default{border-color:navy}
+QMainWindow {
+  background-repeat: no-repeat;
+  background-image: url(:/media/background-plain.png);
+  background-position: top center;
+  background-color: white; }
+
+QMainWindow#HomeView {
+  background-repeat: no-repeat;
+  background-image: url(:/media/background-logo.png);
+  background-position: top center;
+  background-color: white; }
+
+QListView {
+  background-color: transparent; }
+
+InvertebrateView #widget {
+  background-color: white; }
+
+QPushButton {
+  min-width: 80px;
+  border-radius: 10px;
+  color: #355797;
+  background-color: #FFFFFF; }
+  QPushButton:hover {
+    background-color: #7DB3DE; }
+  QPushButton:flat {
+    border: none;
+    /* no border for a flat push button */
+    background-color: #7DB3DE; }
+  QPushButton:default {
+    border-color: navy;
+    /* make the default button prominent */ }
+
+QPushButton:pressed {
+  background-color: #4479BA;
+  border-color: #042029;
+  color: #042029; }
+
+QComboBox {
+  selection-background-color: #7DB3DE;
+  border: 1px solid #355797;
+  border-radius: 2px;
+  padding: 10px;
+  color: #355797; }
+  QComboBox:disabled {
+    color: #CDCDCD; }
+
+QComboBox QAbstractItemView {
+  background-color: #FFFFFF;
+  border-radius: 2px;
+  border: 1px solid #444; }
+
+QComboBox, QPushButton {
+  border: 2px solid #355797;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 17px;
+  font-weight: bold;
+  max-height: 30px; }
+
+/*# sourceMappingURL=app.css.map */
