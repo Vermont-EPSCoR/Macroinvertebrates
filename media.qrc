@@ -3,10 +3,7 @@
         <file>media/splash.png</file>
         <file>media/background-logo.png</file>
         <file>media/background-plain.png</file>
-        <file>media/buttons/about.png</file>
-        <file>media/buttons/go.png</file>
-        <file>media/buttons/start.png</file>
-        <file>media/buttons/sync.png</file>
         <file>media/invertebrate-placeholder.jpg</file>
+        <file>styles/app.css</file>
     </qresource>
 </RCC>

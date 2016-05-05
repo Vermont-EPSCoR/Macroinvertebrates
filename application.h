@@ -11,10 +11,17 @@
 #include <QMessageBox>
 #include <QMutex>
 #include <QThreadPool>
+#include <QMessageBox>
+#include <QStatusBar>
+#include <QSplashScreen>
+
+#include <QtConcurrent>
 
 #include <QNetworkConfigurationManager>
 
-#include <algorithm>
+#ifdef ADD_FS_WATCHER
+#include <QFileSystemWatcher>
+#endif
 
 #include "webdatasynchronizer.h"
 
@@ -27,11 +34,6 @@
 
 class Application : public QApplication
 {
-    QString masterStylesheet =  "background-repeat: no-repeat;"
-                                "background-image: url(:/media/background-plain.png);"
-                                "background-position: top center;"
-                                "background-color: rgb(255, 255, 255);";
-
     AboutView *aboutView;
     HomeView *homeView;
     StreamView *streamView;
@@ -47,10 +49,16 @@ class Application : public QApplication
     QString dataPath;
     QString imagePath;
 
+#ifdef ADD_FS_WATCHER
+    QFileSystemWatcher watcher;
+#endif
+
     void setupUiTransitions();
     void transitionWidgets(QWidget *origin, QWidget *destination);
 public:
     Application(int argc, char *argv[]);
+    void performSetUp();
+    QWidget* home();
     ~Application();
 
 public slots:
@@ -64,7 +72,7 @@ public slots:
     void transitionSingleStreamToStreams();
 
     void transitionSingleStreamToInvertebrate(const QString &invertebrate);
-    void transitionInvertebrateToSingleStream(const QString &streamName);
+    void transitionInvertebrateToSingleStream();
 
     void transitionHomeToSettings();
     void transitionSettingsToHome();
@@ -72,6 +80,10 @@ public slots:
     void startSync();
     void loadDataFromDisk();
     void saveDataToDisk();
+
+#ifdef ADD_FS_WATCHER
+    void reloadStyles(const QString &path);
+#endif
 };
 
 #endif // APPLICATION_H

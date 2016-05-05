@@ -136,7 +136,9 @@ void WebDataSynchronizer::handleNetworkReplyForStreamData(QNetworkReply *reply)
         xmlReader.readNextStartElement();
         if(xmlReader.name() == "text") {
             Stream stream = handler.parse(xmlReader.readElementText());
-            streamsFromWeb.insert(stream.title, stream);
+            if(!stream.title.isEmpty()) {
+                streamsFromWeb.insert(stream.title, stream);
+            }
         }
     }
 
