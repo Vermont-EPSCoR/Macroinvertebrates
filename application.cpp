@@ -257,6 +257,7 @@ void Application::performSetUp()
     dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     imagePath = QString("%1%2%3").arg(dataPath, QDir::separator(), "images");
 
+    // Put this into the background
     QtConcurrent::run([this](){
         loadDataFromDisk();
     });
