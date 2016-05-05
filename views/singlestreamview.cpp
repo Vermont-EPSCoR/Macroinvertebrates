@@ -33,8 +33,6 @@ void SingleStreamView::setInfo(const QList<Invertebrate> &invertebrates, const Q
             item = new QListWidgetItem(QIcon(placeHolder), invertebrate.name);
         }
 
-//        item = new QListWidgetItem(invertebrate.name);
-
         item->setTextAlignment(Qt::AlignCenter);
         ui->listWidget->addItem(item);
     }

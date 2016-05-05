@@ -12,8 +12,15 @@
 #include <QThreadPool>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QSplashScreen>
+
+#include <QtConcurrent>
 
 #include <QNetworkConfigurationManager>
+
+#ifdef ADD_FS_WATCHER
+#include <QFileSystemWatcher>
+#endif
 
 #include "webdatasynchronizer.h"
 
@@ -41,10 +48,16 @@ class Application : public QApplication
     QString dataPath;
     QString imagePath;
 
+#ifdef ADD_FS_WATCHER
+    QFileSystemWatcher watcher;
+#endif
+
     void setupUiTransitions();
     void transitionWidgets(QWidget *origin, QWidget *destination);
 public:
     Application(int argc, char *argv[]);
+    void performSetUp();
+    QWidget* home();
     ~Application();
 
 public slots:
@@ -58,16 +71,18 @@ public slots:
     void transitionSingleStreamToStreams();
 
     void transitionSingleStreamToInvertebrate(const QString &invertebrate);
-    void transitionInvertebrateToSingleStream(const QString &streamName);
+    void transitionInvertebrateToSingleStream();
 
     void transitionHomeToSettings();
     void transitionSettingsToHome();
 
-    void reloadStyles();
-
     void startSync();
     void loadDataFromDisk();
     void saveDataToDisk();
+
+#ifdef ADD_FS_WATCHER
+    void reloadStyles(const QString &path);
+#endif
 };
 
 #endif // APPLICATION_H

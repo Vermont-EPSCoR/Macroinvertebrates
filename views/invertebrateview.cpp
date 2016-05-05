@@ -6,6 +6,7 @@ InvertebrateView::InvertebrateView(QWidget *parent) :
     ui(new Ui::InvertebrateView)
 {
     ui->setupUi(this);
+    ui->description->setReadOnly(true);
 }
 
 InvertebrateView::~InvertebrateView()
@@ -16,8 +17,10 @@ InvertebrateView::~InvertebrateView()
 void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamName)
 {
     this->streamName = streamName;
+#ifndef MOBILE_DEPLOYMENT
     qDebug() << invertebrate;
-    ui->label_description->setText(invertebrate.description);
+#endif
+    ui->description->setPlainText(invertebrate.description);
     ui->label_family->setText(invertebrate.family);
     ui->label_genus->setText(invertebrate.genus);
     if(invertebrate.imageIsReady) {

@@ -1,13 +1,11 @@
 QMainWindow {
   background-repeat: no-repeat;
-  background-image: url(:/media/background-plain.png);
+  border-image: url(:/media/background-plain.png);
   background-position: top center;
   background-color: white; }
 
 QMainWindow#HomeView {
-  background-repeat: no-repeat;
-  background-image: url(:/media/background-logo.png);
-  background-position: top center;
+  border-image: url(:/media/background-logo.png);
   background-color: white; }
 
 QListView {
@@ -45,6 +43,9 @@ QComboBox {
   QComboBox:disabled {
     color: #CDCDCD; }
 
+QListWidget#SingleStreamView:item {
+  padding: 15px; }
+
 QComboBox QAbstractItemView {
   background-color: #FFFFFF;
   border-radius: 2px;
@@ -63,28 +64,31 @@ QComboBox, QPushButton {
 QScrollBar:vertical {
   width: 7px;
   margin: 16px 0 16px 0;
-  border: 1px solid #222222; }
+  border: 2px solid #355797; }
+  QScrollBar:vertical:groove {
+    width: 20px; }
 
 QScrollBar::handle:vertical {
+  background: white;
   min-height: 20px;
-  border-radius: 2px; }
+  border: 2px solid #355797; }
 
 QScrollBar::add-line:vertical {
-  border: 1px solid #1b1b19;
+  border: 2px solid #355797;
   border-radius: 2px;
   height: 14px;
   subcontrol-position: bottom;
   subcontrol-origin: margin; }
 
 QScrollBar::sub-line:vertical {
-  border: 1px solid #1b1b19;
+  border: 2px solid #355797;
   border-radius: 2px;
   height: 14px;
   subcontrol-position: top;
   subcontrol-origin: margin; }
 
 QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
-  border: 1px solid black;
+  border: 2px solid #355797;
   width: 1px;
   height: 1px;
   background: white; }

@@ -2,64 +2,6 @@
 
 Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 {
-    setOrganizationDomain("epscor.uvm.edu");
-    setOrganizationName("EPSCOR");
-    setApplicationName("Macroinvertebrates");
-
-    setStyle("plastique");
-    QFile file(":/styles/app.css");
-    file.open(QFile::ReadOnly);
-    setStyleSheet(file.readAll());
-    file.close();
-
-    aboutView = new AboutView();
-    homeView = new HomeView();
-    invertebrateView = new InvertebrateView();
-    settingsView = new SettingsView();
-    singleStreamView = new SingleStreamView();
-    streamView = new StreamView();
-
-    dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    imagePath = QString("%1%2%3").arg(dataPath, QDir::separator(), "images");
-
-    loadDataFromDisk();
-    setupUiTransitions();
-
-    QFont listFont("Times", 20);
-    homeView->show();
-
-    streamView->setListFont(listFont);
-    singleStreamView->setListFont(listFont);
-
-    QSettings settings;
-    SyncOptions option = (SyncOptions)settings.value("syncingPreference").toInt();
-    if(option != SyncOptions::MANUAL_ONLY) {
-        if(option == SyncOptions::ON_STARTUP) {
-            startSync();
-        }
-
-        // ELSE TEST FOR WIRELESS
-        QNetworkConfigurationManager ncm;
-        auto nc = ncm.allConfigurations();
-
-        for (auto &x : nc) {
-            qDebug() << x.name();
-            qDebug() << x.bearerTypeName();
-            qDebug() << x.bearerTypeFamily();
-            qDebug() << x.state();
-            qDebug() << x.state().testFlag(QNetworkConfiguration::Active);
-            qDebug() << x.isValid();
-
-            if(x.isValid() && x.state().testFlag(QNetworkConfiguration::Active)) {
-                homeView->statusBar()->showMessage("We're actively connected to some kind of internets", 10000);
-                qDebug() << "Should be showing";
-            }
-        }
-
-    }
-
-    connect(settingsView, &SettingsView::syncButtonClicked, this, &Application::startSync);
-    connect(settingsView, &SettingsView::reloadStylesClicked, this, &Application::reloadStyles);
 }
 
 void Application::transitionHomeToStream()
@@ -122,13 +64,14 @@ void Application::transitionSingleStreamToInvertebrate(const QString &invertebra
     transitionWidgets(singleStreamView, invertebrateView);
 }
 
-void Application::transitionInvertebrateToSingleStream(const QString &streamName)
+void Application::transitionInvertebrateToSingleStream()
 {
     transitionWidgets(invertebrateView, singleStreamView);
 }
 
 void Application::loadDataFromDisk()
 {
+    qDebug() << "Starting";
     QDir directoryHelper;
     bool result = directoryHelper.mkpath(imagePath);
     bool needToSync = false;
@@ -140,7 +83,9 @@ void Application::loadDataFromDisk()
     } else {
         QFile dataFile(streamDataPath);
         if(!dataFile.open(QFile::ReadOnly)) {
+#ifndef MOBILE_DEPLOYMENT
             qDebug() << "Unable to open local invertebrate data";
+#endif
 //            emit noLocalDataFound();
             return;
         } else {
@@ -156,7 +101,9 @@ void Application::loadDataFromDisk()
     } else {
         QFile dataFile(invertebrateDataPath);
         if(!dataFile.open(QFile::ReadOnly)) {
+#ifndef MOBILE_DEPLOYMENT
             qDebug() << "Unable to open local invertebrate data";
+#endif
 //            emit noLocalDataFound();
             return;
         }
@@ -166,9 +113,13 @@ void Application::loadDataFromDisk()
     }
 
     if(needToSync) {
+#ifndef MOBILE_DEPLOYMENT
         qDebug() << "Starting Sync";
+#endif
         startSync();
     }
+
+    qDebug() << "Ending";
 }
 
 void Application::saveDataToDisk()
@@ -177,7 +128,9 @@ void Application::saveDataToDisk()
     QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
     QFile streamDataFile(streamDataPath);
     if(!streamDataFile.open(QFile::WriteOnly)) {
+#ifndef MOBILE_DEPLOYMENT
         qDebug() << "Unable to open local invertebrate data";
+#endif
         return;
     }
 
@@ -187,7 +140,9 @@ void Application::saveDataToDisk()
     QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "invertebrate.data");
     QFile invertebrateDataFile(invertebrateDataPath);
     if(!invertebrateDataFile.open(QFile::WriteOnly)) {
+#ifndef MOBILE_DEPLOYMENT
         qDebug() << "Unable to open local invertebrate data";
+#endif
         return;
     }
 
@@ -259,16 +214,98 @@ Application::~Application() {
     streamView->deleteLater();
 }
 
-void Application::reloadStyles()
+#ifdef ADD_FS_WATCHER
+
+void Application::reloadStyles(const QString &path)
 {
+    if(path.endsWith("app.css")) {
+        qDebug() << path;
+    }
     QFile styles("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
     if(styles.open(QFile::ReadOnly)) {
         setStyleSheet("/* /");
         QString loadedStyles = styles.readAll();
         qDebug() << loadedStyles;
         setStyleSheet(loadedStyles);
-    } else {
+    }/* else {
         qDebug() << "Unable to open styles.css";
         setStyleSheet("/* /");
+    }*/
+}
+
+#endif
+
+void Application::performSetUp()
+{
+    setOrganizationDomain("epscor.uvm.edu");
+    setOrganizationName("EPSCOR");
+    setApplicationName("Macroinvertebrates");
+
+    setStyle("plastique");
+    QFile file(":/styles/app.css");
+    file.open(QFile::ReadOnly);
+    setStyleSheet(file.readAll());
+    file.close();
+
+    aboutView = new AboutView();
+    homeView = new HomeView();
+    invertebrateView = new InvertebrateView();
+    settingsView = new SettingsView();
+    singleStreamView = new SingleStreamView();
+    streamView = new StreamView();
+
+    dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    imagePath = QString("%1%2%3").arg(dataPath, QDir::separator(), "images");
+
+    QtConcurrent::run([this](){
+        loadDataFromDisk();
+    });
+
+    setupUiTransitions();
+
+    QFont listFont("Times", 20);
+    homeView->show();
+
+#ifdef ADD_FS_WATCHER
+    qDebug() << "Doing this";
+    watcher.addPath("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
+    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &Application::reloadStyles);
+#endif
+
+    streamView->setListFont(listFont);
+    singleStreamView->setListFont(listFont);
+
+    QSettings settings;
+    SyncOptions option = (SyncOptions)settings.value("syncingPreference").toInt();
+    if(option != SyncOptions::MANUAL_ONLY) {
+        if(option == SyncOptions::ON_STARTUP) {
+            startSync();
+        }
+
+        // ELSE TEST FOR WIRELESS
+        QNetworkConfigurationManager ncm;
+        auto nc = ncm.allConfigurations();
+
+        for (auto &x : nc) {
+            qDebug() << x.name();
+            qDebug() << x.bearerTypeName();
+            qDebug() << x.bearerTypeFamily();
+            qDebug() << x.state();
+            qDebug() << x.state().testFlag(QNetworkConfiguration::Active);
+            qDebug() << x.isValid();
+
+            if(x.isValid() && x.state().testFlag(QNetworkConfiguration::Active)) {
+                homeView->statusBar()->showMessage("We're actively connected to some kind of internets", 10000);
+                qDebug() << "Should be showing";
+            }
+        }
+
     }
+
+    connect(settingsView, &SettingsView::syncButtonClicked, this, &Application::startSync);
+}
+
+QWidget *Application::home()
+{
+    return homeView;
 }

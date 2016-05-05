@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network xml
+QT       += core gui network xml concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -115,4 +115,15 @@ DISTFILES += \
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
 ICON = media/OSX.icns
+
+macx: {
+# For reloading of the stylesheet during development
+    DEFINES += "ADD_FS_WATCHER"
+}
+
+!macx: {
+#    These settings will remove qDebug statements and other statements that take too long for mobile processors
+    message("Using settings for Mobile.")
+    DEFINES += "MOBILE_DEPLOYMENT"
+}
 
