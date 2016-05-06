@@ -36,11 +36,6 @@ void SingleStreamView::setInfo(const QList<Invertebrate> &invertebrates, const Q
         item->setTextAlignment(Qt::AlignCenter);
         ui->listWidget->addItem(item);
     }
-
-    layout()->update();
-    layout()->activate();
-
-    qDebug() << ui->centralwidget->size();
 }
 
 const QString &SingleStreamView::getStreamName()

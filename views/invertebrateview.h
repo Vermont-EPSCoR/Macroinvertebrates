@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QGridLayout>
+#include <QScreen>
 
 #include "../models/invertebrate.h"
 
@@ -19,7 +20,6 @@ class InvertebrateView : public QMainWindow
 {
     Q_OBJECT
     QString streamName;
-
 public:
     explicit InvertebrateView(QWidget *parent = 0);
     ~InvertebrateView();

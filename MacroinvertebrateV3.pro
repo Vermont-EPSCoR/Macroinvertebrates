@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network xml concurrent
+QT       += core gui network xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -107,11 +107,20 @@ DISTFILES += \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
     android/gradlew.bat \
-    media/vbig.icns
+    media/vbig.icns \
+    Info.plist
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
 ICON = media/OSX.icns
+
+ios {
+    QMAKE_INFO_PLIST = Info.plist
+    ios_icon.files = $$files($$PWD/iOS/iPhone*.png)
+    message($$ios_icon.files)
+    QMAKE_BUNDLE_DATA += ios_icon
+    DEFINES += "ON_IOS"
+}
 
 macx: {
 # For reloading of the stylesheet during development

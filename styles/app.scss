@@ -1,5 +1,5 @@
-$StTropaz: #355797;
-$std_border: 2px solid $StTropaz;
+$std_blue: #355797;
+$std_border: 2px solid $std_blue;
 
 QMainWindow {
   background-repeat: no-repeat;
@@ -26,7 +26,7 @@ InvertebrateView {
 QPushButton {
   min-width: 80px;
   border-radius: 10px;
-  color: $StTropaz;
+  color: $std_blue;
   background-color: #FFFFFF;
 
   &:hover {
@@ -48,15 +48,15 @@ QPushButton:pressed {
 }
 
 QComboBox {
-    selection-background-color: #7DB3DE;
-    border: 1px solid $StTropaz;
-    border-radius: 2px;
-    padding: 10px;
-    color: $StTropaz;
+  selection-background-color: #7DB3DE;
+  border: 1px solid $std_blue;
+  border-radius: 2px;
+  padding: 10px;
+  color: $std_blue;
 
-    &:disabled {
-      color: #CDCDCD;
-    }
+  &:disabled {
+    color: #CDCDCD;
+  }
 }
 
 QListWidget#SingleStreamView:item {
@@ -67,11 +67,10 @@ QComboBox QAbstractItemView {
   background-color: #FFFFFF;
   border-radius: 2px;
   border: 1px solid #444;
-  // selection-background-color: #3d8ec9;
 }
 
 QComboBox, QPushButton {
-  border: 2px solid $StTropaz;
+  border: 2px solid $std_blue;
   padding-left: 10px;
   padding-right: 10px;
   padding-top: 5px;
@@ -79,55 +78,73 @@ QComboBox, QPushButton {
   font-size: 17px;
   font-weight: bold;
   max-height: 30px;
-  // max-width: 75%;
 }
 
 QScrollBar:vertical
 {
-      width: 7px;
-      margin: 16px 0 16px 0;
-      border: $std_border;
-      &:groove {
-        width: 20px;
-      }
+  width: 7px;
+  margin: 16px 0 16px 0;
+  border: $std_border;
+  &:groove {
+    width: 20px;
+  }
 }
 
 QScrollBar::handle:vertical
 {
-
-      background: white;
-      min-height: 20px;
-      border: $std_border;
+  background: white;
+  min-height: 20px;
+  border: $std_border;
 }
 
 QScrollBar::add-line:vertical
 {
-      border: $std_border;
-      border-radius: 2px;
-      height: 14px;
-      subcontrol-position: bottom;
-      subcontrol-origin: margin;
+  border: $std_border;
+  border-radius: 2px;
+  height: 14px;
+  subcontrol-position: bottom;
+  subcontrol-origin: margin;
 }
 
 QScrollBar::sub-line:vertical
 {
-      border: $std_border;
-      border-radius: 2px;
-      height: 14px;
-      subcontrol-position: top;
-      subcontrol-origin: margin;
+  border: $std_border;
+  border-radius: 2px;
+  height: 14px;
+  subcontrol-position: top;
+  subcontrol-origin: margin;
 }
 
 QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical
 {
-      border: $std_border;
-      width: 1px;
-      height: 1px;
-      background: white;
+  border: $std_border;
+  width: 1px;
+  height: 1px;
+  background: white;
 }
-
 
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical
 {
-      background: none;
+  background: transparent;
+}
+
+QScrollArea {
+  border: $std_border;
+  border-radius: 4px;
+  background: transparent;
+}
+
+QScrollArea:scrollAreaWidgetContents {
+  background: transparent;
+}
+
+QLabel#label_title {
+  font-weight: bold;
+  font-size: 30px;
+}
+
+QLabel#label_image {
+  border: $std_border;
+  padding: 0px;
+  margin: 0px;
 }

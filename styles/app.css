@@ -94,6 +94,23 @@ QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
   background: white; }
 
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-  background: none; }
+  background: transparent; }
+
+QScrollArea {
+  border: 2px solid #355797;
+  border-radius: 4px;
+  background: transparent; }
+
+QScrollArea:scrollAreaWidgetContents {
+  background: transparent; }
+
+QLabel#label_title {
+  font-weight: bold;
+  font-size: 30px; }
+
+QLabel#label_image {
+  border: 2px solid #355797;
+  padding: 0px;
+  margin: 0px; }
 
 /*# sourceMappingURL=app.css.map */

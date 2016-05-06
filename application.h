@@ -15,8 +15,6 @@
 #include <QStatusBar>
 #include <QSplashScreen>
 
-#include <QtConcurrent>
-
 #include <QNetworkConfigurationManager>
 
 #ifdef ADD_FS_WATCHER

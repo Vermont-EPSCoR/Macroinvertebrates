@@ -69,7 +69,6 @@ InvertebrateView::InvertebrateView(QWidget *parent) :
     ui(new Ui::InvertebrateView)
 {
     ui->setupUi(this);
-    ui->description->setReadOnly(true);
 }
 
 InvertebrateView::~InvertebrateView()
@@ -82,6 +81,7 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamN
 #ifndef MOBILE_DEPLOYMENT
     qDebug() << invertebrate;
 #endif
+    // Remove all items to start
     int rows = ui->gridLayout->rowCount();
     for(int i = 0; i < rows; i++) {
         removeRow(ui->gridLayout, i, true);
@@ -94,7 +94,6 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamN
     if(!invertebrate.commonName.isEmpty()) {
         ui->gridLayout->addWidget(new QLabel("Common Name:"), row, 0);
         ui->gridLayout->addWidget(new QLabel(invertebrate.commonName), row, 1);
-//        ui->gridLayout->addItem(new QSpacerItem());
         row++;
     }
 
@@ -123,14 +122,22 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamN
     }
 
     ui->gridLayout->setColumnStretch(1, 1);
+    ui->description->setText(invertebrate.description);
 
-    ui->description->setPlainText(invertebrate.description);
+    ui->centralwidget->ensurePolished();
+
+    QPixmap pixmap;
 
     if(invertebrate.imageIsReady) {
-        ui->label_image->setPixmap(QPixmap(invertebrate.imageFileLocal));
+        pixmap = QPixmap(invertebrate.imageFileLocal);
     } else {
-        ui->label_image->setPixmap(QPixmap(":/media/invertebrate-placeholder.jpg"));
+        pixmap = QPixmap(":/media/invertebrate-placeholder.jpg");
     }
+
+#ifdef ON_IOS
+    pixmap = pixmap.scaledToWidth(qApp->primaryScreen()->geometry().size().width() * 0.85);
+#endif
+    ui->label_image->setPixmap(pixmap);
 }
 
 void InvertebrateView::on_pushButton_back_clicked()
