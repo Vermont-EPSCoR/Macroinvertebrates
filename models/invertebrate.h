@@ -5,6 +5,12 @@
 #include <QDataStream>
 #include <QDebug>
 
+enum class ImageStatus {
+    READY,
+    QUEUED_FOR_DOWNLOAD,
+    UNAVAILABLE
+};
+
 class Invertebrate
 {
 
@@ -21,11 +27,10 @@ public:
     // Etc. May be sorted
     QString description;
     QString flyName;
-    QString imageFileLocal;  // Use ETag
+    QString imageFileLocal;
     QString imageFileRemote;
 
-    bool imageIsUpToDate = false;
-    bool imageIsReady = false;
+    ImageStatus imageIsReady = ImageStatus::QUEUED_FOR_DOWNLOAD;
 
     bool operator <(const Invertebrate& inv) const;
     bool operator >(const Invertebrate& inv) const;

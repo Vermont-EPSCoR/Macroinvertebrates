@@ -67,9 +67,7 @@ class WebDataSynchronizer : public QObject, public QRunnable
     QEventLoop loop;
     QString imagePath;
     QDir directoryHelper;
-    QNetworkAccessManager *network = nullptr;
-    QMap<QString, Invertebrate> invertebratesFromWeb;
-    QMap<QString, Stream> streamsFromWeb;
+    QNetworkAccessManager *network = nullptr;  // Must be constructed on the threadpool thread, so this starts off null
     QDateTime lastUpdate;
 
     QNetworkReply *synchronouslyGetUrl(const QUrl &url, bool *ok);
@@ -92,7 +90,7 @@ public slots:
     void stop();
 signals:
     void statusUpdateMessage(const QString &status);
-    void finished(WebDataSynchonizerExitStatus status);  // on SUCCEEDED Application should serialize, and optionally notify the user
+    void finished(WebDataSynchonizerExitStatus status);
     void streamSyncComplete();
     void invertebrateSyncComplete();
     void imageSyncComplete();

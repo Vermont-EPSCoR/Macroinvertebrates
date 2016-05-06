@@ -87,7 +87,7 @@ FORMS    += \
 INCLUDEPATH += "$$PWD/deps/gumbo-parser"
 INCLUDEPATH += "$$PWD/deps/QGumboParser"
 
-#QMAKE_LFLAGS += -v
+QMAKE_LFLAGS += -v
 
 CONFIG += c++11
 QMAKE_CXXFLAGS += -O3
@@ -117,7 +117,6 @@ ICON = media/OSX.icns
 ios {
     QMAKE_INFO_PLIST = Info.plist
     ios_icon.files = $$files($$PWD/iOS/iPhone*.png)
-    message($$ios_icon.files)
     QMAKE_BUNDLE_DATA += ios_icon
     DEFINES += "ON_IOS"
 }

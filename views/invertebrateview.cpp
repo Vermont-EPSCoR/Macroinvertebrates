@@ -128,10 +128,16 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamN
 
     QPixmap pixmap;
 
-    if(invertebrate.imageIsReady) {
-        pixmap = QPixmap(invertebrate.imageFileLocal);
-    } else {
-        pixmap = QPixmap(":/media/invertebrate-placeholder.jpg");
+    switch (invertebrate.imageIsReady) {
+        case ImageStatus::READY:
+            pixmap = QPixmap(invertebrate.imageFileLocal);
+            break;
+        case ImageStatus::QUEUED_FOR_DOWNLOAD:
+            pixmap = QPixmap(":/media/placeholder-queued.png");
+            break;
+        default:
+            pixmap = QPixmap(":/media/placeholder-unavailable.png");
+            break;
     }
 
 #ifdef ON_IOS

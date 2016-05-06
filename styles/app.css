@@ -43,8 +43,13 @@ QComboBox {
   QComboBox:disabled {
     color: #CDCDCD; }
 
-QListWidget#SingleStreamView:item {
-  padding: 15px; }
+#SingleStreamView ::item {
+  padding-bottom: 15px;
+  height: 230px;
+  border: 2px solid #355797; }
+
+QListWidgetItem {
+  background: blue; }
 
 QComboBox QAbstractItemView {
   background-color: #FFFFFF;

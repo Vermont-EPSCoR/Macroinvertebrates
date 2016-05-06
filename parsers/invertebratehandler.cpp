@@ -20,8 +20,6 @@ InvertebrateHandler::InvertebrateHandler()
 
 void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Invertebrate &invertebrate)
 {
-//    if(infoBox.contains())
-
     QRegularExpressionMatch match = textBlock.match(infoBox);
     if(match.hasMatch()) {
         invertebrate.description = match.captured(1).trimmed();
@@ -45,21 +43,19 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
             QString value = pair.at(1).trimmed();
 
             if(key == "|name") {
-                invertebrate.name = value;
+                invertebrate.name = naiveStringToTitleCase(value);
             } else if(key == "|common name") {
-                invertebrate.commonName = value;
+                invertebrate.commonName = naiveStringToTitleCase(value);
             } else if(key == "|family") {
-                invertebrate.family = value;
+                invertebrate.family = naiveStringToTitleCase(value);
             } else if(key == "|fly name") {
-                invertebrate.flyName = value;
+                invertebrate.flyName = naiveStringToTitleCase(value);
             } else if(key == "|genus") {
-                invertebrate.genus = value;
+                invertebrate.genus = naiveStringToTitleCase(value);
             } else if(key == "|image") {
                 invertebrate.imageFileRemote = value;
             } else if(key == "|order") {
-                invertebrate.order = value;
-            } else if(key != "|text") {
-//                qDebug() << "Key: " << key << " Value: " << value;
+                invertebrate.order = naiveStringToTitleCase(value);
             }
         }
     }
@@ -76,9 +72,9 @@ bool InvertebrateHandler::validate(const Invertebrate &invertebrate)
     QStringList nullAttributes;
 
 //    commonName is commonly missing and may not be an error?
-//    if(invertebrate.commonName.isEmpty()) {
-//        nullAttributes << "commonName";
-//    }
+    if(invertebrate.commonName.isEmpty()) {
+        nullAttributes << "commonName";
+    }
 
     if(invertebrate.description.isEmpty()) {
         nullAttributes << "description/title";
@@ -137,4 +133,23 @@ void InvertebrateHandler::fixWikiLinks(Invertebrate &invertebrate)
         QRegularExpressionMatch match = iter.next();
         invertebrate.description = invertebrate.description.replace(match.captured(0), match.captured(1));
     }
+}
+
+QString InvertebrateHandler::naiveStringToTitleCase(const QString &original)
+{
+    QString string = original.toLower();
+    bool lastCharWasSpace = true;
+    for(int i = 0; i < string.length(); i++) {
+        QCharRef c = string[i];
+        if(c.isSpace()) {
+            lastCharWasSpace = true;
+        } else {
+            if(lastCharWasSpace) {
+                string[i] = c.toUpper();
+            }
+            lastCharWasSpace = false;
+        }
+    }
+
+    return string;
 }

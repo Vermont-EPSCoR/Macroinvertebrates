@@ -23,6 +23,7 @@ void WebDataSynchronizer::run()
     if(network->networkAccessible() == QNetworkAccessManager::Accessible) {
         syncStreams();
         syncInvertebrates();
+        // emit basicInformationComplete();
         syncImages();
         syncAbout();
 
@@ -137,7 +138,8 @@ void WebDataSynchronizer::handleNetworkReplyForStreamData(QNetworkReply *reply)
         if(xmlReader.name() == "text") {
             Stream stream = handler.parse(xmlReader.readElementText());
             if(!stream.title.isEmpty()) {
-                streamsFromWeb.insert(stream.title, stream);
+                QMutexLocker locker(mutex);
+                streamsFromLocal->insert(stream.title, stream);
             }
         }
     }
@@ -255,7 +257,8 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *r
         xmlReader.readNextStartElement();
         if(xmlReader.name() == "text") {
             Invertebrate invertebrate = handler.parse(xmlReader.readElementText());
-            invertebratesFromWeb.insert(invertebrate.name, invertebrate);
+            QMutexLocker locker(mutex);
+            invertebratesFromLocal->insert(invertebrate.name, invertebrate);
         }
     }
 }
@@ -268,7 +271,7 @@ void WebDataSynchronizer::syncImages()
     }
     // if this method is only ever called from the end of the invertebrate sync there's no need to check for isOk
     QStringList titles;
-    for(Invertebrate &invertebrate: invertebratesFromWeb) {
+    for(Invertebrate &invertebrate: *invertebratesFromLocal) {
         titles.append(invertebrate.imageFileRemote);
     }
 
@@ -287,7 +290,7 @@ void WebDataSynchronizer::syncImages()
     bool ok;
 
     QMap<QString, QList<Invertebrate*>> invertebrateImages;
-    for(Invertebrate& invertebrate: invertebratesFromWeb) {
+    for(Invertebrate& invertebrate: *invertebratesFromLocal) {
         QString storedFileName = invertebrate.imageFileRemote;
         QString spacesToUnderscores = invertebrate.imageFileRemote.replace(" ", "_");
         QString underscoresToSpaces = invertebrate.imageFileRemote.replace("_", " ");
@@ -373,22 +376,22 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply, Q
 
             QString localFileName = QString("%1%2%3.%4").arg(imagePath, directoryHelper.separator(), hasher.result().toHex(), extension);
 
+            QMutexLocker locker(mutex);
             if(!directoryHelper.exists(localFileName)) {
                 QNetworkReply *nextReply = synchronouslyGetUrl(thumbUrl, &ok);
-
                 if(ok) {
                     if(handleNetworkReplyForImageData(nextReply, localFileName)) {
-                        invertebrate->imageIsReady = true;
+                        invertebrate->imageIsReady = ImageStatus::READY;
                         invertebrate->imageFileLocal = localFileName;
                     } else {
-                        invertebrate->imageIsReady = false;
+                        invertebrate->imageIsReady = ImageStatus::UNAVAILABLE;
                     }
                 } else {
                     qDebug() << "Request was not ok: " << thumbUrl << " " << nextReply->errorString();
-                    invertebrate->imageIsReady = false;
+                    invertebrate->imageIsReady = ImageStatus::UNAVAILABLE;
                 }
             } else {
-                invertebrate->imageIsReady = true;
+                invertebrate->imageIsReady = ImageStatus::READY;
                 invertebrate->imageFileLocal = localFileName;
             }
         }
@@ -427,14 +430,6 @@ void WebDataSynchronizer::finalize()
         emit finished(WebDataSynchonizerExitStatus::FAILED_RUNTIME);
         return;
     }
-
-    QMutexLocker locker(mutex);
-    streamsFromLocal->clear();
-    streamsFromLocal->unite(streamsFromWeb);
-
-    invertebratesFromLocal->clear();
-    invertebratesFromLocal->unite(invertebratesFromWeb);
-    locker.unlock();
 
     emit finished(WebDataSynchonizerExitStatus::SUCCEEDED);
 }

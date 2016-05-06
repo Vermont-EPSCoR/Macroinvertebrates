@@ -59,8 +59,14 @@ QComboBox {
   }
 }
 
-QListWidget#SingleStreamView:item {
-  padding: 15px;
+#SingleStreamView ::item {
+  padding-bottom: 15px;
+  height: 230px;
+  border: $std_border;
+}
+
+QListWidgetItem {
+  background: blue;
 }
 
 QComboBox QAbstractItemView {

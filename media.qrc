@@ -3,7 +3,8 @@
         <file>media/splash.png</file>
         <file>media/background-logo.png</file>
         <file>media/background-plain.png</file>
-        <file>media/invertebrate-placeholder.jpg</file>
         <file>styles/app.css</file>
+        <file>media/placeholder-queued.png</file>
+        <file>media/placeholder-unavailable.png</file>
     </qresource>
 </RCC>

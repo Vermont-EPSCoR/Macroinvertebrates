@@ -26,6 +26,7 @@ class InvertebrateHandler
 
     QString getLocalFileUrl(const QString &remoteFileUrl);
     QString getRemoteFileUrl(const QString &imageName);
+    QString naiveStringToTitleCase(const QString &original);
 
     bool localFileIsPresent(const QString &localFileUrl);
 

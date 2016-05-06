@@ -27,7 +27,7 @@ void SingleStreamView::setInfo(const QList<Invertebrate> &invertebrates, const Q
     for(const Invertebrate& invertebrate: invertebrates) {
         QListWidgetItem *item;
 
-        if(invertebrate.imageIsReady) {
+        if(invertebrate.imageIsReady == ImageStatus::READY) {
             item = new QListWidgetItem(QIcon(invertebrate.imageFileLocal), invertebrate.name);
         } else {
             item = new QListWidgetItem(QIcon(placeHolder), invertebrate.name);

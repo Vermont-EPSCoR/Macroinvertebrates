@@ -223,19 +223,13 @@ Application::~Application() {
 
 void Application::reloadStyles(const QString &path)
 {
-    if(path.endsWith("app.css")) {
-        qDebug() << path;
-    }
     QFile styles("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
     if(styles.open(QFile::ReadOnly)) {
         setStyleSheet("/* /");
         QString loadedStyles = styles.readAll();
         qDebug() << loadedStyles;
         setStyleSheet(loadedStyles);
-    }/* else {
-        qDebug() << "Unable to open styles.css";
-        setStyleSheet("/* /");
-    }*/
+    }
 }
 
 #endif
