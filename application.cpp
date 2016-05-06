@@ -170,25 +170,44 @@ void Application::setupUiTransitions()
 
 void Application::startSync()
 {
-    syncer = new WebDataSynchronizer();
-    syncer->setData(&mutex, &invertebrates, &streams);
-    connect(syncer, &WebDataSynchronizer::finished, [&](WebDataSynchonizerExitStatus status) {
-        if(status == WebDataSynchonizerExitStatus::SUCCEEDED) {
-            saveDataToDisk();
-        } else {
-            qDebug() << "NOT savingToDisk";
+    if(!isSyncingNow) {
+        isSyncingNow = true;
+        syncer = new WebDataSynchronizer();
+        syncer->setData(&mutex, &invertebrates, &streams);
+
+        connect(syncer, &WebDataSynchronizer::finished, [&](WebDataSynchonizerExitStatus status) {
+            // We're done syncing. If the user REALLY wants to they can start again.
+            isSyncingNow = false;
+
+            if(status == WebDataSynchonizerExitStatus::SUCCEEDED) {
+                saveDataToDisk();
+            } else {
+                qDebug() << "NOT savingToDisk";
+            }
+        });
+
+        connect(syncer, &WebDataSynchronizer::aboutStringParsed, aboutView, &AboutView::updateAbout);
+        connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
+        QThreadPool::globalInstance()->start(syncer);
+        settingsView->updateLastSync();
+
+        QMessageBox msgBox;
+        msgBox.setText("Data syncing has begun!");
+        msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
+        if(msgBox.exec() == QMessageBox::Cancel) {
+            syncer->isOk = false;
         }
-    });
-
-    connect(syncer, &WebDataSynchronizer::aboutStringParsed, aboutView, &AboutView::updateAbout);
-    connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
-    QThreadPool::globalInstance()->start(syncer);
-    settingsView->updateLastSync();
-
-    QMessageBox msgBox;
-    msgBox.setText("Data syncing has begun!\nEtcetera and so forth.");
-    msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
-    msgBox.exec();
+    } else {
+        QMessageBox msgBox;
+        msgBox.setText("Data is already syncing. Cancel?");
+        msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::No);
+        if(msgBox.exec() == QMessageBox::Yes) {
+            // If we get here then syncer shouldn't be null, but it's possible so: check
+            if(syncer != nullptr) {
+                syncer->isOk = false;
+            }
+        }
+    }
 }
 
 void Application::transitionHomeToSettings()
@@ -264,8 +283,8 @@ void Application::performSetUp()
 
 #ifdef ADD_FS_WATCHER
     qDebug() << "Doing this";
-    watcher.addPath("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
-    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &Application::reloadStyles);
+//    watcher.addPath("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
+//    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &Application::reloadStyles);
 #endif
 
     streamView->setListFont(listFont);

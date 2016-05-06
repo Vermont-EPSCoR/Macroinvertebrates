@@ -43,6 +43,7 @@ class Application : public QApplication
     QMap<QString, Invertebrate> invertebrates;
     QMap<QString, Stream> streams;
     QMutex mutex;
+    bool isSyncingNow = false;
 
     QString dataPath;
     QString imagePath;
