@@ -145,7 +145,6 @@ QScrollArea:scrollAreaWidgetContents {
 }
 
 QLabel#label_title, QLabel#streamName, QLabel#label {
-  font-weight: bold;
   font-size: 30px;
 }
 
@@ -153,4 +152,8 @@ QLabel#label_image {
   border: $std_border;
   padding: 0px;
   margin: 0px;
+}
+
+AboutView QLabel#label {
+  font-size: 14px;
 }

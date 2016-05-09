@@ -71,7 +71,6 @@ void Application::transitionInvertebrateToSingleStream()
 
 void Application::loadDataFromDisk()
 {
-    qDebug() << "Starting";
     QDir directoryHelper;
     directoryHelper.mkpath(imagePath);
     bool needToSync = false;
@@ -113,13 +112,8 @@ void Application::loadDataFromDisk()
     }
 
     if(needToSync) {
-#ifndef MOBILE_DEPLOYMENT
-        qDebug() << "Starting Sync";
-#endif
         startSync();
     }
-
-    qDebug() << "Ending";
 }
 
 void Application::saveDataToDisk()
@@ -182,7 +176,7 @@ void Application::startSync()
             if(status == WebDataSynchonizerExitStatus::SUCCEEDED) {
                 saveDataToDisk();
             } else {
-                qDebug() << "NOT savingToDisk";
+//                qDebug() << "NOT savingToDisk";
             }
         });
 
