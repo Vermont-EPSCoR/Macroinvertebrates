@@ -92,14 +92,14 @@ QScrollBar:vertical
   margin: 16px 0 16px 0;
   border: $std_border;
   &:groove {
-    width: 20px;
+    width: 10px;
   }
 }
 
 QScrollBar::handle:vertical
 {
   background: white;
-  min-height: 20px;
+  min-height: 10px;
   border: $std_border;
 }
 
@@ -144,7 +144,7 @@ QScrollArea:scrollAreaWidgetContents {
   background: transparent;
 }
 
-QLabel#label_title {
+QLabel#label_title, QLabel#streamName, QLabel#label {
   font-weight: bold;
   font-size: 30px;
 }

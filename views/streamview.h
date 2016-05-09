@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QList>
 #include <QListWidgetItem>
+#include <QScroller>
 
 #include "../models/stream.h"
 

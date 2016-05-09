@@ -113,6 +113,7 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
         if(ok && isOk) {
             handleNetworkReplyForStreamData(nextReply.data());
+            emit statusUpdateMessage(QString("Syncing stream batch %0").arg(i));
         } else {
             isOk = false;
             return;
@@ -221,6 +222,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
     bool ok;
 
     do {
+        emit statusUpdateMessage(QString("Syncing invertebrate batch %0").arg(i));
         int batchStart = i * batchSize;
         int batchEnd = batchStart + batchSize;
         QStringList invertebrateTitlesBatch = invertebrateTitles.mid(batchStart, batchEnd);
@@ -308,6 +310,7 @@ void WebDataSynchronizer::syncImages()
     }
 
     do {
+        emit statusUpdateMessage(QString("Fetching image batch %0").arg(i));
         if(!isOk) {
             qDebug() << "Exiting sync images";
             return;
@@ -367,7 +370,13 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply, Q
         for(Invertebrate *invertebrate: invertebrates) {
             QString extension = title.split(".").last().toLower();
             QJsonObject imageInfo = obj.value("imageinfo").toArray().at(0).toObject();
-            QUrl thumbUrl(imageInfo.value("thumburl").toString());
+            QString urlString = imageInfo.value("thumburl").toString();
+
+            if(urlString.isEmpty()) {
+                continue;
+            }
+
+            QUrl thumbUrl(urlString);
             QString sha = imageInfo.value("sha1").toString();
 
             hasher.reset();
@@ -378,6 +387,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply, Q
 
             QMutexLocker locker(mutex);
             if(!directoryHelper.exists(localFileName)) {
+                emit statusUpdateMessage(QString("Fetching image for %0").arg(invertebrate->name));
                 QNetworkReply *nextReply = synchronouslyGetUrl(thumbUrl, &ok);
                 if(ok) {
                     if(handleNetworkReplyForImageData(nextReply, localFileName)) {
@@ -424,13 +434,13 @@ bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, Q
 
 void WebDataSynchronizer::finalize()
 {
-    qDebug() << "Finalizing";
     if(!isOk) {
-        qDebug() << "Finalizing busted";
+        emit statusUpdateMessage("Sync stopped; Incomplete.");
         emit finished(WebDataSynchonizerExitStatus::FAILED_RUNTIME);
         return;
     }
 
+    emit statusUpdateMessage("Syncing completed successfully.");
     emit finished(WebDataSynchonizerExitStatus::SUCCEEDED);
 }
 

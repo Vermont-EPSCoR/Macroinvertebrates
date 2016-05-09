@@ -69,6 +69,12 @@ InvertebrateView::InvertebrateView(QWidget *parent) :
     ui(new Ui::InvertebrateView)
 {
     ui->setupUi(this);
+    QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
+    QScrollerProperties ScrollerProperties = QScroller::scroller(ui->scrollArea->viewport())->scrollerProperties();
+    ScrollerProperties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, OvershootPolicy);
+    ScrollerProperties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, OvershootPolicy);
+    QScroller::scroller(ui->scrollArea->viewport())->setScrollerProperties(ScrollerProperties);
+    QScroller::grabGesture(ui->scrollArea->viewport(), QScroller::LeftMouseButtonGesture);
 }
 
 InvertebrateView::~InvertebrateView()

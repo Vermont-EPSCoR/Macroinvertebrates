@@ -48,6 +48,8 @@ class Application : public QApplication
     QString dataPath;
     QString imagePath;
 
+    QMainWindow *currentView;
+
 #ifdef ADD_FS_WATCHER
     QFileSystemWatcher watcher;
 #endif
@@ -79,6 +81,8 @@ public slots:
     void startSync();
     void loadDataFromDisk();
     void saveDataToDisk();
+
+    void syncMessage(const QString& message);
 
 #ifdef ADD_FS_WATCHER
     void reloadStyles(const QString &path);

@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include <QIcon>
 #include <QList>
+#include <QScroller>
 
 #include "../models/invertebrate.h"
 
@@ -19,8 +20,6 @@ class SingleStreamView : public QMainWindow
 public:
     explicit SingleStreamView(QWidget *parent = 0);
     ~SingleStreamView();
-
-    QString placeHolder = ":/media/placeholder-queued.png";
 
     void setInfo(const QList<Invertebrate> &invertebrates, const QString &streamName);
     void setListFont(const QFont &font);

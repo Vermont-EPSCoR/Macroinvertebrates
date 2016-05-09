@@ -73,7 +73,7 @@ void Application::loadDataFromDisk()
 {
     qDebug() << "Starting";
     QDir directoryHelper;
-    bool result = directoryHelper.mkpath(imagePath);
+    directoryHelper.mkpath(imagePath);
     bool needToSync = false;
 
     QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
@@ -188,12 +188,16 @@ void Application::startSync()
 
         connect(syncer, &WebDataSynchronizer::aboutStringParsed, aboutView, &AboutView::updateAbout);
         connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
+        connect(syncer, &WebDataSynchronizer::statusUpdateMessage, this, &Application::syncMessage);
+
         QThreadPool::globalInstance()->start(syncer);
         settingsView->updateLastSync();
 
         QMessageBox msgBox;
         msgBox.setText("Data syncing has begun!");
+        msgBox.setInformativeText("Sync has begun. Items will be updated as they are completed. If you wish to stop, press cancel.");
         msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
+
         if(msgBox.exec() == QMessageBox::Cancel) {
             syncer->isOk = false;
         }
@@ -226,6 +230,7 @@ void Application::transitionWidgets(QWidget *origin, QWidget *destination)
     destination->move(origin->pos());
     destination->resize(origin->size());
     destination->show();
+    currentView = static_cast<QMainWindow *>(destination);
     origin->hide();
 }
 
@@ -282,9 +287,8 @@ void Application::performSetUp()
     homeView->show();
 
 #ifdef ADD_FS_WATCHER
-    qDebug() << "Doing this";
-//    watcher.addPath("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
-//    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &Application::reloadStyles);
+    watcher.addPath("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
+    connect(&watcher, &QFileSystemWatcher::fileChanged, this, &Application::reloadStyles);
 #endif
 
     streamView->setListFont(listFont);
@@ -323,4 +327,9 @@ void Application::performSetUp()
 QWidget *Application::home()
 {
     return homeView;
+}
+
+void Application::syncMessage(const QString &message)
+{
+    currentView->statusBar()->showMessage(message, 10000);
 }

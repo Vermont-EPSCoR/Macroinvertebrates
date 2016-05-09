@@ -6,6 +6,12 @@ SingleStreamView::SingleStreamView(QWidget *parent) :
     ui(new Ui::SingleStreamView)
 {
     ui->setupUi(this);
+    QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
+    QScrollerProperties ScrollerProperties = QScroller::scroller(ui->listWidget->viewport())->scrollerProperties();
+    ScrollerProperties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, OvershootPolicy);
+    ScrollerProperties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, OvershootPolicy);
+    QScroller::scroller(ui->listWidget->viewport())->setScrollerProperties(ScrollerProperties);
+    QScroller::grabGesture(ui->listWidget->viewport(), QScroller::LeftMouseButtonGesture);
 }
 
 SingleStreamView::~SingleStreamView()
@@ -22,6 +28,7 @@ void SingleStreamView::setInfo(const QList<Invertebrate> &invertebrates, const Q
 {
     ui->listWidget->clear();
     ui->listWidget->scrollToTop();
+    ui->streamName->setText(streamName);
     this->streamName = streamName;
 
     for(const Invertebrate& invertebrate: invertebrates) {
@@ -29,8 +36,10 @@ void SingleStreamView::setInfo(const QList<Invertebrate> &invertebrates, const Q
 
         if(invertebrate.imageIsReady == ImageStatus::READY) {
             item = new QListWidgetItem(QIcon(invertebrate.imageFileLocal), invertebrate.name);
+        } else if(invertebrate.imageIsReady == ImageStatus::QUEUED_FOR_DOWNLOAD) {
+            item = new QListWidgetItem(QIcon(":/media/placeholder-queued.png"), invertebrate.name);
         } else {
-            item = new QListWidgetItem(QIcon(placeHolder), invertebrate.name);
+            item = new QListWidgetItem(QIcon(":/media/placeholder-unavailable.png"), invertebrate.name);
         }
 
         item->setTextAlignment(Qt::AlignCenter);
