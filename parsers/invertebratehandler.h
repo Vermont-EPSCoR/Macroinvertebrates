@@ -23,6 +23,7 @@ class InvertebrateHandler
     QRegularExpression textBlock;
     QRegularExpression textBlockWithoutStop;
     QRegularExpression wikiStyleLink;
+    QRegularExpression tooMuchWhiteSpace;
 
     QString getLocalFileUrl(const QString &remoteFileUrl);
     QString getRemoteFileUrl(const QString &imageName);

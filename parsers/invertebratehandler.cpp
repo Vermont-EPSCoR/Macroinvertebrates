@@ -16,6 +16,9 @@ InvertebrateHandler::InvertebrateHandler()
 
     wikiStyleLink.setPattern("\\[http[^ ]+ ([^]]+)\\]");
     wikiStyleLink.optimize();
+
+    tooMuchWhiteSpace.setPattern("[\t\f ]{2,}");
+    tooMuchWhiteSpace.optimize();
 }
 
 void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Invertebrate &invertebrate)
@@ -26,7 +29,7 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
     } else {
         match = textBlockWithoutStop.match(infoBox);
         if(match.hasMatch()) {
-            invertebrate.description = match.captured(1).trimmed();
+            invertebrate.description = match.captured(1).trimmed().replace(tooMuchWhiteSpace, " ");
         } else {
             qDebug() << "Something went wrong with the match: " << infoBox;
         }

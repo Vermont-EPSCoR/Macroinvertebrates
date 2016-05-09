@@ -20,7 +20,7 @@ public:
     explicit SingleStreamView(QWidget *parent = 0);
     ~SingleStreamView();
 
-    QString placeHolder = "://media/invertebrate-placeholder.jpg";
+    QString placeHolder = ":/media/placeholder-queued.png";
 
     void setInfo(const QList<Invertebrate> &invertebrates, const QString &streamName);
     void setListFont(const QFont &font);
