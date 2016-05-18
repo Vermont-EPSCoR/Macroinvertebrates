@@ -85,7 +85,7 @@ public slots:
     void syncMessage(const QString& message);
 
 #ifdef ADD_FS_WATCHER
-    void reloadStyles(const QString &path);
+    void reloadStyles();
 #endif
 };
 

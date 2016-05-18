@@ -180,6 +180,8 @@ void Application::startSync()
             }
         });
 
+        bool isFirstSync = streams.count() == 0;
+
         connect(syncer, &WebDataSynchronizer::aboutStringParsed, aboutView, &AboutView::updateAbout);
         connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
         connect(syncer, &WebDataSynchronizer::statusUpdateMessage, this, &Application::syncMessage);
@@ -187,13 +189,16 @@ void Application::startSync()
         QThreadPool::globalInstance()->start(syncer);
         settingsView->updateLastSync();
 
-        QMessageBox msgBox;
-        msgBox.setText("Data syncing has begun!");
-        msgBox.setInformativeText("Sync has begun. Items will be updated as they are completed. If you wish to stop, press cancel.");
-        msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
+        // only show the message about syncing running if the user clicked the sync button
+        if(!isFirstSync) {
+            QMessageBox msgBox;
+            msgBox.setText("Data syncing has begun!");
+            msgBox.setInformativeText("Sync has begun. Items will be updated as they are completed. If you wish to stop, press cancel.");
+            msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
 
-        if(msgBox.exec() == QMessageBox::Cancel) {
-            syncer->isOk = false;
+            if(msgBox.exec() == QMessageBox::Cancel) {
+                syncer->syncingShouldContinue = false;
+            }
         }
     } else {
         QMessageBox msgBox;
@@ -202,7 +207,7 @@ void Application::startSync()
         if(msgBox.exec() == QMessageBox::Yes) {
             // If we get here then syncer shouldn't be null, but it's possible so: check
             if(syncer != nullptr) {
-                syncer->isOk = false;
+                syncer->syncingShouldContinue = false;
             }
         }
     }
@@ -239,7 +244,7 @@ Application::~Application() {
 
 #ifdef ADD_FS_WATCHER
 
-void Application::reloadStyles(const QString &path)
+void Application::reloadStyles()
 {
     QFile styles("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
     if(styles.open(QFile::ReadOnly)) {
@@ -274,11 +279,9 @@ void Application::performSetUp()
     dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     imagePath = QString("%1%2%3").arg(dataPath, QDir::separator(), "images");
 
-    loadDataFromDisk();
-    setupUiTransitions();
-
     QFont listFont("Times", 20);
     homeView->show();
+    currentView = static_cast<QMainWindow *>(homeView);
 
 #ifdef ADD_FS_WATCHER
     watcher.addPath("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
@@ -310,12 +313,18 @@ void Application::performSetUp()
             if(x.isValid() && x.state().testFlag(QNetworkConfiguration::Active)) {
                 homeView->statusBar()->showMessage("We're actively connected to some kind of internets", 10000);
                 qDebug() << "Should be showing";
+                QMessageBox box;
+                box.setText(x.name() + " " + x.bearerTypeName() + " " + x.bearerTypeFamily());
+                box.exec();
             }
         }
 
     }
 
     connect(settingsView, &SettingsView::syncButtonClicked, this, &Application::startSync);
+
+    setupUiTransitions();
+    loadDataFromDisk();
 }
 
 QWidget *Application::home()

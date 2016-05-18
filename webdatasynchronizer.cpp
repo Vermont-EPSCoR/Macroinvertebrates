@@ -38,7 +38,7 @@ void WebDataSynchronizer::run()
 
 void WebDataSynchronizer::syncStreams()
 {
-    if(!isOk) {
+    if(!syncingShouldContinue) {
 //        qDebug() << "We're not OK";
         return;
     }
@@ -60,13 +60,13 @@ void WebDataSynchronizer::syncStreams()
     if(ok) {
         handleNetworkReplyForStreamList(reply.data());
     } else {
-        isOk = false;
+        syncingShouldContinue = false;
     }
 }
 
 void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 {
-    if(!isOk) {
+    if(!syncingShouldContinue) {
 //        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
         return;
     }
@@ -76,7 +76,7 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
     if(doc.isNull()) {
 //        qDebug() << "Doc is null/invalid.";
 //        qDebug() << doc;
-        isOk = false;
+        syncingShouldContinue = false;
         return;
     }
 
@@ -111,11 +111,11 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
         QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> nextReply(synchronouslyGetUrl(url, &ok));
 
-        if(ok && isOk) {
+        if(ok && syncingShouldContinue) {
             handleNetworkReplyForStreamData(nextReply.data());
             emit statusUpdateMessage(QString("Syncing stream batch %0").arg(i));
         } else {
-            isOk = false;
+            syncingShouldContinue = false;
             return;
         }
 
@@ -125,9 +125,9 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
 void WebDataSynchronizer::handleNetworkReplyForStreamData(QNetworkReply *reply)
 {
-    if(reply->error() != QNetworkReply::NoError || !isOk) {
-        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
-        isOk = false;
+    if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
+        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << syncingShouldContinue;
+        syncingShouldContinue = false;
         return;
     }
 
@@ -151,7 +151,7 @@ void WebDataSynchronizer::handleNetworkReplyForStreamData(QNetworkReply *reply)
 void WebDataSynchronizer::syncInvertebrates()
 {
     qDebug() << "Syncing invertebrates";
-    if(!isOk) {
+    if(!syncingShouldContinue) {
 //        qDebug() << "We're not OK";
         return;
     }
@@ -173,7 +173,7 @@ void WebDataSynchronizer::syncInvertebrates()
     if(ok) {
         handleNetworkReplyForInvertebrateList(nextReply.data());
     } else {
-        isOk = false;
+        syncingShouldContinue = false;
     }
 
     emit invertebrateSyncComplete();
@@ -181,9 +181,9 @@ void WebDataSynchronizer::syncInvertebrates()
 
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *reply)
 {
-    if(reply->error() != QNetworkReply::NoError || !isOk) {
+    if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
 //        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
-        isOk = false;
+        syncingShouldContinue = false;
         return;
     }
 
@@ -192,7 +192,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
 
     if(doc.isNull()) {
 //        qDebug() << "Doc is null/invalid in inverts.";
-        isOk = false;
+        syncingShouldContinue = false;
         return;
     }
 
@@ -204,7 +204,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
         }
     }
 
-    if(!isOk) {
+    if(!syncingShouldContinue) {
 //        qDebug() << "Not ok";
         return;
     }
@@ -232,11 +232,11 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
         url.setQuery(query);
         QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> nextReply(synchronouslyGetUrl(url, &ok));
 
-        if(ok && isOk) {
+        if(ok && syncingShouldContinue) {
             handleNetworkReplyForInvertebrateData(nextReply.data());
         } else {
-            qDebug() << "get FAILED for " << url;
-            isOk = false;
+//            qDebug() << "get FAILED for " << url;
+            syncingShouldContinue = false;
             return;
         }
 
@@ -246,9 +246,9 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
 
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *reply)
 {
-    if(reply->error() != QNetworkReply::NoError || !isOk) {
-        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
-        isOk = false;
+    if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
+        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << syncingShouldContinue;
+        syncingShouldContinue = false;
         return;
     }
 
@@ -260,14 +260,18 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *r
         if(xmlReader.name() == "text") {
             Invertebrate invertebrate = handler.parse(xmlReader.readElementText());
             QMutexLocker locker(mutex);
-            invertebratesFromLocal->insert(invertebrate.name, invertebrate);
+            if(invertebrate.name != "Baetis") {  // Baetis is the demo invertebrate and is not useful.
+                invertebratesFromLocal->insert(invertebrate.name, invertebrate);
+            } else {
+                // pass
+            }
         }
     }
 }
 
 void WebDataSynchronizer::syncImages()
 {
-    if(!isOk) {
+    if(!syncingShouldContinue) {
 //        qDebug() << "Exiting sync images";
         return;
     }
@@ -311,7 +315,7 @@ void WebDataSynchronizer::syncImages()
 
     do {
         emit statusUpdateMessage(QString("Fetching image batch %0").arg(i));
-        if(!isOk) {
+        if(!syncingShouldContinue) {
 //            qDebug() << "Exiting sync images";
             return;
         }
@@ -330,7 +334,7 @@ void WebDataSynchronizer::syncImages()
         if(ok) {
             handleNetworkReplyForImageList(reply.data(), &invertebrateImages);
         } else {
-            isOk = false;
+            syncingShouldContinue = false;
         }
 
         i++;
@@ -339,9 +343,9 @@ void WebDataSynchronizer::syncImages()
 
 void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply, QMap<QString, QList<Invertebrate*>> *invertebrateImages)
 {
-    if(reply->error() != QNetworkReply::NoError || !isOk) {
+    if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
 //        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
-        isOk = false;
+        syncingShouldContinue = false;
         return;
     }
 
@@ -349,7 +353,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply, Q
 
     if(doc.isNull()) {
 //        qDebug() << "Doc is null/invalid in ImageList.";
-        isOk = false;
+        syncingShouldContinue = false;
         return;
     }
 
@@ -358,7 +362,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply, Q
     bool ok;
 
     for(const QJsonValue &value: images) {
-        if(!isOk) {
+        if(!syncingShouldContinue) {
 //            qDebug() << "Exiting from handleNetworkReplyForImageList";
             return;
         }
@@ -410,7 +414,7 @@ void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply, Q
 
 bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, QString localFileName)
 {
-    if(!isOk) {
+    if(!syncingShouldContinue) {
         return false;
     }
 
@@ -434,7 +438,7 @@ bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, Q
 
 void WebDataSynchronizer::finalize()
 {
-    if(!isOk) {
+    if(!syncingShouldContinue) {
         emit statusUpdateMessage("Sync stopped; Incomplete.");
         emit finished(WebDataSynchonizerExitStatus::FAILED_RUNTIME);
         return;
@@ -475,13 +479,13 @@ QNetworkReply *WebDataSynchronizer::synchronouslyGetUrl(const QUrl &url, bool *o
 
 void WebDataSynchronizer::stop()
 {
-    isOk = false;
+    syncingShouldContinue = false;
     emit shouldStop();
 }
 
 void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
 {
-    if(reply->error() != QNetworkReply::NoError || !isOk) {
+    if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
         return;
     }
 
@@ -515,7 +519,7 @@ void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
 
 void WebDataSynchronizer::syncAbout()
 {
-    if(!isOk) {
+    if(!syncingShouldContinue) {
         return;
     }
 

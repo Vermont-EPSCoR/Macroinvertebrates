@@ -85,7 +85,7 @@ public:
     void setData(QMutex *mutex, QMap<QString, Invertebrate> *invertebrates, QMap<QString, Stream> *streams);
     void run();
 
-    bool isOk = true;
+    bool syncingShouldContinue = true;
 public slots:
     void stop();
 signals:
