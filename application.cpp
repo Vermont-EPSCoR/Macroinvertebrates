@@ -164,8 +164,25 @@ void Application::setupUiTransitions()
 
 void Application::startSync()
 {
+    // Don't allow multiple syncs to start concurrently
     if(!isSyncingNow) {
+        bool syncIsRequired = streams.count() == 0;
+
+        // Let the user choose if they want to sync data on the first run/if data is empty
+        if(syncIsRequired) {
+            QMessageBox msgBox;
+            msgBox.setText("Welcome new user!");
+            msgBox.setInformativeText("Thank you for installing this app. In order for it to be useful it needs to sync data. This takes up less than 5 megabytes of space.");
+            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+
+            if(msgBox.exec() == QMessageBox::Cancel) {
+                return;
+            }
+        }
+
+        // Start the sync process
         isSyncingNow = true;
+        settingsView->toggleSyncButtonText(SyncStatus::SYNC_IN_PROGRESS);
         syncer = new WebDataSynchronizer();
         syncer->setData(&mutex, &invertebrates, &streams);
 
@@ -173,14 +190,15 @@ void Application::startSync()
             if(status == WebDataSynchonizerExitStatus::SUCCEEDED) {
                 saveDataToDisk();
             } else {
-//                qDebug() << "NOT savingToDisk";
+                // I tried this and ended up causing a number of crashes, possibly something about opening multiple modals?
+//                QMessageBox msgBox;
+//                msgBox.setText("Sync halted");
+//                msgBox.setInformativeText("Sync did not complete. Stored data has not been changed.");
+//                msgBox.exec();
             }
 
-            // We're done syncing. If the user REALLY wants to they can start again.
-            isSyncingNow = false;
+           stopSync();
         });
-
-        bool isFirstSync = streams.count() == 0;
 
         connect(syncer, &WebDataSynchronizer::aboutStringParsed, aboutView, &AboutView::updateAbout);
         connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
@@ -190,25 +208,24 @@ void Application::startSync()
         settingsView->updateLastSync();
 
         // only show the message about syncing running if the user clicked the sync button
-        if(!isFirstSync) {
+        if(!syncIsRequired) {
             QMessageBox msgBox;
             msgBox.setText("Data syncing has begun!");
             msgBox.setInformativeText("Sync has begun. Items will be updated as they are completed. If you wish to stop, press cancel.");
             msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
 
             if(msgBox.exec() == QMessageBox::Cancel) {
-                syncer->syncingShouldContinue = false;
+                stopSync();
             }
         }
     } else {
+        // The user requested a data sync when one was already running. They might want to quit.
         QMessageBox msgBox;
         msgBox.setText("Data is already syncing. Cancel?");
         msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         if(msgBox.exec() == QMessageBox::Yes) {
             // If we get here then syncer shouldn't be null, but it's possible so: check
-            if(syncer != nullptr) {
-                syncer->syncingShouldContinue = false;
-            }
+            stopSync();
         }
     }
 }
@@ -318,7 +335,6 @@ void Application::performSetUp()
                 box.exec();
             }
         }
-
     }
 
     connect(settingsView, &SettingsView::syncButtonClicked, this, &Application::startSync);
@@ -335,4 +351,14 @@ QWidget *Application::home()
 void Application::syncMessage(const QString &message)
 {
     currentView->statusBar()->showMessage(message, 10000);
+}
+
+void Application::stopSync()
+{
+    if(syncer != nullptr) {
+        syncer->syncingShouldContinue = false;
+    }
+
+    settingsView->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
+    isSyncingNow = false;
 }

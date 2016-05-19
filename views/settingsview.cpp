@@ -48,3 +48,12 @@ void SettingsView::updateLastSync()
     QSettings settings;
     ui->lastUpdateLabel->setText(settings.value("lastUpdate").toString());
 }
+
+void SettingsView::toggleSyncButtonText(SyncStatus desiredState)
+{
+    if(desiredState == SyncStatus::READY_TO_SYNC) {
+        ui->pushButton->setText("Sync Now");
+    } else {
+        ui->pushButton->setText("Cancel Sync");
+    }
+}

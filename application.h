@@ -79,6 +79,8 @@ public slots:
     void transitionSettingsToHome();
 
     void startSync();
+    void stopSync();
+
     void loadDataFromDisk();
     void saveDataToDisk();
 

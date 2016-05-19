@@ -23,7 +23,6 @@ void WebDataSynchronizer::run()
     if(network->networkAccessible() == QNetworkAccessManager::Accessible) {
         syncStreams();
         syncInvertebrates();
-        // emit basicInformationComplete();
         syncImages();
         syncAbout();
 
@@ -486,6 +485,7 @@ void WebDataSynchronizer::stop()
 void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
 {
     if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
+        qDebug() << "exiting here";
         return;
     }
 
@@ -493,6 +493,9 @@ void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
     QString htmlStub;
 
     while(!xmlReader.atEnd()) {
+        if(!syncingShouldContinue) {
+            return;
+        }
         xmlReader.readNextStartElement();
         if(xmlReader.name() == "text") {
             htmlStub = xmlReader.readElementText();
@@ -503,6 +506,10 @@ void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
     QGumboNodes paragraphs = doc.rootNode().getElementsByTagName(HtmlTag::P);
     QStringList paragraphList;
     for(QGumboNode node: paragraphs) {
+        if(!syncingShouldContinue) {
+            return;
+        }
+
         QString trimmed = node.innerText().trimmed().replace(QRegularExpression("\\s{2, }"), " ");
 
         if(!trimmed.isEmpty()) {
@@ -511,6 +518,10 @@ void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
     }
 
     if(!paragraphList.isEmpty()) {
+        if(!syncingShouldContinue) {
+            return;
+        }
+
         QSettings settings;
         settings.setValue("aboutText", paragraphList.join("\n\n"));
         emit aboutStringParsed(paragraphList.join("\n\n"));

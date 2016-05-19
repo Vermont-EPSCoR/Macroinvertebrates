@@ -20,6 +20,7 @@ public:
     explicit SettingsView(QWidget *parent = 0);
     ~SettingsView();
     void updateLastSync();
+    void toggleSyncButtonText(SyncStatus desiredState);
 signals:
     void backButtonClicked();
     void syncButtonClicked();

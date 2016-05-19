@@ -53,6 +53,11 @@ enum class SyncOptions {
     WIFI
 };
 
+enum class SyncStatus {
+    SYNC_IN_PROGRESS = 0,
+    READY_TO_SYNC
+};
+
 class WebDataSynchronizer : public QObject, public QRunnable
 {
     Q_OBJECT
