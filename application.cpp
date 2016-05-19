@@ -170,14 +170,14 @@ void Application::startSync()
         syncer->setData(&mutex, &invertebrates, &streams);
 
         connect(syncer, &WebDataSynchronizer::finished, [&](WebDataSynchonizerExitStatus status) {
-            // We're done syncing. If the user REALLY wants to they can start again.
-            isSyncingNow = false;
-
             if(status == WebDataSynchonizerExitStatus::SUCCEEDED) {
                 saveDataToDisk();
             } else {
 //                qDebug() << "NOT savingToDisk";
             }
+
+            // We're done syncing. If the user REALLY wants to they can start again.
+            isSyncingNow = false;
         });
 
         bool isFirstSync = streams.count() == 0;
@@ -203,7 +203,7 @@ void Application::startSync()
     } else {
         QMessageBox msgBox;
         msgBox.setText("Data is already syncing. Cancel?");
-        msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::No);
+        msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         if(msgBox.exec() == QMessageBox::Yes) {
             // If we get here then syncer shouldn't be null, but it's possible so: check
             if(syncer != nullptr) {
