@@ -1,7 +1,7 @@
 #ifndef INVERTEBRATEVIEW_H
 #define INVERTEBRATEVIEW_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QGridLayout>
 #include <QScreen>
 #include <QScroller>
@@ -17,22 +17,16 @@ namespace Ui {
 class InvertebrateView;
 }
 
-class InvertebrateView : public QMainWindow
+class InvertebrateView : public QWidget
 {
     Q_OBJECT
-    QString streamName;
+
 public:
     explicit InvertebrateView(QWidget *parent = 0);
     ~InvertebrateView();
 
     void setInfo(const Invertebrate &invertebrate, QString streamName);
-
-signals:
-    void backButtonClicked(const QString& streamName);
-
-private slots:
-    void on_pushButton_back_clicked();
-
+    void backButtonClicked();
 private:
     Ui::InvertebrateView *ui;
 };

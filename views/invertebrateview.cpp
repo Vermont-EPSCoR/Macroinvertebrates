@@ -65,7 +65,7 @@ void removeColumn(QGridLayout *layout, int column, bool deleteWidgets) {
 }
 
 InvertebrateView::InvertebrateView(QWidget *parent) :
-    QMainWindow(parent),
+    QWidget(parent),
     ui(new Ui::InvertebrateView)
 {
     ui->setupUi(this);
@@ -93,8 +93,7 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamN
         removeRow(ui->gridLayout, i, true);
     }
 
-    this->streamName = streamName;
-    ui->label_title->setText(invertebrate.name);
+    ui->titleLabel->setText(invertebrate.name);
 
     int row = 0;
     if(!invertebrate.commonName.isEmpty()) {
@@ -128,9 +127,9 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamN
     }
 
     ui->gridLayout->setColumnStretch(1, 1);
-    ui->description->setText(invertebrate.description);
+    ui->descriptionLabel->setText(invertebrate.description);
 
-    ui->centralwidget->ensurePolished();
+//    ui->centralwidget->ensurePolished();
 
     QPixmap pixmap;
 
@@ -149,10 +148,11 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, QString streamN
 #ifdef ON_IOS
     pixmap = pixmap.scaledToWidth(qApp->primaryScreen()->geometry().size().width() * 0.85);
 #endif
-    ui->label_image->setPixmap(pixmap);
+    ui->imageLabel->setPixmap(pixmap);
 }
 
 void InvertebrateView::on_pushButton_back_clicked()
 {
-    emit backButtonClicked(streamName);
+    emit backButtonClicked();
 }
+

@@ -1,7 +1,7 @@
 #ifndef SETTINGSVIEW_H
 #define SETTINGSVIEW_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QSettings>
 #include <QDebug>
 #include <QDateTime>
@@ -12,7 +12,7 @@ namespace Ui {
 class SettingsView;
 }
 
-class SettingsView : public QMainWindow
+class SettingsView : public QWidget
 {
     Q_OBJECT
 
@@ -24,11 +24,10 @@ public:
 signals:
     void backButtonClicked();
     void syncButtonClicked();
-    void reloadStylesClicked();
 private slots:
-    void on_pushButton_2_clicked();
-    void on_pushButton_clicked();
-    void on_comboBox_currentIndexChanged(int index);
+    void on_backButton_pressed();
+    void on_syncModeComboBox_currentIndexChanged(int index);
+    void on_syncButton_pressed();
 
 private:
     Ui::SettingsView *ui;

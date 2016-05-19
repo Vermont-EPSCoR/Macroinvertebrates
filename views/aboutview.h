@@ -1,29 +1,26 @@
 #ifndef ABOUTVIEW_H
 #define ABOUTVIEW_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QSettings>
 
 namespace Ui {
 class AboutView;
 }
 
-class AboutView : public QMainWindow
+class AboutView : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit AboutView(QWidget *parent = 0);
     ~AboutView();
-
-public slots:
-    void updateAbout(const QString& about);
-
-private slots:
-    void on_pushButton_clicked();
-
 signals:
     void backButtonClicked();
+public slots:
+    void updateAbout(const QString& about);
+private slots:
+    void on_backButton_pressed();
 
 private:
     Ui::AboutView *ui;

@@ -15,7 +15,6 @@ TEMPLATE = app
 SOURCES += main.cpp \
     application.cpp \
     views/homeview.cpp \
-    views/locationview.cpp \
     views/streamview.cpp \
     views/invertebrateview.cpp \
     models/stream.cpp \
@@ -39,12 +38,13 @@ SOURCES += main.cpp \
     deps/QGumboParser/qgumboattribute.cpp \
     deps/QGumboParser/qgumbodocument.cpp \
     deps/QGumboParser/qgumbonode.cpp \
-    views/settingsview.cpp
+    views/settingsview.cpp \
+    views/settingsview.cpp \
+    views/streamview.cpp
 
 HEADERS  += \
     application.h \
     views/homeview.h \
-    views/locationview.h \
     views/streamview.h \
     views/invertebrateview.h \
     models/stream.h \
@@ -73,16 +73,19 @@ HEADERS  += \
     deps/QGumboParser/qgumboattribute.h \
     deps/QGumboParser/qgumbodocument.h \
     deps/QGumboParser/qgumbonode.h \
-    views/settingsview.h
+    views/settingsview.h \
+    views/settingsview.h \
+    views/streamview.h
 
 FORMS    += \
     views/homeview.ui \
-    views/locationview.ui \
     views/streamview.ui \
     views/invertebrateview.ui \
     views/aboutview.ui \
     views/singlestreamview.ui \
-    views/settingsview.ui
+    views/settingsview.ui \
+    views/settingsview.ui \
+    views/streamview.ui
 
 INCLUDEPATH += "$$PWD/deps/gumbo-parser"
 INCLUDEPATH += "$$PWD/deps/QGumboParser"

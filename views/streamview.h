@@ -1,7 +1,7 @@
 #ifndef STREAMVIEW_H
 #define STREAMVIEW_H
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QList>
 #include <QListWidgetItem>
 #include <QScroller>
@@ -12,24 +12,21 @@ namespace Ui {
 class StreamView;
 }
 
-class StreamView : public QMainWindow
+class StreamView : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit StreamView(QWidget *parent = 0);
     ~StreamView();
-
-    void setStreamList(const QList<Stream> &streamList);
-    void setListFont(const QFont& font);
-private slots:
-    void on_pushButton_clicked();
-    void on_listWidget_itemClicked(QListWidgetItem *item);
-
-    void on_lineEdit_textEdited(const QString &arg1);
-
+    void StreamView::setStreamList(const QList<Stream> &streamList);
 signals:
     void backButtonClicked();
-    void singleStreamDoubleClicked(const QString& streamName);
+    void singleStreamClicked(const QString &stream);
+private slots:
+    void on_backButton_pressed();
+    void on_listWidget_itemClicked(QListWidgetItem *item);
+
 private:
     Ui::StreamView *ui;
 };

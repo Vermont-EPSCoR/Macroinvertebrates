@@ -2,7 +2,7 @@
 #include "ui_streamview.h"
 
 StreamView::StreamView(QWidget *parent) :
-    QMainWindow(parent),
+    QWidget(parent),
     ui(new Ui::StreamView)
 {
     ui->setupUi(this);
@@ -19,9 +19,14 @@ StreamView::~StreamView()
     delete ui;
 }
 
-void StreamView::on_pushButton_clicked()
+void StreamView::on_backButton_pressed()
 {
     emit backButtonClicked();
+}
+
+void StreamView::on_listWidget_itemClicked(QListWidgetItem *item)
+{
+    emit singleStreamClicked(item->text());
 }
 
 void StreamView::setStreamList(const QList<Stream> &streamList)
@@ -33,17 +38,7 @@ void StreamView::setStreamList(const QList<Stream> &streamList)
     }
 }
 
-void StreamView::setListFont(const QFont &font)
-{
-    ui->listWidget->setFont(font);
-}
-
-void StreamView::on_listWidget_itemClicked(QListWidgetItem *item)
-{
-    emit singleStreamDoubleClicked(item->text());
-}
-
-void StreamView::on_lineEdit_textEdited(const QString &arg1)
+void StreamView::on_streamSearch_textEdited(const QString &arg1)
 {
     int rowCount = ui->listWidget->model()->rowCount();
     for(int i = 0; i < rowCount; i++) {
