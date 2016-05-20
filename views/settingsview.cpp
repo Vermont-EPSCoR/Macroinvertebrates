@@ -14,6 +14,7 @@ SettingsView::SettingsView(QWidget *parent) :
                                    "On Startup (Always)",  // SyncOptions::ON_STARTUP
                                    "On Startup (WiFi)",  // SyncOptions::WIFI
                                });
+    ui->lastSyncLabel->setText(settings.value("lastUpdate").toString());
     ui->syncModeComboBox->addItems(syncingOptions);
     // Disable On Startup
     // Horrible hack according to peppe (who is one of the Qt developers)
@@ -41,12 +42,6 @@ void SettingsView::on_syncModeComboBox_currentIndexChanged(int index)
 void SettingsView::on_syncButton_pressed()
 {
     emit syncButtonClicked();
-}
-
-void SettingsView::updateLastSync()
-{
-    QSettings settings;
-    ui->lastSyncLabel->setText(settings.value("lastUpdate").toString());
 }
 
 void SettingsView::toggleSyncButtonText(SyncStatus desiredState)

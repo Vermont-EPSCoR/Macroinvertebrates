@@ -5,12 +5,12 @@ QMainWindow {
   background-repeat: no-repeat;
   border-image: url(:/media/background-plain.png);
   background-position: top center;
-  background-color: rgb(255, 255, 255);
+  // background-color: rgb(255, 255, 255);
 }
 
-QMainWindow#HomeView {
+HomeView {
   border-image: url(:/media/background-logo.png);
-  background-color: rgb(255, 255, 255);
+  // background-color: rgb(255, 255, 255);
 }
 
 QListView {

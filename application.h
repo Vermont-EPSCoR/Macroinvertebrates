@@ -14,12 +14,15 @@
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QSplashScreen>
+#include <QMainWindow>
 
 #include <QNetworkConfigurationManager>
 
 #ifdef ADD_FS_WATCHER
 #include <QFileSystemWatcher>
 #endif
+
+#include <vector>
 
 #include "webdatasynchronizer.h"
 
@@ -32,13 +35,6 @@
 
 class Application : public QApplication
 {
-    AboutView *aboutView;
-    HomeView *homeView;
-    StreamView *streamView;
-    SettingsView *settingsView;
-    SingleStreamView *singleStreamView;
-    InvertebrateView *invertebrateView;
-
     WebDataSynchronizer *syncer; // owned by the threadpool's global instance. don't delete
     QMap<QString, Invertebrate> invertebrates;
     QMap<QString, Stream> streams;
@@ -48,34 +44,29 @@ class Application : public QApplication
     QString dataPath;
     QString imagePath;
 
-    QMainWindow *currentView;
+    QMainWindow mainWindow;
 
 #ifdef ADD_FS_WATCHER
     QFileSystemWatcher watcher;
 #endif
-
-    void setupUiTransitions();
-    void transitionWidgets(QWidget *origin, QWidget *destination);
 public:
     Application(int argc, char *argv[]);
     void performSetUp();
     QWidget* home();
     ~Application();
 
-public slots:
-    void transitionHomeToStream();
-    void transitionStreamToHome();
+private slots:
+    void transitionToAllStreams();
+    void transitionToHome();
+    void transitionToAbout();
 
-    void transitionAboutToHome();
-    void transitionHomeToAbout();
-
-    void transitionStreamsToSingleStream(const QString &streamName);
+    void transitionToSingleStream(const QString &streamName);
     void transitionSingleStreamToStreams();
 
-    void transitionSingleStreamToInvertebrate(const QString &invertebrate);
+    void transitionToInvertebrate(const QString &invertebrate, const QString &streamName);
     void transitionInvertebrateToSingleStream();
 
-    void transitionHomeToSettings();
+    void transitionToSettings();
     void transitionSettingsToHome();
 
     void startSync();
@@ -85,6 +76,8 @@ public slots:
     void saveDataToDisk();
 
     void syncMessage(const QString& message);
+    void updateLastSync();
+    void updateAboutText(const QString &about);
 
 #ifdef ADD_FS_WATCHER
     void reloadStyles();

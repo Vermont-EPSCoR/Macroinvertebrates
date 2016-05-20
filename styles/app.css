@@ -1,12 +1,10 @@
 QMainWindow {
   background-repeat: no-repeat;
   border-image: url(:/media/background-plain.png);
-  background-position: top center;
-  background-color: white; }
+  background-position: top center; }
 
-QMainWindow#HomeView {
-  border-image: url(:/media/background-logo.png);
-  background-color: white; }
+HomeView {
+  border-image: url(:/media/background-logo.png); }
 
 QListView {
   background-color: transparent; }

@@ -7,6 +7,8 @@
 #include <QList>
 #include <QScroller>
 
+#include <vector>
+
 #include "../models/invertebrate.h"
 
 namespace Ui {
@@ -18,17 +20,13 @@ class SingleStreamView : public QWidget
     Q_OBJECT
     QString streamName;
 public:
-    explicit SingleStreamView(QWidget *parent = 0);
+    explicit SingleStreamView(const std::vector<Invertebrate> &invertebratesList, const QString &streamName, QWidget *parent = 0);
     ~SingleStreamView();
-
-    void setInfo(const QList<Invertebrate> &invertebrates, const QString &streamName);
-    const QString &getStreamName();
 signals:
-    void backButtonClicked();
-    void invertebrateDoubleClicked(const QString &invertebrate);
+    void backButtonClicked(const QString& streamName);
+    void invertebrateDoubleClicked(const QString &invertebrate, const QString &streamName);
 private slots:
     void on_backButton_pressed();
-
     void on_listWidget_itemClicked(QListWidgetItem *item);
 
 private:

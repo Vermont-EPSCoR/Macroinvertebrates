@@ -4,9 +4,6 @@ WebDataSynchronizer::WebDataSynchronizer(QObject *parent) : QObject(parent)
 {
     QString dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     imagePath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "images");
-
-    QSettings settings;
-    settings.setValue("lastUpdate", QDateTime::currentDateTime());
 }
 
 void WebDataSynchronizer::setData(QMutex *mutex, QMap<QString, Invertebrate> *invertebrates, QMap<QString, Stream> *streams)
@@ -443,6 +440,8 @@ void WebDataSynchronizer::finalize()
         return;
     }
 
+    QSettings settings;
+    settings.setValue("lastUpdate", QDateTime::currentDateTime());
     emit statusUpdateMessage("Syncing completed successfully.");
     emit finished(WebDataSynchonizerExitStatus::SUCCEEDED);
 }

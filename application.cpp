@@ -4,69 +4,74 @@ Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 {
 }
 
-void Application::transitionHomeToStream()
+void Application::transitionToAllStreams()
 {
+    std::vector<QString> streamList;
     QMutexLocker locker(&mutex);
-    streamView->setStreamList(streams.values());
+    streamList.reserve(streams.size());
+    for(const Stream& stream: streams.values()) {
+        if(!stream.title.isEmpty()) {
+            streamList.push_back(stream.title);
+        }
+    }
     locker.unlock();
 
-    transitionWidgets(homeView, streamView);
+    std::sort(streamList.begin(), streamList.end());
+
+    StreamView *view = new StreamView(streamList);
+    mainWindow.setCentralWidget(view);
+    connect(view, &StreamView::backButtonClicked, this, &Application::transitionToHome);
+    connect(view, &StreamView::singleStreamClicked, this, &Application::transitionToSingleStream);
 }
 
-void Application::transitionStreamToHome()
+void Application::transitionToHome()
 {
-    transitionWidgets(streamView, homeView);
+    HomeView *view = new HomeView();
+    mainWindow.setCentralWidget(view);
+    connect(view, &HomeView::aboutButtonClicked, this, &Application::transitionToAbout);
+    connect(view, &HomeView::syncButtonClicked, this, &Application::transitionToSettings);
+    connect(view, &HomeView::startButtonClicked, this, &Application::transitionToAllStreams);
 }
 
-void Application::transitionAboutToHome()
+void Application::transitionToAbout()
 {
-    transitionWidgets(aboutView, homeView);
+    AboutView *view = new AboutView();
+    mainWindow.setCentralWidget(view);
+    connect(view, &AboutView::backButtonClicked, this, &Application::transitionToHome);
 }
 
-void Application::transitionHomeToAbout()
+void Application::transitionToSingleStream(const QString &streamName)
 {
-    transitionWidgets(homeView, aboutView);
-}
-
-void Application::transitionStreamsToSingleStream(const QString &streamName)
-{
-    QList<Invertebrate> invertebratesList;
+    qDebug() << streamName;
+    std::vector<Invertebrate> invertebratesList;
     QMutexLocker locker(&mutex);
     Stream &stream = streams[streamName];
     invertebratesList.reserve(stream.invertebrateList.length());
 
     for(QString &invertebrateName: stream.invertebrateList) {
         Invertebrate invertebrate = invertebrates[invertebrateName];
-        if(!invertebrate.name.isNull()) {
-            invertebratesList.append(invertebrate);
+        if(!invertebrate.name.isEmpty()) {
+            invertebratesList.push_back(invertebrate);
         }
     }
 
     locker.unlock();
-
     std::sort(invertebratesList.begin(), invertebratesList.end());
-    singleStreamView->setInfo(invertebratesList, streamName);
 
-    transitionWidgets(streamView, singleStreamView);
+    SingleStreamView *view = new SingleStreamView(invertebratesList, streamName);
+    mainWindow.setCentralWidget(view);
+    connect(view, &SingleStreamView::backButtonClicked, this, &Application::transitionToAllStreams);
+    connect(view, &SingleStreamView::invertebrateDoubleClicked, this, &Application::transitionToInvertebrate);
 }
 
-void Application::transitionSingleStreamToStreams()
-{   
-    transitionWidgets(singleStreamView, streamView);
-}
-
-void Application::transitionSingleStreamToInvertebrate(const QString &invertebrate)
+void Application::transitionToInvertebrate(const QString &invertebrate, const QString &streamName)
 {
     QMutexLocker locker(&mutex);
-    invertebrateView->setInfo(invertebrates.value(invertebrate), singleStreamView->getStreamName());
+    InvertebrateView *view = new InvertebrateView(invertebrates.value(invertebrate), streamName);
     locker.unlock();
 
-    transitionWidgets(singleStreamView, invertebrateView);
-}
-
-void Application::transitionInvertebrateToSingleStream()
-{
-    transitionWidgets(invertebrateView, singleStreamView);
+    mainWindow.setCentralWidget(view);
+    connect(view, &InvertebrateView::backButtonClicked, this, &Application::transitionToSingleStream);
 }
 
 void Application::loadDataFromDisk()
@@ -77,7 +82,6 @@ void Application::loadDataFromDisk()
 
     QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
     if(!directoryHelper.exists(streamDataPath)) {
-//        emit noLocalDataFound();
         needToSync = true;
     } else {
         QFile dataFile(streamDataPath);
@@ -85,7 +89,6 @@ void Application::loadDataFromDisk()
 #ifndef MOBILE_DEPLOYMENT
             qDebug() << "Unable to open local invertebrate data";
 #endif
-//            emit noLocalDataFound();
             return;
         } else {
             QDataStream loader(&dataFile);
@@ -95,7 +98,6 @@ void Application::loadDataFromDisk()
 
     QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "invertebrate.data");
     if(!directoryHelper.exists(invertebrateDataPath) || needToSync) {
-//        emit noLocalDataFound();
         needToSync = true;
     } else {
         QFile dataFile(invertebrateDataPath);
@@ -103,7 +105,6 @@ void Application::loadDataFromDisk()
 #ifndef MOBILE_DEPLOYMENT
             qDebug() << "Unable to open local invertebrate data";
 #endif
-//            emit noLocalDataFound();
             return;
         }
 
@@ -144,24 +145,6 @@ void Application::saveDataToDisk()
     invertebrateSaver << invertebrates;
 }
 
-void Application::setupUiTransitions()
-{
-    connect(homeView, &HomeView::startButtonClicked, this, &Application::transitionHomeToStream);
-    connect(streamView, &StreamView::backButtonClicked, this, &Application::transitionStreamToHome);
-
-    connect(homeView, &HomeView::aboutButtonClicked, this, &Application::transitionHomeToAbout);
-    connect(aboutView, &AboutView::backButtonClicked, this, &Application::transitionAboutToHome);
-
-    connect(streamView, &StreamView::singleStreamDoubleClicked, this, &Application::transitionStreamsToSingleStream);
-    connect(singleStreamView, &SingleStreamView::backButtonClicked, this, &Application::transitionSingleStreamToStreams);
-
-    connect(singleStreamView, &SingleStreamView::invertebrateDoubleClicked, this, &Application::transitionSingleStreamToInvertebrate);
-    connect(invertebrateView, &InvertebrateView::backButtonClicked, this, &Application::transitionInvertebrateToSingleStream);
-
-    connect(homeView, &HomeView::syncButtonClicked, this, &Application::transitionHomeToSettings);
-    connect(settingsView, &SettingsView::backButtonClicked, this, &Application::transitionSettingsToHome);
-}
-
 void Application::startSync()
 {
     // Don't allow multiple syncs to start concurrently
@@ -182,7 +165,6 @@ void Application::startSync()
 
         // Start the sync process
         isSyncingNow = true;
-        settingsView->toggleSyncButtonText(SyncStatus::SYNC_IN_PROGRESS);
         syncer = new WebDataSynchronizer();
         syncer->setData(&mutex, &invertebrates, &streams);
 
@@ -200,12 +182,10 @@ void Application::startSync()
            stopSync();
         });
 
-        connect(syncer, &WebDataSynchronizer::aboutStringParsed, aboutView, &AboutView::updateAbout);
         connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
         connect(syncer, &WebDataSynchronizer::statusUpdateMessage, this, &Application::syncMessage);
 
         QThreadPool::globalInstance()->start(syncer);
-        settingsView->updateLastSync();
 
         // only show the message about syncing running if the user clicked the sync button
         if(!syncIsRequired) {
@@ -230,33 +210,15 @@ void Application::startSync()
     }
 }
 
-void Application::transitionHomeToSettings()
+void Application::transitionToSettings()
 {
-    settingsView->updateLastSync();
-    transitionWidgets(homeView, settingsView);
-}
-
-void Application::transitionSettingsToHome()
-{
-    transitionWidgets(settingsView, homeView);
-}
-
-void Application::transitionWidgets(QWidget *origin, QWidget *destination)
-{
-    destination->move(origin->pos());
-    destination->resize(origin->size());
-    destination->show();
-    currentView = static_cast<QMainWindow *>(destination);
-    origin->hide();
+    SettingsView *view = new SettingsView();
+    mainWindow.setCentralWidget(view);
+    connect(view, &SettingsView::backButtonClicked, this, &Application::transitionToHome);
+    connect(view, &SettingsView::syncButtonClicked, this, &Application::startSync);
 }
 
 Application::~Application() {
-    aboutView->deleteLater();
-    homeView->deleteLater();
-    invertebrateView->deleteLater();
-    settingsView->deleteLater();
-    singleStreamView->deleteLater();
-    streamView->deleteLater();
 }
 
 #ifdef ADD_FS_WATCHER
@@ -286,27 +248,20 @@ void Application::performSetUp()
     setStyleSheet(file.readAll());
     file.close();
 
-    aboutView = new AboutView();
-    homeView = new HomeView();
-    invertebrateView = new InvertebrateView();
-    settingsView = new SettingsView();
-    singleStreamView = new SingleStreamView();
-    streamView = new StreamView();
+    HomeView *view = new HomeView();
+    connect(view, &HomeView::aboutButtonClicked, this, &Application::transitionToAbout);
+    connect(view, &HomeView::syncButtonClicked, this, &Application::transitionToSettings);
+    connect(view, &HomeView::startButtonClicked, this, &Application::transitionToAllStreams);
+    mainWindow.setCentralWidget(view);
+    mainWindow.show();
 
     dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     imagePath = QString("%1%2%3").arg(dataPath, QDir::separator(), "images");
-
-    QFont listFont("Times", 20);
-    homeView->show();
-    currentView = static_cast<QMainWindow *>(homeView);
 
 #ifdef ADD_FS_WATCHER
     watcher.addPath("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
     connect(&watcher, &QFileSystemWatcher::fileChanged, this, &Application::reloadStyles);
 #endif
-
-    streamView->setListFont(listFont);
-    singleStreamView->setListFont(listFont);
 
     QSettings settings;
     SyncOptions option = (SyncOptions)settings.value("syncingPreference").toInt();
@@ -315,42 +270,34 @@ void Application::performSetUp()
             startSync();
         }
 
-        // ELSE TEST FOR WIRELESS
-        QNetworkConfigurationManager ncm;
-        auto nc = ncm.allConfigurations();
+//        // ELSE TEST FOR WIRELESS
+//        QNetworkConfigurationManager ncm;
+//        auto nc = ncm.allConfigurations();
 
-        for (auto &x : nc) {
-            qDebug() << x.name();
-            qDebug() << x.bearerTypeName();
-            qDebug() << x.bearerTypeFamily();
-            qDebug() << x.state();
-            qDebug() << x.state().testFlag(QNetworkConfiguration::Active);
-            qDebug() << x.isValid();
+//        for (auto &x : nc) {
+//            qDebug() << x.name();
+//            qDebug() << x.bearerTypeName();
+//            qDebug() << x.bearerTypeFamily();
+//            qDebug() << x.state();
+//            qDebug() << x.state().testFlag(QNetworkConfiguration::Active);
+//            qDebug() << x.isValid();
 
-            if(x.isValid() && x.state().testFlag(QNetworkConfiguration::Active)) {
-                homeView->statusBar()->showMessage("We're actively connected to some kind of internets", 10000);
-                qDebug() << "Should be showing";
-                QMessageBox box;
-                box.setText(x.name() + " " + x.bearerTypeName() + " " + x.bearerTypeFamily());
-                box.exec();
-            }
-        }
+//            if(x.isValid() && x.state().testFlag(QNetworkConfiguration::Active)) {
+//                mainWindow->statusBar()->showMessage("We're actively connected to some kind of internets", 10000);
+//                qDebug() << "Should be showing";
+//                QMessageBox box;
+//                box.setText(x.name() + " " + x.bearerTypeName() + " " + x.bearerTypeFamily());
+//                box.exec();
+//            }
+//        }
     }
 
-    connect(settingsView, &SettingsView::syncButtonClicked, this, &Application::startSync);
-
-    setupUiTransitions();
     loadDataFromDisk();
-}
-
-QWidget *Application::home()
-{
-    return homeView;
 }
 
 void Application::syncMessage(const QString &message)
 {
-    currentView->statusBar()->showMessage(message, 10000);
+    mainWindow.statusBar()->showMessage(message, 10000);
 }
 
 void Application::stopSync()
@@ -359,6 +306,5 @@ void Application::stopSync()
         syncer->syncingShouldContinue = false;
     }
 
-    settingsView->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
     isSyncingNow = false;
 }

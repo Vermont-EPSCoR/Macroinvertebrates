@@ -12,18 +12,7 @@ TARGET = MacroinvertebrateV3
 TEMPLATE = app
 
 
-SOURCES += main.cpp \
-    application.cpp \
-    views/homeview.cpp \
-    views/streamview.cpp \
-    views/invertebrateview.cpp \
-    models/stream.cpp \
-    models/invertebrate.cpp \
-    parsers/streamhandler.cpp \
-    parsers/invertebratehandler.cpp \
-    views/aboutview.cpp \
-    views/singlestreamview.cpp \
-    webdatasynchronizer.cpp \
+SOURCES += application.cpp \
     deps/gumbo-parser/attribute.c \
     deps/gumbo-parser/char_ref.c \
     deps/gumbo-parser/error.c \
@@ -38,22 +27,21 @@ SOURCES += main.cpp \
     deps/QGumboParser/qgumboattribute.cpp \
     deps/QGumboParser/qgumbodocument.cpp \
     deps/QGumboParser/qgumbonode.cpp \
+    main.cpp \
+    models/invertebrate.cpp \
+    models/stream.cpp \
+    parsers/invertebratehandler.cpp \
+    parsers/streamhandler.cpp \
+    views/aboutview.cpp \
+    views/homeview.cpp \
+    views/invertebrateview.cpp \
     views/settingsview.cpp \
-    views/settingsview.cpp \
-    views/streamview.cpp
+    views/singlestreamview.cpp \
+    views/streamview.cpp \
+    webdatasynchronizer.cpp
 
-HEADERS  += \
-    application.h \
-    views/homeview.h \
-    views/streamview.h \
-    views/invertebrateview.h \
-    models/stream.h \
-    models/invertebrate.h \
-    parsers/streamhandler.h \
-    parsers/invertebratehandler.h \
-    views/aboutview.h \
-    views/singlestreamview.h \
-    webdatasynchronizer.h \
+
+HEADERS  += application.h \
     deps/gumbo-parser/attribute.h \
     deps/gumbo-parser/char_ref.h \
     deps/gumbo-parser/char_ref.rl \
@@ -64,8 +52,8 @@ HEADERS  += \
     deps/gumbo-parser/string_buffer.h \
     deps/gumbo-parser/string_piece.h \
     deps/gumbo-parser/token_type.h \
-    deps/gumbo-parser/tokenizer_states.h \
     deps/gumbo-parser/tokenizer.h \
+    deps/gumbo-parser/tokenizer_states.h \
     deps/gumbo-parser/utf8.h \
     deps/gumbo-parser/util.h \
     deps/gumbo-parser/vector.h \
@@ -73,18 +61,24 @@ HEADERS  += \
     deps/QGumboParser/qgumboattribute.h \
     deps/QGumboParser/qgumbodocument.h \
     deps/QGumboParser/qgumbonode.h \
+    models/invertebrate.h \
+    models/stream.h \
+    parsers/invertebratehandler.h \
+    parsers/streamhandler.h \
+    views/aboutview.h \
+    views/homeview.h \
+    views/invertebrateview.h \
     views/settingsview.h \
-    views/settingsview.h \
-    views/streamview.h
+    views/singlestreamview.h \
+    views/streamview.h \
+    webdatasynchronizer.h
 
 FORMS    += \
-    views/homeview.ui \
-    views/streamview.ui \
-    views/invertebrateview.ui \
     views/aboutview.ui \
+    views/homeview.ui \
+    views/invertebrateview.ui \
+    views/settingsview.ui \
     views/singlestreamview.ui \
-    views/settingsview.ui \
-    views/settingsview.ui \
     views/streamview.ui
 
 INCLUDEPATH += "$$PWD/deps/gumbo-parser"
@@ -96,7 +90,7 @@ CONFIG += c++11
 QMAKE_CXXFLAGS += -O3
 QMAKE_CFLAGS += -std=c99 -O3  # For Gumbo
 CONFIG += mobility
-MOBILITY = 
+MOBILITY =
 
 RESOURCES += \
     media.qrc

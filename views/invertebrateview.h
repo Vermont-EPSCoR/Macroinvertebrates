@@ -8,11 +8,6 @@
 
 #include "../models/invertebrate.h"
 
-void remove(QGridLayout *layout, int row, int column, bool deleteWidgets);
-void deleteChildWidgets(QLayoutItem *item);
-void removeRow(QGridLayout *layout, int row, bool deleteWidgets);
-void removeColumn(QGridLayout *layout, int column, bool deleteWidgets);
-
 namespace Ui {
 class InvertebrateView;
 }
@@ -20,13 +15,16 @@ class InvertebrateView;
 class InvertebrateView : public QWidget
 {
     Q_OBJECT
-
+    QString originStream;
+    void setInfo(const Invertebrate &invertebrate, const QString &streamName);
 public:
-    explicit InvertebrateView(QWidget *parent = 0);
+    explicit InvertebrateView(const Invertebrate &invertebrate, const QString &streamName, QWidget *parent = 0);
     ~InvertebrateView();
+signals:
+    void backButtonClicked(const QString &originStream);
+private slots:
+    void on_pushButton_back_pressed();
 
-    void setInfo(const Invertebrate &invertebrate, QString streamName);
-    void backButtonClicked();
 private:
     Ui::InvertebrateView *ui;
 };
