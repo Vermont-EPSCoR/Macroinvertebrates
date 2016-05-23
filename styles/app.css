@@ -1,10 +1,8 @@
 QMainWindow {
   background-repeat: no-repeat;
   border-image: url(:/media/background-plain.png);
-  background-position: top center; }
-
-HomeView {
-  border-image: url(:/media/background-logo.png); }
+  background-position: top center;
+  background-color: white; }
 
 QListView {
   background-color: transparent; }
@@ -44,10 +42,11 @@ QComboBox {
 #SingleStreamView ::item {
   padding-bottom: 15px;
   height: 230px;
-  border: 2px solid #355797; }
+  border: 2px solid #355797;
+  background-color: #EDEDED; }
 
-QListWidgetItem {
-  background: blue; }
+QListView {
+  font-size: 20px; }
 
 QComboBox QAbstractItemView {
   background-color: #FFFFFF;

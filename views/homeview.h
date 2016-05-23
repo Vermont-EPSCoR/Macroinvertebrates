@@ -2,6 +2,7 @@
 #define HOMEVIEW_H
 
 #include <QWidget>
+#include <QFile>
 
 namespace Ui {
 class HomeView;

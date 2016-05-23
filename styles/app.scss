@@ -5,12 +5,7 @@ QMainWindow {
   background-repeat: no-repeat;
   border-image: url(:/media/background-plain.png);
   background-position: top center;
-  // background-color: rgb(255, 255, 255);
-}
-
-HomeView {
-  border-image: url(:/media/background-logo.png);
-  // background-color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255);
 }
 
 QListView {
@@ -63,10 +58,15 @@ QComboBox {
   padding-bottom: 15px;
   height: 230px;
   border: $std_border;
+  background-color: #EDEDED;
 }
 
-QListWidgetItem {
-  background: blue;
+QListView {
+  font-size: 20px;
+}
+
+QListView::item {
+  
 }
 
 QComboBox QAbstractItemView {
@@ -157,3 +157,4 @@ QLabel#label_image {
 AboutView QLabel#label {
   font-size: 14px;
 }
+
