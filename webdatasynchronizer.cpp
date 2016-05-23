@@ -17,12 +17,18 @@ void WebDataSynchronizer::run()
 {
     network = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager(), [](QNetworkAccessManager *obj){ obj->deleteLater(); });
     if(network->networkAccessible() == QNetworkAccessManager::Accessible) {
+//        qDebug() << "Begin";
         syncStreams();
+//        qDebug() << "Streams done";
         syncInvertebrates();
+//        qDebug() << "Inverts done";
         syncImages();
+//        qDebug() << "Images done";
         syncAbout();
+//        qDebug() << "About done";
 
         finalize();
+//        qDebug() << "Finalize done";
     } else {
         emit finished(WebDataSynchonizerExitStatus::FAILED_NETWORK_ACCESS);
     }
@@ -59,7 +65,7 @@ void WebDataSynchronizer::syncStreams()
 void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 {
     if(!syncingShouldContinue) {
-//        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
+//        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " syncingShouldContinue: " << syncingShouldContinue;
         return;
     }
 
@@ -118,7 +124,7 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 void WebDataSynchronizer::handleNetworkReplyForStreamData(QNetworkReply *reply)
 {
     if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
-        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << syncingShouldContinue;
+//        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " syncingShouldContinue: " << syncingShouldContinue;
         syncingShouldContinue = false;
         return;
     }
@@ -142,7 +148,7 @@ void WebDataSynchronizer::handleNetworkReplyForStreamData(QNetworkReply *reply)
 
 void WebDataSynchronizer::syncInvertebrates()
 {
-    qDebug() << "Syncing invertebrates";
+//    qDebug() << "Syncing invertebrates";
     if(!syncingShouldContinue) {
 //        qDebug() << "We're not OK";
         return;
@@ -174,7 +180,7 @@ void WebDataSynchronizer::syncInvertebrates()
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *reply)
 {
     if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
-//        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
+//        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " syncingShouldContinue: " << syncingShouldContinue;
         syncingShouldContinue = false;
         return;
     }
@@ -239,7 +245,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateData(QNetworkReply *reply)
 {
     if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
-        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << syncingShouldContinue;
+//        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " syncingShouldContinue: " << syncingShouldContinue;
         syncingShouldContinue = false;
         return;
     }
@@ -267,7 +273,7 @@ void WebDataSynchronizer::syncImages()
 //        qDebug() << "Exiting sync images";
         return;
     }
-    // if this method is only ever called from the end of the invertebrate sync there's no need to check for isOk
+    // if this method is only ever called from the end of the invertebrate sync there's no need to check for syncingShouldContinue
     QStringList titles;
     for(Invertebrate &invertebrate: *invertebratesFromLocal) {
         titles.append(invertebrate.imageFileRemote);
@@ -336,7 +342,7 @@ void WebDataSynchronizer::syncImages()
 void WebDataSynchronizer::handleNetworkReplyForImageList(QNetworkReply *reply, QMap<QString, QList<Invertebrate*>> *invertebrateImages)
 {
     if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
-//        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " isOK: " << isOk;
+//        qDebug() << "A network error occurred, or we're not OK: " << reply->errorString() << " syncingShouldContinue: " << syncingShouldContinue;
         syncingShouldContinue = false;
         return;
     }
@@ -430,16 +436,21 @@ bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, Q
 
 void WebDataSynchronizer::finalize()
 {
+//    qDebug() << "Begin finalize";
     if(!syncingShouldContinue) {
-        emit statusUpdateMessage("Sync stopped; Incomplete.");
+//        qDebug() << "emitting finished";
+//        emit statusUpdateMessage("Sync stopped; Incomplete.");
         emit finished(WebDataSynchonizerExitStatus::FAILED_RUNTIME);
+//        qDebug() << "failure";
         return;
     }
 
     QSettings settings;
     settings.setValue("lastUpdate", QDateTime::currentDateTime());
-    emit statusUpdateMessage("Syncing completed successfully.");
+//    qDebug() << "last update complete";
+//    emit statusUpdateMessage("Syncing completed successfully.");
     emit finished(WebDataSynchonizerExitStatus::SUCCEEDED);
+//    qDebug() << "success";
 }
 
 WebDataSynchronizer::~WebDataSynchronizer()
@@ -480,7 +491,7 @@ void WebDataSynchronizer::stop()
 void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
 {
     if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
-        qDebug() << "exiting here";
+//        qDebug() << "exiting here";
         return;
     }
 

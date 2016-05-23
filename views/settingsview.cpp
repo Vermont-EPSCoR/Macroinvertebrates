@@ -57,3 +57,4 @@ void SettingsView::toggleSyncButtonText(SyncStatus desiredState)
         ui->syncButton->setText("Cancel Sync");
     }
 }
+

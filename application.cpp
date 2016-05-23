@@ -149,6 +149,7 @@ void Application::startSync()
 {
     // Don't allow multiple syncs to start concurrently
     if(!isSyncingNow) {
+        // No stored streams means we need to sync
         bool syncIsRequired = streams.count() == 0;
 
         // Let the user choose if they want to sync data on the first run/if data is empty
@@ -172,19 +173,16 @@ void Application::startSync()
             if(status == WebDataSynchonizerExitStatus::SUCCEEDED) {
                 saveDataToDisk();
             } else {
+                // Woe unto those who add code before the mutex. Woe and segfaults.
+                QMutexLocker locker(&mutex);
                 mainWindow.statusBar()->showMessage("Sync did not complete. Stored data has not been changed.", 10000);
             }
-
            stopSync();
         });
 
-        if(!settings.isNull()) {
-            connect(syncer, &WebDataSynchronizer::finished, [&](){
-                settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
-            });
-        }
-
+        // Ensure that quitting the application halts the background process
         connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
+        // Hook up the status updates to the mainWindow's statusBar
         connect(syncer, &WebDataSynchronizer::statusUpdateMessage, this, &Application::syncMessage);
 
         QThreadPool::globalInstance()->start(syncer);
@@ -206,7 +204,6 @@ void Application::startSync()
         msgBox.setText("Data is already syncing. Cancel?");
         msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
         if(msgBox.exec() == QMessageBox::Yes) {
-            // If we get here then syncer shouldn't be null, but it's possible so: check
             stopSync();
         }
     }
@@ -218,12 +215,6 @@ void Application::transitionToSettings()
     mainWindow.setCentralWidget(settings);
     connect(settings, &SettingsView::backButtonClicked, this, &Application::transitionToHome);
     connect(settings, &SettingsView::syncButtonClicked, this, &Application::startSync);
-
-    if(!syncer.isNull()) {
-        connect(syncer, &WebDataSynchronizer::finished, [&](){
-            settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
-        });
-    }
 }
 
 Application::~Application() {
@@ -304,13 +295,18 @@ void Application::performSetUp()
 
 void Application::syncMessage(const QString &message)
 {
+    QMutexLocker locker(&mutex);
     mainWindow.statusBar()->showMessage(message, 10000);
 }
 
 void Application::stopSync()
 {
-    if(syncer != nullptr) {
+    if(syncer) {
         syncer->syncingShouldContinue = false;
+    }
+
+    if(settings) {
+        settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
     }
 
     isSyncingNow = false;
