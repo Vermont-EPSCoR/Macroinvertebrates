@@ -172,15 +172,17 @@ void Application::startSync()
             if(status == WebDataSynchonizerExitStatus::SUCCEEDED) {
                 saveDataToDisk();
             } else {
-                // I tried this and ended up causing a number of crashes, possibly something about opening multiple modals?
-//                QMessageBox msgBox;
-//                msgBox.setText("Sync halted");
-//                msgBox.setInformativeText("Sync did not complete. Stored data has not been changed.");
-//                msgBox.exec();
+                mainWindow.statusBar()->showMessage("Sync did not complete. Stored data has not been changed.", 10000);
             }
 
            stopSync();
         });
+
+        if(!settings.isNull()) {
+            connect(syncer, &WebDataSynchronizer::finished, [&](){
+                settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
+            });
+        }
 
         connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
         connect(syncer, &WebDataSynchronizer::statusUpdateMessage, this, &Application::syncMessage);
@@ -212,10 +214,16 @@ void Application::startSync()
 
 void Application::transitionToSettings()
 {
-    SettingsView *view = new SettingsView();
-    mainWindow.setCentralWidget(view);
-    connect(view, &SettingsView::backButtonClicked, this, &Application::transitionToHome);
-    connect(view, &SettingsView::syncButtonClicked, this, &Application::startSync);
+    settings = new SettingsView(isSyncingNow);
+    mainWindow.setCentralWidget(settings);
+    connect(settings, &SettingsView::backButtonClicked, this, &Application::transitionToHome);
+    connect(settings, &SettingsView::syncButtonClicked, this, &Application::startSync);
+
+    if(!syncer.isNull()) {
+        connect(syncer, &WebDataSynchronizer::finished, [&](){
+            settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
+        });
+    }
 }
 
 Application::~Application() {
@@ -265,6 +273,7 @@ void Application::performSetUp()
 
     QSettings settings;
     SyncOptions option = (SyncOptions)settings.value("syncingPreference").toInt();
+    loadDataFromDisk();
     if(option != SyncOptions::MANUAL_ONLY) {
         if(option == SyncOptions::ON_STARTUP) {
             startSync();
@@ -291,8 +300,6 @@ void Application::performSetUp()
 //            }
 //        }
     }
-
-    loadDataFromDisk();
 }
 
 void Application::syncMessage(const QString &message)

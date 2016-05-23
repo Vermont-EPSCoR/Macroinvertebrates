@@ -15,8 +15,7 @@ void WebDataSynchronizer::setData(QMutex *mutex, QMap<QString, Invertebrate> *in
 
 void WebDataSynchronizer::run()
 {
-//    qDebug() << "Running";
-    network = new QNetworkAccessManager();
+    network = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager(), [](QNetworkAccessManager *obj){ obj->deleteLater(); });
     if(network->networkAccessible() == QNetworkAccessManager::Accessible) {
         syncStreams();
         syncInvertebrates();
@@ -25,11 +24,8 @@ void WebDataSynchronizer::run()
 
         finalize();
     } else {
-//        qDebug() << "No network access";
         emit finished(WebDataSynchonizerExitStatus::FAILED_NETWORK_ACCESS);
     }
-
-    network->deleteLater();
 }
 
 void WebDataSynchronizer::syncStreams()
@@ -457,7 +453,7 @@ QNetworkReply *WebDataSynchronizer::synchronouslyGetUrl(const QUrl &url, bool *o
     // Use of a waiter isn't the most reliable method, but it does work...
     QEventLoop waiter;
     auto conn = std::make_shared<QMetaObject::Connection>();
-    *conn = connect(network, &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
+    *conn = connect(network.data(), &QNetworkAccessManager::finished, [&](QNetworkReply *reply) {
         if(reply->error() == QNetworkReply::NoError) {
             *ok = true;
         } else {
@@ -467,7 +463,7 @@ QNetworkReply *WebDataSynchronizer::synchronouslyGetUrl(const QUrl &url, bool *o
         QObject::disconnect(*conn);
     });
 
-    connect(network, &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
+    connect(network.data(), &QNetworkAccessManager::finished, &waiter, &QEventLoop::quit);
     theReply = network->get(request);
     connect(this, &WebDataSynchronizer::shouldStop, theReply, &QNetworkReply::abort);
     waiter.exec();

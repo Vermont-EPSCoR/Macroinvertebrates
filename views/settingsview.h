@@ -17,7 +17,7 @@ class SettingsView : public QWidget
     Q_OBJECT
 
 public:
-    explicit SettingsView(QWidget *parent = 0);
+    explicit SettingsView(bool isSyncingNow, QWidget *parent = 0);
     ~SettingsView();
     void toggleSyncButtonText(SyncStatus desiredState);
 signals:

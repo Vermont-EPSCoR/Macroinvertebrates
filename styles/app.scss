@@ -8,6 +8,11 @@ QMainWindow {
   background-color: rgb(255, 255, 255);
 }
 
+#titleLabel, #streamNameLabel {
+  font-size: 20px;
+  font-weight: bold;
+}
+
 QListView {
   background-color: transparent;
 }
@@ -19,7 +24,8 @@ InvertebrateView {
 }
 
 QPushButton {
-  min-width: 80px;
+  min-width: 90px;
+  min-height: 40px;
   border-radius: 10px;
   color: $std_blue;
   background-color: #FFFFFF;

@@ -1,7 +1,7 @@
 #include "settingsview.h"
 #include "ui_settingsview.h"
 
-SettingsView::SettingsView(QWidget *parent) :
+SettingsView::SettingsView(bool isSyncingNow, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SettingsView)
 {
@@ -20,6 +20,10 @@ SettingsView::SettingsView(QWidget *parent) :
     // Horrible hack according to peppe (who is one of the Qt developers)
     ui->syncModeComboBox->setItemData(2, QVariant(0), Qt::UserRole - 1);
     ui->syncModeComboBox->setCurrentIndex(syncingPreference);
+
+    if(isSyncingNow) {
+        toggleSyncButtonText(SyncStatus::SYNC_IN_PROGRESS);
+    }
 }
 
 SettingsView::~SettingsView()
@@ -41,6 +45,7 @@ void SettingsView::on_syncModeComboBox_currentIndexChanged(int index)
 
 void SettingsView::on_syncButton_pressed()
 {
+    toggleSyncButtonText(SyncStatus::SYNC_IN_PROGRESS);
     emit syncButtonClicked();
 }
 

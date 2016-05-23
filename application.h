@@ -6,6 +6,7 @@
 #include <QFont>
 #include <QDebug>
 #include <QMap>
+#include <QPointer>
 #include <QString>
 #include <QSettings>
 #include <QMessageBox>
@@ -35,7 +36,7 @@
 
 class Application : public QApplication
 {
-    WebDataSynchronizer *syncer; // owned by the threadpool's global instance. don't delete
+    QPointer<WebDataSynchronizer> syncer;
     QMap<QString, Invertebrate> invertebrates;
     QMap<QString, Stream> streams;
     QMutex mutex;
@@ -44,6 +45,7 @@ class Application : public QApplication
     QString dataPath;
     QString imagePath;
 
+    QPointer<SettingsView> settings;
     QMainWindow mainWindow;
 
 #ifdef ADD_FS_WATCHER

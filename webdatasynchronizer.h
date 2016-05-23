@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QRunnable>
 #include <QScopedPointerDeleteLater>
+#include <QSharedPointer>
 #include <QSettings>
 #include <QStandardPaths>
 #include <QString>
@@ -72,7 +73,7 @@ class WebDataSynchronizer : public QObject, public QRunnable
     QEventLoop loop;
     QString imagePath;
     QDir directoryHelper;
-    QNetworkAccessManager *network = nullptr;  // Must be constructed on the threadpool thread, so this starts off null
+    QSharedPointer<QNetworkAccessManager> network;  // Must be constructed on the threadpool thread, so this starts off null
     QDateTime lastUpdate;
 
     QNetworkReply *synchronouslyGetUrl(const QUrl &url, bool *ok);
