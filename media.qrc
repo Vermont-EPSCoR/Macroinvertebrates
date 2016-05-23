@@ -6,5 +6,6 @@
         <file>styles/app.css</file>
         <file>media/placeholder-queued.png</file>
         <file>media/placeholder-unavailable.png</file>
+        <file>media/logo.png</file>
     </qresource>
 </RCC>
