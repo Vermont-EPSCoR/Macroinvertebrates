@@ -22,6 +22,7 @@ void Application::transitionToAllStreams()
     mainWindow.setCentralWidget(view);
     connect(view, &StreamView::backButtonClicked, this, &Application::transitionToHome);
     connect(view, &StreamView::singleStreamClicked, this, &Application::transitionToSingleStream);
+    connect(&mainWindow, &MainWindow::backButtonReleased, view, &StreamView::backButtonClicked);
 }
 
 void Application::transitionToHome()
@@ -31,6 +32,10 @@ void Application::transitionToHome()
     connect(view, &HomeView::aboutButtonClicked, this, &Application::transitionToAbout);
     connect(view, &HomeView::syncButtonClicked, this, &Application::transitionToSettings);
     connect(view, &HomeView::startButtonClicked, this, &Application::transitionToAllStreams);
+    connect(&mainWindow, &MainWindow::backButtonReleased, view, &HomeView::on_backButton_pressed);
+    connect(view, &HomeView::backButtonPressed, [&](){
+        quit();
+    });
 }
 
 void Application::transitionToAbout()
@@ -38,6 +43,7 @@ void Application::transitionToAbout()
     AboutView *view = new AboutView();
     mainWindow.setCentralWidget(view);
     connect(view, &AboutView::backButtonClicked, this, &Application::transitionToHome);
+    connect(&mainWindow, &MainWindow::backButtonReleased, view, &AboutView::backButtonClicked);
 }
 
 void Application::transitionToSingleStream(const QString &streamName)
@@ -62,6 +68,7 @@ void Application::transitionToSingleStream(const QString &streamName)
     mainWindow.setCentralWidget(view);
     connect(view, &SingleStreamView::backButtonClicked, this, &Application::transitionToAllStreams);
     connect(view, &SingleStreamView::invertebrateDoubleClicked, this, &Application::transitionToInvertebrate);
+    connect(&mainWindow, &MainWindow::backButtonReleased, view, &SingleStreamView::on_backButton_pressed);
 }
 
 void Application::transitionToInvertebrate(const QString &invertebrate, const QString &streamName)
@@ -72,6 +79,7 @@ void Application::transitionToInvertebrate(const QString &invertebrate, const QS
 
     mainWindow.setCentralWidget(view);
     connect(view, &InvertebrateView::backButtonClicked, this, &Application::transitionToSingleStream);
+    connect(&mainWindow, &MainWindow::backButtonReleased, view, &InvertebrateView::on_pushButton_back_pressed);
 }
 
 void Application::loadDataFromDisk()
@@ -247,11 +255,7 @@ void Application::performSetUp()
     setStyleSheet(file.readAll());
     file.close();
 
-    HomeView *view = new HomeView();
-    connect(view, &HomeView::aboutButtonClicked, this, &Application::transitionToAbout);
-    connect(view, &HomeView::syncButtonClicked, this, &Application::transitionToSettings);
-    connect(view, &HomeView::startButtonClicked, this, &Application::transitionToAllStreams);
-    mainWindow.setCentralWidget(view);
+    transitionToHome();
     mainWindow.show();
 
     dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);

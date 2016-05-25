@@ -27,3 +27,8 @@ void HomeView::on_aboutButton_pressed()
 {
     emit aboutButtonClicked();
 }
+
+void HomeView::on_backButton_pressed()
+{
+    emit backButtonPressed();
+}

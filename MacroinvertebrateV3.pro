@@ -38,7 +38,8 @@ SOURCES += application.cpp \
     views/settingsview.cpp \
     views/singlestreamview.cpp \
     views/streamview.cpp \
-    webdatasynchronizer.cpp
+    webdatasynchronizer.cpp \
+    views/mainwindow.cpp
 
 
 HEADERS  += application.h \
@@ -71,7 +72,8 @@ HEADERS  += application.h \
     views/settingsview.h \
     views/singlestreamview.h \
     views/streamview.h \
-    webdatasynchronizer.h
+    webdatasynchronizer.h \
+    views/mainwindow.h
 
 FORMS    += \
     views/aboutview.ui \
