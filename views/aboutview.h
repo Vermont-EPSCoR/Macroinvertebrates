@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QSettings>
+#include <QScroller>
 
 namespace Ui {
 class AboutView;

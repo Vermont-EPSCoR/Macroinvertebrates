@@ -1,6 +1,7 @@
 $std_blue: #355797;
 $std_border: 2px solid $std_blue;
 $mercury_white: #E6E6E6;
+$std_font_size: 30px;
 
 QMainWindow {
   background-repeat: no-repeat;
@@ -10,21 +11,22 @@ QMainWindow {
 }
 
 #titleLabel, #streamNameLabel {
-  font-size: 20px;
+  font-size: $std_font_size;
   font-weight: bold;
 }
 
 #AboutView #label {
-  font-size: 20px;
+  font-size: $std_font_size;
 }
 
 QListView {
   background-color: transparent;
-  font-size: 20px;
+  font-size: $std_font_size;
   &::item {
     margin: 4px;
     border: $std_border;
     background-color: $mercury_white;
+    min-height: 50px;
   }
 }
 
@@ -34,23 +36,23 @@ QListView {
 
 #SingleStreamView {
   background-color: transparent;
-  &::item {
-    padding-bottom: 15px;
-    max-height: 230px;
-    border: $std_border;
-    background-color: #EDEDED;
-  }
+  // &::item {
+  //   padding-bottom: 15px;
+  //   max-height: 230px;
+  //   border: $std_border;
+  //   background-color: #EDEDED;
+  // }
 }
 
 #SettingsView {
   QLabel {
-    font-size: 20px;
+    font-size: $std_font_size;
   }
 }
 
 QPushButton {
-  min-width: 90px;
-  min-height: 40px;
+  min-width: 100px;
+  min-height: 50px;
   border-radius: 10px;
   color: $std_blue;
   background-color: #FFFFFF;
@@ -161,6 +163,10 @@ QScrollArea:scrollAreaWidgetContents {
 }
 
 QLabel#label_title, QLabel#streamName, #StreamView > #label {
+  font-size: 30px;
+}
+
+#scrollAreaWidgetContents QLabel {
   font-size: 30px;
 }
 
