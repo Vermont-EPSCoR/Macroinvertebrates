@@ -14,17 +14,24 @@ QMainWindow {
 QListView {
   background-color: transparent;
   font-size: 30px; }
-  QListView::item {
-    margin: 4px;
-    border: 2px solid #355797;
-    background-color: #E6E6E6;
-    min-height: 50px; }
 
 #StreamView {
   background-color: #E6E6E6; }
+  #StreamView ::item {
+    margin: 4px;
+    border: 2px solid #355797;
+    background-color: #E6E6E6;
+    min-height: 50px;
+    min-width: 250px; }
 
 #SingleStreamView {
   background-color: transparent; }
+  #SingleStreamView ::item {
+    padding: 15px;
+    height: 275px;
+    border: 2px solid #355797;
+    background-color: #EDEDED;
+    border-radius: 10px; }
 
 #SettingsView QLabel {
   font-size: 30px; }
@@ -34,7 +41,8 @@ QPushButton {
   min-height: 50px;
   border-radius: 10px;
   color: #355797;
-  background-color: #FFFFFF; }
+  background-color: #FFFFFF;
+  margin-bottom: 5px; }
   QPushButton:hover {
     background-color: #7DB3DE; }
   QPushButton:flat {

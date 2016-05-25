@@ -118,17 +118,15 @@ ios {
     DEFINES += "ON_IOS"
 }
 
-macx|linux: {
+macx {
 # For reloading of the stylesheet during development
     message("Adding file system watcher")
     DEFINES += "ADD_FS_WATCHER"
 }
 
 !macx: {
-    !linux: {
-    #    These settings will remove qDebug statements and other statements that take too long for mobile processors
-        message("Using settings for Mobile.")
-        DEFINES += "MOBILE_DEPLOYMENT"
-    }
+#    These settings will remove qDebug statements and other statements that take too long for mobile processors
+    message("Using settings for Mobile.")
+    DEFINES += "MOBILE_DEPLOYMENT"
 }
 

@@ -22,26 +22,28 @@ QMainWindow {
 QListView {
   background-color: transparent;
   font-size: $std_font_size;
-  &::item {
+}
+
+#StreamView {
+  ::item {
     margin: 4px;
     border: $std_border;
     background-color: $mercury_white;
     min-height: 50px;
+    min-width: 250px;
   }
-}
-
-#StreamView {
   background-color: $mercury_white;
 }
 
 #SingleStreamView {
   background-color: transparent;
-  // &::item {
-  //   padding-bottom: 15px;
-  //   max-height: 230px;
-  //   border: $std_border;
-  //   background-color: #EDEDED;
-  // }
+  ::item {
+    padding: 15px;
+    height: 275px;
+    border: $std_border;
+    background-color: #EDEDED;
+    border-radius: 10px;
+  }
 }
 
 #SettingsView {
@@ -56,6 +58,7 @@ QPushButton {
   border-radius: 10px;
   color: $std_blue;
   background-color: #FFFFFF;
+  margin-bottom: 5px;
 
   &:hover {
     background-color: #7DB3DE;
