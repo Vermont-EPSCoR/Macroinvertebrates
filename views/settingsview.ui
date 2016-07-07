@@ -62,7 +62,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
-          <string>Date Last Synced</string>
+          <string>Date Last Synced:</string>
          </property>
         </widget>
        </item>

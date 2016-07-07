@@ -15,9 +15,6 @@
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QSplashScreen>
-#include <QMainWindow>
-
-#include <QNetworkConfigurationManager>
 
 #ifdef ADD_FS_WATCHER
 #include <QFileSystemWatcher>
@@ -27,6 +24,7 @@
 
 #include "webdatasynchronizer.h"
 
+#include "views/mainwindow.h"
 #include "views/homeview.h"
 #include "views/streamview.h"
 #include "views/aboutview.h"
@@ -46,7 +44,7 @@ class Application : public QApplication
     QString imagePath;
 
     QPointer<SettingsView> settings;
-    QMainWindow mainWindow;
+    MainWindow mainWindow;
 
 #ifdef ADD_FS_WATCHER
     QFileSystemWatcher watcher;
@@ -54,7 +52,6 @@ class Application : public QApplication
 public:
     Application(int argc, char *argv[]);
     void performSetUp();
-    QWidget* home();
     ~Application();
 
 private slots:

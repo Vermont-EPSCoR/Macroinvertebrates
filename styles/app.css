@@ -5,21 +5,44 @@ QMainWindow {
   background-color: white; }
 
 #titleLabel, #streamNameLabel {
-  font-size: 20px;
+  font-size: 30px;
   font-weight: bold; }
 
-QListView {
-  background-color: transparent; }
+#AboutView #label {
+  font-size: 30px; }
 
-InvertebrateView #widget {
-  background-color: white; }
+QListView {
+  background-color: transparent;
+  font-size: 30px; }
+
+#StreamView {
+  background-color: #E6E6E6; }
+  #StreamView ::item {
+    margin: 4px;
+    border: 2px solid #355797;
+    background-color: #E6E6E6;
+    min-height: 50px;
+    min-width: 250px; }
+
+#SingleStreamView {
+  background-color: transparent; }
+  #SingleStreamView ::item {
+    padding: 15px;
+    height: 275px;
+    border: 2px solid #355797;
+    background-color: #EDEDED;
+    border-radius: 10px; }
+
+#SettingsView QLabel {
+  font-size: 30px; }
 
 QPushButton {
-  min-width: 90px;
-  min-height: 40px;
+  min-width: 100px;
+  min-height: 50px;
   border-radius: 10px;
   color: #355797;
-  background-color: #FFFFFF; }
+  background-color: #FFFFFF;
+  margin-bottom: 5px; }
   QPushButton:hover {
     background-color: #7DB3DE; }
   QPushButton:flat {
@@ -43,15 +66,6 @@ QComboBox {
   color: #355797; }
   QComboBox:disabled {
     color: #CDCDCD; }
-
-#SingleStreamView ::item {
-  padding-bottom: 15px;
-  height: 230px;
-  border: 2px solid #355797;
-  background-color: #EDEDED; }
-
-QListView {
-  font-size: 20px; }
 
 QComboBox QAbstractItemView {
   background-color: #FFFFFF;
@@ -111,7 +125,10 @@ QScrollArea {
 QScrollArea:scrollAreaWidgetContents {
   background: transparent; }
 
-QLabel#label_title, QLabel#streamName, QLabel#label {
+QLabel#label_title, QLabel#streamName, #StreamView > #label {
+  font-size: 30px; }
+
+#scrollAreaWidgetContents QLabel {
   font-size: 30px; }
 
 QLabel#label_image {

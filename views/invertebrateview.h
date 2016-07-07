@@ -23,7 +23,7 @@ public:
     ~InvertebrateView();
 signals:
     void backButtonClicked(const QString &originStream);
-private slots:
+public slots:
     void on_pushButton_back_pressed();
 
 private:

@@ -25,7 +25,7 @@ public:
 signals:
     void backButtonClicked(const QString& streamName);
     void invertebrateDoubleClicked(const QString &invertebrate, const QString &streamName);
-private slots:
+public slots:
     void on_backButton_pressed();
     void on_listWidget_itemClicked(QListWidgetItem *item);
 
