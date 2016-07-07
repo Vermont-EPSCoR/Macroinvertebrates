@@ -34,11 +34,21 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, const QString &
         ui->gridLayout->addWidget(new QLabel("Common Name:"), row, 0);
         ui->gridLayout->addWidget(new QLabel(invertebrate.commonName), row, 1);
         row++;
+        QFrame *hr = new QFrame();
+        hr->setFrameShape(QFrame::HLine);
+        hr->setFrameShadow(QFrame::Sunken);
+        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
+        row++;
     }
 
     if(!invertebrate.family.isEmpty()) {
         ui->gridLayout->addWidget(new QLabel("Family:"), row, 0);
         ui->gridLayout->addWidget(new QLabel(invertebrate.family), row, 1);
+        row++;
+        QFrame *hr = new QFrame();
+        hr->setFrameShape(QFrame::HLine);
+        hr->setFrameShadow(QFrame::Sunken);
+        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
         row++;
     }
 
@@ -46,17 +56,32 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, const QString &
         ui->gridLayout->addWidget(new QLabel("Genus:"), row, 0);
         ui->gridLayout->addWidget(new QLabel(invertebrate.genus), row, 1);
         row++;
+        QFrame *hr = new QFrame();
+        hr->setFrameShape(QFrame::HLine);
+        hr->setFrameShadow(QFrame::Sunken);
+        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
+        row++;
     }
 
     if(!invertebrate.order.isEmpty()) {
         ui->gridLayout->addWidget(new QLabel("Order:"), row, 0);
         ui->gridLayout->addWidget(new QLabel(invertebrate.order), row, 1);
         row++;
+        QFrame *hr = new QFrame();
+        hr->setFrameShape(QFrame::HLine);
+        hr->setFrameShadow(QFrame::Sunken);
+        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
+        row++;
     }
 
     if(!invertebrate.flyName.isEmpty()) {
         ui->gridLayout->addWidget(new QLabel("Tied Fly:"), row, 0);
         ui->gridLayout->addWidget(new QLabel(invertebrate.flyName), row, 1);
+        row++;
+        QFrame *hr = new QFrame();
+        hr->setFrameShape(QFrame::HLine);
+        hr->setFrameShadow(QFrame::Sunken);
+        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
         row++;
     }
 

@@ -89,14 +89,14 @@
         </widget>
        </item>
        <item>
-        <layout class="QGridLayout" name="gridLayout"/>
-       </item>
-       <item>
         <widget class="Line" name="line">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
         </widget>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout"/>
        </item>
        <item>
         <widget class="QLabel" name="descriptionLabel">

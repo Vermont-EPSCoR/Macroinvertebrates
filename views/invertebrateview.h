@@ -5,6 +5,7 @@
 #include <QGridLayout>
 #include <QScreen>
 #include <QScroller>
+#include <QFrame>
 
 #include "../models/invertebrate.h"
 
