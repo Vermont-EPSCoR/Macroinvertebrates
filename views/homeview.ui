@@ -46,11 +46,11 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
      <property name="text">
       <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="../media.qrc">:/media/logo.png</pixmap>
      </property>
      <property name="scaledContents">
       <bool>false</bool>
@@ -98,8 +98,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../media.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

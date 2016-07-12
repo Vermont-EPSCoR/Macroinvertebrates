@@ -1,12 +1,64 @@
 #include "homeview.h"
 #include "ui_homeview.h"
 
-HomeView::HomeView(QWidget *parent) :
+#include <QDebug>
+
+HomeView::HomeView(QWidget* parent):
     QWidget(parent),
     ui(new Ui::HomeView)
 {
+    epscor_logo = QPixmap::fromImage(QImage(":/media/logo.png"));
     ui->setupUi(this);
 }
+
+#ifndef ADD_FS_WATCHER
+void HomeView::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+    QRect rect = geometry();
+    QPixmap scaled_pixmap;
+    QSettings settings;
+
+    bool is_wide = (rect.width() > rect.height()) ? true : false;
+    if (is_wide) {
+        QVariant data = settings.value("epscor_logo_wide");
+
+        if (data.isNull()) {
+            qDebug() << "Generating the wide version";
+            scaled_pixmap = epscor_logo.scaled(rect.width() * 0.25, rect.height() * 0.25, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+            QByteArray byteArray;
+            QBuffer buffer(&byteArray);
+            buffer.open(QBuffer::WriteOnly);
+            scaled_pixmap.save(&buffer, "PNG");
+
+            settings.setValue("epscor_logo_wide", byteArray);
+        } else {
+            qDebug() << "Using stored wide version";
+            scaled_pixmap.loadFromData(data.toByteArray(), "PNG");
+        }
+    } else {
+        QVariant data = settings.value("epscor_logo_tall");
+
+        if(data.isNull()) {
+            qDebug() << "Generating tall version";
+            scaled_pixmap = epscor_logo.scaled(rect.width() * 0.85, rect.height() * 0.85, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+            QByteArray byteArray;
+            QBuffer buffer(&byteArray);
+            buffer.open(QBuffer::WriteOnly);
+            scaled_pixmap.save(&buffer, "PNG");
+
+            settings.setValue("epscor_logo_tall", byteArray);
+        } else {
+            qDebug() << "Using stored tall version";
+            scaled_pixmap.loadFromData(data.toByteArray(), "PNG");
+        }
+    }
+
+    ui->label->setPixmap(scaled_pixmap);
+}
+#endif
 
 HomeView::~HomeView()
 {

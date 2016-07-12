@@ -29,6 +29,7 @@ QListView {
   #SingleStreamView ::item {
     padding: 15px;
     height: 275px;
+    width: 275px;
     border: 2px solid #355797;
     background-color: #EDEDED;
     border-radius: 10px; }
@@ -78,7 +79,7 @@ QComboBox, QPushButton {
   padding-right: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
-  font-size: 17px;
+  font-size: 30px;
   font-weight: bold;
   max-height: 30px; }
 

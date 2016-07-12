@@ -87,7 +87,8 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
     // MediaWiki API recommends sorting so caching is more likely to occur, and of course uniqueing
     std::sort(streamTitles.begin(), streamTitles.end());
-    std::unique(streamTitles.begin(), streamTitles.end());
+    auto end = std::unique(streamTitles.begin(), streamTitles.end());
+    streamTitles.erase(end, streamTitles.end());
 
     QUrl url("http://wikieducator.org/api.php");
     QUrlQuery query;
@@ -208,7 +209,8 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
     }
 
     std::sort(invertebrateTitles.begin(), invertebrateTitles.end());
-    std::unique(invertebrateTitles.begin(), invertebrateTitles.end());
+    auto end = std::unique(invertebrateTitles.begin(), invertebrateTitles.end());
+    invertebrateTitles.erase(end, invertebrateTitles.end());
 
     QUrl url("http://wikieducator.org/api.php");
     QUrlQuery query;
@@ -280,7 +282,8 @@ void WebDataSynchronizer::syncImages()
     }
 
     std::sort(titles.begin(), titles.end());
-    std::unique(titles.begin(), titles.end());
+    auto end = std::unique(titles.begin(), titles.end());
+    titles.erase(end, titles.end());
 
     QUrl url("http://wikieducator.org/api.php");
     QUrlQuery query;
@@ -446,7 +449,8 @@ void WebDataSynchronizer::finalize()
     }
 
     QSettings settings;
-    settings.setValue("lastUpdate", QDateTime::currentDateTime());
+//    settings.setValue("lastUpdate", QDateTime::currentDateTime().toString("MM-dd-yyyy at HH:mm"));
+    settings.setValue("lastUpdate", QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate));
 //    qDebug() << "last update complete";
 //    emit statusUpdateMessage("Syncing completed successfully.");
     emit finished(WebDataSynchonizerExitStatus::SUCCEEDED);
