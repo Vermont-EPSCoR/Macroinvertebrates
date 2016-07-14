@@ -7,7 +7,6 @@ HomeView::HomeView(QWidget* parent):
     QWidget(parent),
     ui(new Ui::HomeView)
 {
-    epscor_logo = QPixmap::fromImage(QImage(":/media/logo.png"));
     ui->setupUi(this);
 }
 
@@ -25,7 +24,7 @@ void HomeView::resizeEvent(QResizeEvent* event)
 
         if (data.isNull()) {
             qDebug() << "Generating the wide version";
-            scaled_pixmap = epscor_logo.scaled(rect.width() * 0.25, rect.height() * 0.25, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            scaled_pixmap = QPixmap::fromImage(QImage(":/media/logo.png")).scaled(rect.width() * 0.25, rect.height() * 0.25, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
             QByteArray byteArray;
             QBuffer buffer(&byteArray);
@@ -42,7 +41,7 @@ void HomeView::resizeEvent(QResizeEvent* event)
 
         if(data.isNull()) {
             qDebug() << "Generating tall version";
-            scaled_pixmap = epscor_logo.scaled(rect.width() * 0.85, rect.height() * 0.85, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            scaled_pixmap = QPixmap::fromImage(QImage(":/media/logo.png")).scaled(rect.width() * 0.85, rect.height() * 0.85, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
             QByteArray byteArray;
             QBuffer buffer(&byteArray);

@@ -16,11 +16,9 @@ class HomeView;
 class HomeView : public QWidget
 {
     Q_OBJECT
-    QPixmap epscor_logo;
 
-#ifndef ADD_FS_WATCHER
   void resizeEvent(QResizeEvent *event);
-#endif
+
 public:
     explicit HomeView(QWidget *parent = 0);
     ~HomeView();

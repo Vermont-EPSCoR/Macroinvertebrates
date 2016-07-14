@@ -6,11 +6,15 @@ InvertebrateView::InvertebrateView(const Invertebrate &invertebrate, const QStri
     ui(new Ui::InvertebrateView)
 {
     ui->setupUi(this);
+    ui->scrollArea->setWidgetResizable(true);
     QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
-    QScrollerProperties ScrollerProperties = QScroller::scroller(ui->scrollArea->viewport())->scrollerProperties();
-    ScrollerProperties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, OvershootPolicy);
-    ScrollerProperties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, OvershootPolicy);
-    QScroller::scroller(ui->scrollArea->viewport())->setScrollerProperties(ScrollerProperties);
+    QScrollerProperties properties = QScroller::scroller(ui->scrollArea->viewport())->scrollerProperties();
+    properties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, OvershootPolicy);
+    properties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, OvershootPolicy);
+
+    properties.setScrollMetric(QScrollerProperties::MaximumVelocity, QVariant(0.0001));
+
+    QScroller::scroller(ui->scrollArea->viewport())->setScrollerProperties(properties);
     QScroller::grabGesture(ui->scrollArea->viewport(), QScroller::LeftMouseButtonGesture);
 
     setInfo(invertebrate, streamName);
@@ -29,60 +33,27 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, const QString &
     this->originStream = streamName;
     ui->titleLabel->setText(invertebrate.name);
 
+    bool viewIsNarrow = (qApp->desktop()->availableGeometry().size().width() < 400);
+
     int row = 0;
     if(!invertebrate.commonName.isEmpty()) {
-        ui->gridLayout->addWidget(new QLabel("Common Name:"), row, 0);
-        ui->gridLayout->addWidget(new QLabel(invertebrate.commonName), row, 1);
-        row++;
-        QFrame *hr = new QFrame();
-        hr->setFrameShape(QFrame::HLine);
-        hr->setFrameShadow(QFrame::Sunken);
-        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
-        row++;
+        addInfoToLayout(viewIsNarrow, "Common Name:", invertebrate.commonName, row);
     }
 
     if(!invertebrate.family.isEmpty()) {
-        ui->gridLayout->addWidget(new QLabel("Family:"), row, 0);
-        ui->gridLayout->addWidget(new QLabel(invertebrate.family), row, 1);
-        row++;
-        QFrame *hr = new QFrame();
-        hr->setFrameShape(QFrame::HLine);
-        hr->setFrameShadow(QFrame::Sunken);
-        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
-        row++;
+        addInfoToLayout(viewIsNarrow, "Family:", invertebrate.family, row);
     }
 
     if(!invertebrate.genus.isEmpty()) {
-        ui->gridLayout->addWidget(new QLabel("Genus:"), row, 0);
-        ui->gridLayout->addWidget(new QLabel(invertebrate.genus), row, 1);
-        row++;
-        QFrame *hr = new QFrame();
-        hr->setFrameShape(QFrame::HLine);
-        hr->setFrameShadow(QFrame::Sunken);
-        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
-        row++;
+        addInfoToLayout(viewIsNarrow, "Genus:", invertebrate.genus, row);
     }
 
     if(!invertebrate.order.isEmpty()) {
-        ui->gridLayout->addWidget(new QLabel("Order:"), row, 0);
-        ui->gridLayout->addWidget(new QLabel(invertebrate.order), row, 1);
-        row++;
-        QFrame *hr = new QFrame();
-        hr->setFrameShape(QFrame::HLine);
-        hr->setFrameShadow(QFrame::Sunken);
-        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
-        row++;
+        addInfoToLayout(viewIsNarrow, "Order:", invertebrate.order, row);
     }
 
     if(!invertebrate.flyName.isEmpty()) {
-        ui->gridLayout->addWidget(new QLabel("Tied Fly:"), row, 0);
-        ui->gridLayout->addWidget(new QLabel(invertebrate.flyName), row, 1);
-        row++;
-        QFrame *hr = new QFrame();
-        hr->setFrameShape(QFrame::HLine);
-        hr->setFrameShadow(QFrame::Sunken);
-        ui->gridLayout->addWidget(hr, row, 0, 1, 2);
-        row++;
+        addInfoToLayout(viewIsNarrow, "Tied Fly:", invertebrate.flyName, row);
     }
 
     ui->gridLayout->setColumnStretch(1, 1);
@@ -113,4 +84,34 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, const QString &
 void InvertebrateView::on_pushButton_back_pressed()
 {
     emit backButtonClicked(originStream);
+}
+
+void InvertebrateView::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+//    qDebug() << "Device " << qApp->primaryScreen()->geometry().size();
+//    qDebug() << "Scrollarea " << ui->scrollArea->size();
+//    qDebug() << "Scroll contents " << ui->scrollAreaWidgetContents->size();
+//    ui->scrollAreaWidgetContents->resize(ui->scrollArea->size());
+//    ui->scrollAreaWidgetContents->update();
+}
+
+void InvertebrateView::addInfoToLayout(bool isNarrow, const QString &label, const QString &value, int &active_row)
+{
+    int valueCol = (isNarrow) ? 0 : 1;
+    ui->gridLayout->addWidget(new QLabel(label), active_row, 0);
+
+    if(isNarrow) {
+        active_row++;
+    }
+
+    ui->gridLayout->addWidget(new QLabel(value), active_row, valueCol);
+    active_row++;
+
+    // Add a horizontal rule
+    QFrame *hr = new QFrame();
+    hr->setFrameShape(QFrame::HLine);
+    hr->setFrameShadow(QFrame::Sunken);
+    ui->gridLayout->addWidget(hr, active_row, 0, 1, 2);
+    active_row++;
 }

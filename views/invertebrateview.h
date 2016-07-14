@@ -7,6 +7,8 @@
 #include <QScroller>
 #include <QFrame>
 
+#include <QDesktopWidget>
+
 #include "../models/invertebrate.h"
 
 namespace Ui {
@@ -18,6 +20,8 @@ class InvertebrateView : public QWidget
     Q_OBJECT
     QString originStream;
     void setInfo(const Invertebrate &invertebrate, const QString &streamName);
+    void addInfoToLayout(bool isNarrow, const QString &label, const QString &value, int &active_row);
+    void resizeEvent(QResizeEvent *event);
 public:
     explicit InvertebrateView(const Invertebrate &invertebrate, const QString &streamName, QWidget *parent = 0);
     ~InvertebrateView();
