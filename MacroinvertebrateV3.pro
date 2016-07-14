@@ -115,7 +115,8 @@ ICON = media/OSX.icns
 
 ios {
     QMAKE_INFO_PLIST = Info.plist
-    ios_icon.files = $$files($$PWD/iOS/iPhone*.png)
+    ios_icon.files = $$files($$PWD/media/iOS/icon*.png)
+    ios_icon.path = assets
     QMAKE_BUNDLE_DATA += ios_icon
     DEFINES += "ON_IOS"
 }
