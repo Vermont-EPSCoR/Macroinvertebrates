@@ -78,6 +78,7 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, const QString &
 #ifdef ON_IOS
     pixmap = pixmap.scaledToWidth(qApp->primaryScreen()->geometry().size().width() * 0.85);
 #endif
+    image = pixmap;
     ui->imageLabel->setPixmap(pixmap);
 }
 
@@ -94,10 +95,13 @@ void InvertebrateView::resizeEvent(QResizeEvent *event)
 //    qDebug() << "Scroll contents " << ui->scrollAreaWidgetContents->size();
 //    ui->scrollAreaWidgetContents->resize(ui->scrollArea->size());
 //    ui->scrollAreaWidgetContents->update();
+    qDebug() << qApp->primaryScreen()->geometry().size();
+    ui->imageLabel->setPixmap(image.scaled(qApp->primaryScreen()->geometry().size() * 0.85, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 void InvertebrateView::addInfoToLayout(bool isNarrow, const QString &label, const QString &value, int &active_row)
 {
+    isNarrow = true;
     int valueCol = (isNarrow) ? 0 : 1;
     ui->gridLayout->addWidget(new QLabel(label), active_row, 0);
 

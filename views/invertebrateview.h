@@ -19,6 +19,8 @@ class InvertebrateView : public QWidget
 {
     Q_OBJECT
     QString originStream;
+    QPixmap image;
+
     void setInfo(const Invertebrate &invertebrate, const QString &streamName);
     void addInfoToLayout(bool isNarrow, const QString &label, const QString &value, int &active_row);
     void resizeEvent(QResizeEvent *event);
