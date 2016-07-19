@@ -2,6 +2,7 @@
 #define HOMEVIEW_H
 
 #include <QDesktopWidget>
+#include <QScreen>
 #include <QWidget>
 #include <QFile>
 #include <QPixmap>
@@ -17,7 +18,9 @@ class HomeView : public QWidget
 {
     Q_OBJECT
 
+#ifdef MOBILE_DEPLOYMENT
   void resizeEvent(QResizeEvent *event);
+#endif
 
 public:
     explicit HomeView(QWidget *parent = 0);

@@ -36,17 +36,17 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Streams</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Streams</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="QLineEdit" name="streamSearch">
@@ -66,6 +66,10 @@
     </widget>
    </item>
   </layout>
+  <zorder>streamSearch</zorder>
+  <zorder>listWidget</zorder>
+  <zorder>label</zorder>
+  <zorder>horizontalSpacer</zorder>
  </widget>
  <resources/>
  <connections/>

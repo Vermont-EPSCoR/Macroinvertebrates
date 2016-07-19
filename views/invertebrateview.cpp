@@ -90,12 +90,6 @@ void InvertebrateView::on_pushButton_back_pressed()
 void InvertebrateView::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-//    qDebug() << "Device " << qApp->primaryScreen()->geometry().size();
-//    qDebug() << "Scrollarea " << ui->scrollArea->size();
-//    qDebug() << "Scroll contents " << ui->scrollAreaWidgetContents->size();
-//    ui->scrollAreaWidgetContents->resize(ui->scrollArea->size());
-//    ui->scrollAreaWidgetContents->update();
-    qDebug() << qApp->primaryScreen()->geometry().size();
     ui->imageLabel->setPixmap(image.scaled(qApp->primaryScreen()->geometry().size() * 0.85, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 

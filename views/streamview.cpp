@@ -6,12 +6,16 @@ StreamView::StreamView(const std::vector<QString> &streamList, QWidget *parent) 
     ui(new Ui::StreamView)
 {
     ui->setupUi(this);
-    QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
-    QScrollerProperties ScrollerProperties = QScroller::scroller(ui->listWidget->viewport())->scrollerProperties();
-    ScrollerProperties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, OvershootPolicy);
-    ScrollerProperties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, OvershootPolicy);
-    QScroller::scroller(ui->listWidget->viewport())->setScrollerProperties(ScrollerProperties);
-    QScroller::grabGesture(ui->listWidget->viewport(), QScroller::LeftMouseButtonGesture);
+
+    if( qApp->desktop()->size().width() < 500) {
+        qDebug() << "Doing this";
+        QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
+        QScrollerProperties ScrollerProperties = QScroller::scroller(ui->listWidget->viewport())->scrollerProperties();
+        ScrollerProperties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, OvershootPolicy);
+        ScrollerProperties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, OvershootPolicy);
+        QScroller::scroller(ui->listWidget->viewport())->setScrollerProperties(ScrollerProperties);
+        QScroller::grabGesture(ui->listWidget->viewport(), QScroller::LeftMouseButtonGesture);
+    }
 
     for(const QString& stream: streamList) {
         ui->listWidget->addItem(stream);

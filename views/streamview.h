@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QListWidgetItem>
 #include <QScroller>
+#include <QDesktopWidget>
+#include <QDebug>
 
 #include <vector>
 
