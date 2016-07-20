@@ -8,7 +8,6 @@ StreamView::StreamView(const std::vector<QString> &streamList, QWidget *parent) 
     ui->setupUi(this);
 
     if( qApp->desktop()->size().width() < 500) {
-        qDebug() << "Doing this";
         QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
         QScrollerProperties ScrollerProperties = QScroller::scroller(ui->listWidget->viewport())->scrollerProperties();
         ScrollerProperties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, OvershootPolicy);

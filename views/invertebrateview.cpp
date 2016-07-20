@@ -59,8 +59,6 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, const QString &
     ui->gridLayout->setColumnStretch(1, 1);
     ui->descriptionLabel->setText(invertebrate.description);
 
-//    ui->centralwidget->ensurePolished();
-
     QPixmap pixmap;
 
     switch (invertebrate.imageIsReady) {
