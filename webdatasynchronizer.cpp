@@ -452,7 +452,7 @@ void WebDataSynchronizer::finalize()
 //    settings.setValue("lastUpdate", QDateTime::currentDateTime().toString("MM-dd-yyyy at HH:mm"));
     settings.setValue("lastUpdate", QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate));
 //    qDebug() << "last update complete";
-//    emit statusUpdateMessage("Syncing completed successfully.");
+    emit statusUpdateMessage("Syncing completed successfully.");
     emit finished(WebDataSynchonizerExitStatus::SUCCEEDED);
 //    qDebug() << "success";
 }
@@ -523,7 +523,7 @@ void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
         QString trimmed = node.innerText().trimmed().replace(QRegularExpression("\\s{2, }"), " ");
 
         if(!trimmed.isEmpty()) {
-            paragraphList << trimmed.prepend('\t');
+            paragraphList << trimmed;
         }
     }
 

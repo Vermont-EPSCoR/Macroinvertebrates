@@ -10,14 +10,15 @@ QMainWindow {
   background-color: rgb(255, 255, 255);
 }
 
-#titleLabel, #streamNameLabel, #AboutView #label {
+#titleLabel, #streamNameLabel {
   font-size: $std_font_size;
   font-weight: bold;
 }
 
-// #AboutView #label {
-//   font-size: $std_font_size;
-// }
+// Keep this separate from the titleLabel and streamNameLabels because we don't need this to be bold
+#AboutView #label {
+  font-size: $std_font_size;
+}
 
 QListView {
   background-color: transparent;
