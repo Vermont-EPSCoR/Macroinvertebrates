@@ -28,7 +28,6 @@ signals:
 private slots:
     void on_backButton_pressed();
     void on_listWidget_itemClicked(QListWidgetItem *item);
-
     void on_streamSearch_textEdited(const QString &arg1);
 
 private:
