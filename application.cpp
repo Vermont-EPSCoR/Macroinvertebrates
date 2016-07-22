@@ -1,5 +1,7 @@
 #include "application.h"
 
+#include <QDir>
+
 Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 {
 }
@@ -121,6 +123,18 @@ void Application::loadDataFromDisk()
     }
 
     if(needToSync) {
+        // Deploy initial data!
+        QDir dir;
+        dir.setPath(":/initial_data/data");
+        QFile::copy(":/initial_data/data/stream.data", streamDataPath);
+        QFile::copy(":/initial_data/data/invertebrate.data", invertebrateDataPath);
+
+        dir.setPath(":/initial_data/data/images");
+        QFileInfoList fileList = dir.entryInfoList();
+        for(QFileInfo &entry: fileList) {
+            QFile::copy(entry.filePath(), QString("%1%2%3").arg(imagePath, dir.separator(), entry.fileName()));
+        }
+
         startSync();
     }
 }
