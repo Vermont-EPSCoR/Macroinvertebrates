@@ -14,7 +14,7 @@ SettingsView::SettingsView(bool isSyncingNow, QWidget *parent) :
                                    "On Startup (Always)",  // SyncOptions::ON_STARTUP
                                    "On Startup (WiFi)",  // SyncOptions::WIFI
                                });
-    ui->lastSyncLabel->setText(settings.value("lastUpdate").toString());
+    ui->lastSyncLabel->setText(settings.value("lastUpdate", "Never").toString());
     ui->syncModeComboBox->addItems(syncingOptions);
     // Disable On Startup
     // Horrible hack according to peppe (who is one of the Qt developers)

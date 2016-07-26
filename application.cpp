@@ -92,20 +92,7 @@ void Application::loadDataFromDisk()
     loadVariableFromDisk(needToSync, "stream");
 
     if(needToSync) {
-        thisIsTheFirstRun = true;
-        // Deploy initial data!
-        QString streamDataPath = QString("%1%2%3").arg(dataPath, dir.separator(), "stream.data");
-        QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, dir.separator(), "invertebrate.data");
-
-        dir.setPath(":/initial_data/data");
-        QFile::copy(":/initial_data/data/stream.data", streamDataPath);
-        QFile::copy(":/initial_data/data/invertebrate.data", invertebrateDataPath);
-
-        dir.setPath(":/initial_data/data/images");
-        QFileInfoList fileList = dir.entryInfoList();
-        for(QFileInfo &entry: fileList) {
-            QFile::copy(entry.filePath(), QString("%1%2%3").arg(imagePath, dir.separator(), entry.fileName()));
-        }
+        stageBundledData();
 
         loadVariableFromDisk(needToSync, "invertebrate");
         loadVariableFromDisk(needToSync, "stream");
@@ -147,12 +134,15 @@ void Application::startSync()
     // Don't allow multiple syncs to start concurrently
     if(!isSyncingNow) {
         // Let the user choose if they want to sync data on the first run/if data is empty
-        if(thisIsTheFirstRun) {
+        QSettings settings;
+        bool firstRunMessageHasBeenShown = settings.value("firstRunMessageHasBeenShown", false).toBool();
+
+        if(!firstRunMessageHasBeenShown) {
+            settings.setValue("firstRunMessageHasBeenShown", true);
             QMessageBox msgBox;
             msgBox.setText("Welcome new user!");
             msgBox.setInformativeText("This app has been preloaded with some initial data. This data may be out of date and from time to time you should sync with the remote server. Would you like to sync now?");
             msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-
             if(msgBox.exec() == QMessageBox::Cancel) {
                 return;
             }
@@ -182,7 +172,7 @@ void Application::startSync()
         QThreadPool::globalInstance()->start(syncer);
 
         // only show the message about syncing running if the user clicked the sync button
-        if(!thisIsTheFirstRun) {
+//        if(!firstRunMessageHasBeenShown) {
             QMessageBox msgBox;
             msgBox.setText("Data syncing has begun!");
             msgBox.setInformativeText("Sync has begun. Items will be updated as they are completed. If you wish to stop, press cancel.");
@@ -191,7 +181,7 @@ void Application::startSync()
             if(msgBox.exec() == QMessageBox::Cancel) {
                 stopSync();
             }
-        }
+//        }
     } else {
         // The user requested a data sync when one was already running. They might want to cancel the running sync.
         QMessageBox msgBox;
@@ -328,5 +318,21 @@ void Application::loadVariableFromDisk(bool &needToSync, QString variable)
         } else {
 //            qDebug() << "You asked for a case that doesn't exist. "<< variable;
         }
+    }
+}
+
+void Application::stageBundledData() {
+    QDir dir;
+    QString streamDataPath = QString("%1%2%3").arg(dataPath, dir.separator(), "stream.data");
+    QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, dir.separator(), "invertebrate.data");
+
+    dir.setPath(":/initial_data/data");
+    QFile::copy(":/initial_data/data/stream.data", streamDataPath);
+    QFile::copy(":/initial_data/data/invertebrate.data", invertebrateDataPath);
+
+    dir.setPath(":/initial_data/data/images");
+    QFileInfoList fileList = dir.entryInfoList();
+    for(QFileInfo &entry: fileList) {
+        QFile::copy(entry.filePath(), QString("%1%2%3").arg(imagePath, dir.separator(), entry.fileName()));
     }
 }

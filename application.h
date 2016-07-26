@@ -40,13 +40,15 @@ class Application : public QApplication
     QMap<QString, Stream> streams;
     QMutex mutex;
     bool isSyncingNow = false;
-    bool thisIsTheFirstRun = true;
 
     QString dataPath;
     QString imagePath;
 
     QPointer<SettingsView> settings;
     MainWindow mainWindow;
+
+    void loadVariableFromDisk(bool &needToSync, QString variable);
+    void stageBundledData();
 
 #ifdef ADD_FS_WATCHER
     QFileSystemWatcher watcher;
@@ -55,7 +57,6 @@ public:
     Application(int argc, char *argv[]);
     void performSetUp();
     ~Application();
-    void loadVariableFromDisk(bool &needToSync, QString variable);
 
 private slots:
     void transitionToAllStreams();

@@ -3,6 +3,8 @@
 
 #include <QString>
 #include <QDataStream>
+#include <QStandardPaths>
+#include <QDir>
 #include <QDebug>
 
 enum class ImageStatus {
@@ -15,6 +17,7 @@ class Invertebrate
 {
 
 public:
+    static QString imagePath;  // Not serialized
     Invertebrate();
 
     // Don't sort this

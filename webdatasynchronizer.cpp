@@ -26,7 +26,6 @@ void WebDataSynchronizer::run()
 //        qDebug() << "Images done";
         syncAbout();
 //        qDebug() << "About done";
-
         finalize();
 //        qDebug() << "Finalize done";
     } else {
@@ -73,7 +72,6 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
 
     if(doc.isNull()) {
 //        qDebug() << "Doc is null/invalid.";
-//        qDebug() << doc;
         syncingShouldContinue = false;
         return;
     }
