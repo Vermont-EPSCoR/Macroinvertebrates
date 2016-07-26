@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QObject>
 #include <QFont>
+#include <QDir>
 #include <QDebug>
 #include <QMap>
 #include <QPointer>
@@ -39,6 +40,7 @@ class Application : public QApplication
     QMap<QString, Stream> streams;
     QMutex mutex;
     bool isSyncingNow = false;
+    bool thisIsTheFirstRun = true;
 
     QString dataPath;
     QString imagePath;
@@ -53,6 +55,7 @@ public:
     Application(int argc, char *argv[]);
     void performSetUp();
     ~Application();
+    void loadVariableFromDisk(bool &needToSync, QString variable);
 
 private slots:
     void transitionToAllStreams();

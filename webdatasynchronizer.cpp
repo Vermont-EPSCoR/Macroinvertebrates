@@ -173,6 +173,7 @@ void WebDataSynchronizer::syncInvertebrates()
         handleNetworkReplyForInvertebrateList(nextReply.data());
     } else {
         syncingShouldContinue = false;
+        return;
     }
 
     emit invertebrateSyncComplete();
@@ -441,20 +442,16 @@ void WebDataSynchronizer::finalize()
 {
 //    qDebug() << "Begin finalize";
     if(!syncingShouldContinue) {
-//        qDebug() << "emitting finished";
-//        emit statusUpdateMessage("Sync stopped; Incomplete.");
+        emit statusUpdateMessage("Sync stopped; Incomplete.");
         emit finished(WebDataSynchonizerExitStatus::FAILED_RUNTIME);
 //        qDebug() << "failure";
         return;
     }
 
     QSettings settings;
-//    settings.setValue("lastUpdate", QDateTime::currentDateTime().toString("MM-dd-yyyy at HH:mm"));
     settings.setValue("lastUpdate", QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate));
-//    qDebug() << "last update complete";
     emit statusUpdateMessage("Syncing completed successfully.");
     emit finished(WebDataSynchonizerExitStatus::SUCCEEDED);
-//    qDebug() << "success";
 }
 
 WebDataSynchronizer::~WebDataSynchronizer()
