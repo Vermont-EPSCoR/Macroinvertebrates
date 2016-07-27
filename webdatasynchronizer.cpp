@@ -15,6 +15,7 @@ void WebDataSynchronizer::setData(QMutex *mutex, QMap<QString, Invertebrate> *in
 
 void WebDataSynchronizer::run()
 {
+    emit started();
     network = QSharedPointer<QNetworkAccessManager>(new QNetworkAccessManager(), [](QNetworkAccessManager *obj){ obj->deleteLater(); });
     if(network->networkAccessible() == QNetworkAccessManager::Accessible) {
 //        qDebug() << "Begin";

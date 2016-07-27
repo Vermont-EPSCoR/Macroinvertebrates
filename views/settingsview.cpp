@@ -1,7 +1,7 @@
 #include "settingsview.h"
 #include "ui_settingsview.h"
 
-SettingsView::SettingsView(bool isSyncingNow, QWidget *parent) :
+SettingsView::SettingsView(SyncStatus syncStatus, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SettingsView)
 {
@@ -21,7 +21,7 @@ SettingsView::SettingsView(bool isSyncingNow, QWidget *parent) :
 //    ui->syncModeComboBox->setItemData(2, QVariant(0), Qt::UserRole - 1);
     ui->syncModeComboBox->setCurrentIndex(syncingPreference);
 
-    if(isSyncingNow) {
+    if(syncStatus == SyncStatus::SYNC_IN_PROGRESS) {
         toggleSyncButtonText(SyncStatus::SYNC_IN_PROGRESS);
     }
 }

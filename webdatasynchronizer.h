@@ -92,11 +92,11 @@ public:
     ~WebDataSynchronizer();
     void setData(QMutex *mutex, QMap<QString, Invertebrate> *invertebrates, QMap<QString, Stream> *streams);
     void run();
-
     bool syncingShouldContinue = true;
 public slots:
     void stop();
 signals:
+    void started();
     void statusUpdateMessage(const QString &status);
     void finished(WebDataSynchonizerExitStatus status);
 //    void streamSyncComplete();

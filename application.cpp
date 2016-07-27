@@ -83,12 +83,11 @@ void Application::transitionToInvertebrate(const QString &invertebrate, const QS
 
 void Application::transitionToSettings()
 {
-    settings = new SettingsView(isSyncingNow);
+    settings = new SettingsView(syncStatus);
     mainWindow.setCentralWidget(settings);
     connect(settings, &SettingsView::backButtonClicked, this, &Application::transitionToHome);
     connect(settings, &SettingsView::syncButtonClicked, this, &Application::startSync);
 }
-
 
 void Application::loadDataFromDisk()
 {
@@ -130,7 +129,6 @@ void Application::startSync()
 
         // Start the sync process
         isSyncingNow = true;
-        syncStatus = SyncStatus::SYNC_IN_PROGRESS;
         syncer = new WebDataSynchronizer();
         syncer->setData(&mutex, &invertebrates, &streams);
 
@@ -140,12 +138,21 @@ void Application::startSync()
         connect(syncer, &WebDataSynchronizer::statusUpdateMessage, this, &Application::syncMessage);
         // Update the settings view when sync is complete
         connect(syncer, &WebDataSynchronizer::destroyed, [&](){
+            syncStatus = SyncStatus::READY_TO_SYNC;
             if(!settings.isNull()) {
                 settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
             }
         });
+        // On start do these things:
+        connect(syncer, &WebDataSynchronizer::started, [&](){
+            syncStatus = SyncStatus::SYNC_IN_PROGRESS;
+            if(!settings.isNull()) {
+                settings->toggleSyncButtonText(SyncStatus::SYNC_IN_PROGRESS);
+            }
+        });
 
         QThreadPool::globalInstance()->start(syncer);
+
 
         // only show the message about syncing running if the user clicked the sync button
         if(!firstRunMessageHasBeenShown) {
