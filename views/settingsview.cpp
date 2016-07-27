@@ -12,13 +12,13 @@ SettingsView::SettingsView(bool isSyncingNow, QWidget *parent) :
     QStringList syncingOptions({
                                    "Manual Only",  // SyncOptions::MANUAL_ONLY
                                    "On Startup (Always)",  // SyncOptions::ON_STARTUP
-                                   "On Startup (WiFi)",  // SyncOptions::WIFI
+//                                   "On Startup (WiFi)",  // SyncOptions::WIFI
                                });
     ui->lastSyncLabel->setText(settings.value("lastUpdate", "Never").toString());
     ui->syncModeComboBox->addItems(syncingOptions);
-    // Disable On Startup
-    // Horrible hack according to peppe (who is one of the Qt developers)
-    ui->syncModeComboBox->setItemData(2, QVariant(0), Qt::UserRole - 1);
+//    // Disable On Startup
+//    // Horrible hack according to peppe (who is one of the Qt developers)
+//    ui->syncModeComboBox->setItemData(2, QVariant(0), Qt::UserRole - 1);
     ui->syncModeComboBox->setCurrentIndex(syncingPreference);
 
     if(isSyncingNow) {
@@ -56,5 +56,7 @@ void SettingsView::toggleSyncButtonText(SyncStatus desiredState)
     } else {
         ui->syncButton->setText("Cancel Sync");
     }
+
+    update();
 }
 

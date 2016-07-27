@@ -56,6 +56,7 @@ enum class SyncOptions {
 
 enum class SyncStatus {
     SYNC_IN_PROGRESS = 0,
+    SYNC_HALTING,
     READY_TO_SYNC
 };
 
@@ -85,6 +86,7 @@ class WebDataSynchronizer : public QObject, public QRunnable
     void handleNetworkReplyForImageList(QNetworkReply* reply, QMap<QString, QList<Invertebrate *>> *invertebrateImages);
     bool handleNetworkReplyForImageData(QNetworkReply* reply, QString localFileName);
     void handleNetworkReplyForAbout(QNetworkReply* reply);
+    void saveData();
 public:
     explicit WebDataSynchronizer(QObject *parent = 0);
     ~WebDataSynchronizer();
@@ -97,8 +99,8 @@ public slots:
 signals:
     void statusUpdateMessage(const QString &status);
     void finished(WebDataSynchonizerExitStatus status);
-    void streamSyncComplete();
-    void invertebrateSyncComplete();
+//    void streamSyncComplete();
+//    void invertebrateSyncComplete();
     void imageSyncComplete();
     void aboutStringParsed(const QString& about);
     void shouldStop();

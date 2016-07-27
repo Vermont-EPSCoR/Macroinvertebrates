@@ -48,7 +48,6 @@ void Application::transitionToAbout()
 
 void Application::transitionToSingleStream(const QString &streamName)
 {
-    qDebug() << streamName;
     std::vector<Invertebrate> invertebratesList;
     QMutexLocker locker(&mutex);
     Stream &stream = streams[streamName];
@@ -82,6 +81,15 @@ void Application::transitionToInvertebrate(const QString &invertebrate, const QS
     connect(&mainWindow, &MainWindow::backButtonReleased, view, &InvertebrateView::on_pushButton_back_pressed);
 }
 
+void Application::transitionToSettings()
+{
+    settings = new SettingsView(isSyncingNow);
+    mainWindow.setCentralWidget(settings);
+    connect(settings, &SettingsView::backButtonClicked, this, &Application::transitionToHome);
+    connect(settings, &SettingsView::syncButtonClicked, this, &Application::startSync);
+}
+
+
 void Application::loadDataFromDisk()
 {
     QDir dir;
@@ -101,44 +109,16 @@ void Application::loadDataFromDisk()
     }
 }
 
-void Application::saveDataToDisk()
-{
-    QDir directoryHelper;
-    QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
-    QFile streamDataFile(streamDataPath);
-    if(!streamDataFile.open(QFile::WriteOnly)) {
-#ifndef MOBILE_DEPLOYMENT
-        qDebug() << "Unable to open local invertebrate data";
-#endif
-        return;
-    }
-
-    QDataStream streamSaver(&streamDataFile);
-    streamSaver << streams;
-
-    QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "invertebrate.data");
-    QFile invertebrateDataFile(invertebrateDataPath);
-    if(!invertebrateDataFile.open(QFile::WriteOnly)) {
-#ifndef MOBILE_DEPLOYMENT
-        qDebug() << "Unable to open local invertebrate data";
-#endif
-        return;
-    }
-
-    QDataStream invertebrateSaver(&invertebrateDataFile);
-    invertebrateSaver << invertebrates;
-}
-
 void Application::startSync()
 {
     // Don't allow multiple syncs to start concurrently
-    if(!isSyncingNow) {
+    if(syncStatus == SyncStatus::READY_TO_SYNC) {
         // Let the user choose if they want to sync data on the first run/if data is empty
-        QSettings settings;
-        bool firstRunMessageHasBeenShown = settings.value("firstRunMessageHasBeenShown", false).toBool();
+        QSettings applicationSettings;
+        bool firstRunMessageHasBeenShown = applicationSettings.value("firstRunMessageHasBeenShown", false).toBool();
 
         if(!firstRunMessageHasBeenShown) {
-            settings.setValue("firstRunMessageHasBeenShown", true);
+            applicationSettings.setValue("firstRunMessageHasBeenShown", true);
             QMessageBox msgBox;
             msgBox.setText("Welcome new user!");
             msgBox.setInformativeText("This app has been preloaded with some initial data. This data may be out of date and from time to time you should sync with the remote server. Would you like to sync now?");
@@ -150,55 +130,47 @@ void Application::startSync()
 
         // Start the sync process
         isSyncingNow = true;
+        syncStatus = SyncStatus::SYNC_IN_PROGRESS;
         syncer = new WebDataSynchronizer();
         syncer->setData(&mutex, &invertebrates, &streams);
-
-        connect(syncer, &WebDataSynchronizer::finished, [&](WebDataSynchonizerExitStatus status) {
-            if(status == WebDataSynchonizerExitStatus::SUCCEEDED) {
-                saveDataToDisk();
-            } else {
-                // Woe unto those who add code before the mutex. Woe and segfaults.
-                QMutexLocker locker(&mutex);
-                mainWindow.statusBar()->showMessage("Sync did not complete. Stored data has not been changed.", 10000);
-            }
-           stopSync();
-        });
 
         // Ensure that quitting the application halts the background process
         connect(this, &Application::aboutToQuit, syncer, &WebDataSynchronizer::stop);
         // Hook up the status updates to the mainWindow's statusBar
         connect(syncer, &WebDataSynchronizer::statusUpdateMessage, this, &Application::syncMessage);
+        // Update the settings view when sync is complete
+        connect(syncer, &WebDataSynchronizer::destroyed, [&](){
+            if(!settings.isNull()) {
+                settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
+            }
+        });
 
         QThreadPool::globalInstance()->start(syncer);
 
         // only show the message about syncing running if the user clicked the sync button
-//        if(!firstRunMessageHasBeenShown) {
+        if(!firstRunMessageHasBeenShown) {
             QMessageBox msgBox;
             msgBox.setText("Data syncing has begun!");
             msgBox.setInformativeText("Sync has begun. Items will be updated as they are completed. If you wish to stop, press cancel.");
             msgBox.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
+            msgBox.setWindowModality(Qt::WindowModal);
 
             if(msgBox.exec() == QMessageBox::Cancel) {
                 stopSync();
             }
-//        }
-    } else {
+        }
+    } else if(syncStatus == SyncStatus::SYNC_IN_PROGRESS) {
         // The user requested a data sync when one was already running. They might want to cancel the running sync.
         QMessageBox msgBox;
         msgBox.setText("Data is already syncing. Cancel?");
         msgBox.setStandardButtons(QMessageBox::Yes|QMessageBox::No);
+        msgBox.setWindowModality(Qt::WindowModal);
         if(msgBox.exec() == QMessageBox::Yes) {
             stopSync();
         }
+    } else {
+        mainWindow.statusBar()->showMessage("Sync is halting. Stop pressing the button so much.", 10000);
     }
-}
-
-void Application::transitionToSettings()
-{
-    settings = new SettingsView(isSyncingNow);
-    mainWindow.setCentralWidget(settings);
-    connect(settings, &SettingsView::backButtonClicked, this, &Application::transitionToHome);
-    connect(settings, &SettingsView::syncButtonClicked, this, &Application::startSync);
 }
 
 Application::~Application() {
@@ -275,21 +247,32 @@ void Application::performSetUp()
 
 void Application::syncMessage(const QString &message)
 {
-    QMutexLocker locker(&mutex);
-    mainWindow.statusBar()->showMessage(message, 10000);
+    if(mutex.tryLock(250)) {
+        mainWindow.statusBar()->showMessage(message, 10000);
+        mutex.unlock();
+    } else {
+//        qDebug() << "Unable to lock and set message";
+    }
 }
 
 void Application::stopSync()
 {
     if(syncer) {
-        syncer->syncingShouldContinue = false;
-    }
+        connect(syncer.data(), &WebDataSynchronizer::destroyed, [&]() {
+            syncStatus = SyncStatus::READY_TO_SYNC;
+            isSyncingNow = false;
 
-    if(settings) {
-        settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
-    }
+            // If we're on the sync view
+            if(!settings.isNull()) {
+                settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
+            }
+        });
 
-    isSyncingNow = false;
+        syncer->stop();
+    } else {
+        syncStatus = SyncStatus::READY_TO_SYNC;
+        isSyncingNow = false;
+    }
 }
 
 void Application::loadVariableFromDisk(bool &needToSync, QString variable)

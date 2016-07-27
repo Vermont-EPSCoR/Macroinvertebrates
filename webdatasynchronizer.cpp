@@ -141,13 +141,10 @@ void WebDataSynchronizer::handleNetworkReplyForStreamData(QNetworkReply *reply)
             }
         }
     }
-
-    emit streamSyncComplete();
 }
 
 void WebDataSynchronizer::syncInvertebrates()
 {
-//    qDebug() << "Syncing invertebrates";
     if(!syncingShouldContinue) {
 //        qDebug() << "We're not OK";
         return;
@@ -173,8 +170,6 @@ void WebDataSynchronizer::syncInvertebrates()
         syncingShouldContinue = false;
         return;
     }
-
-    emit invertebrateSyncComplete();
 }
 
 void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *reply)
@@ -438,13 +433,13 @@ bool WebDataSynchronizer::handleNetworkReplyForImageData(QNetworkReply *reply, Q
 
 void WebDataSynchronizer::finalize()
 {
-//    qDebug() << "Begin finalize";
     if(!syncingShouldContinue) {
         emit statusUpdateMessage("Sync stopped; Incomplete.");
         emit finished(WebDataSynchonizerExitStatus::FAILED_RUNTIME);
-//        qDebug() << "failure";
         return;
     }
+
+    saveData();
 
     QSettings settings;
     settings.setValue("lastUpdate", QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate));
@@ -490,7 +485,6 @@ void WebDataSynchronizer::stop()
 void WebDataSynchronizer::handleNetworkReplyForAbout(QNetworkReply* reply)
 {
     if(reply->error() != QNetworkReply::NoError || !syncingShouldContinue) {
-//        qDebug() << "exiting here";
         return;
     }
 
@@ -544,4 +538,33 @@ void WebDataSynchronizer::syncAbout()
     if(ok) {
         handleNetworkReplyForAbout(reply.data());
     }
+}
+
+void WebDataSynchronizer::saveData()
+{
+    QDir directoryHelper;
+    QString dataPath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    QString streamDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "stream.data");
+    QFile streamDataFile(streamDataPath);
+    if(!streamDataFile.open(QFile::WriteOnly)) {
+#ifndef MOBILE_DEPLOYMENT
+        qDebug() << "Unable to open local invertebrate data";
+#endif
+        return;
+    }
+
+    QDataStream streamSaver(&streamDataFile);
+    streamSaver << *streamsFromLocal;
+
+    QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, directoryHelper.separator(), "invertebrate.data");
+    QFile invertebrateDataFile(invertebrateDataPath);
+    if(!invertebrateDataFile.open(QFile::WriteOnly)) {
+#ifndef MOBILE_DEPLOYMENT
+        qDebug() << "Unable to open local invertebrate data";
+#endif
+        return;
+    }
+
+    QDataStream invertebrateSaver(&invertebrateDataFile);
+    invertebrateSaver << *invertebratesFromLocal;
 }

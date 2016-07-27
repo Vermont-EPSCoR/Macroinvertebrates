@@ -40,6 +40,7 @@ class Application : public QApplication
     QMap<QString, Stream> streams;
     QMutex mutex;
     bool isSyncingNow = false;
+    SyncStatus syncStatus = SyncStatus::READY_TO_SYNC;
 
     QString dataPath;
     QString imagePath;
