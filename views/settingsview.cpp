@@ -60,3 +60,9 @@ void SettingsView::toggleSyncButtonText(SyncStatus desiredState)
     update();
 }
 
+void SettingsView::updateLastSyncDate()
+{
+    QSettings settings;
+    ui->lastSyncLabel->setText(settings.value("lastUpdate", "Never").toString());
+}
+

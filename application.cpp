@@ -141,8 +141,10 @@ void Application::startSync()
             syncStatus = SyncStatus::READY_TO_SYNC;
             if(!settings.isNull()) {
                 settings->toggleSyncButtonText(SyncStatus::READY_TO_SYNC);
+                settings->updateLastSyncDate();
             }
         });
+
         // On start do these things:
         connect(syncer, &WebDataSynchronizer::started, [&](){
             syncStatus = SyncStatus::SYNC_IN_PROGRESS;
@@ -152,7 +154,6 @@ void Application::startSync()
         });
 
         QThreadPool::globalInstance()->start(syncer);
-
 
         // only show the message about syncing running if the user clicked the sync button
         if(!firstRunMessageHasBeenShown) {
