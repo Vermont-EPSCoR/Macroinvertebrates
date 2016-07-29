@@ -17,3 +17,13 @@ The initial data is compiled into the application as a part of the resource file
 Copy the files invertebrate.data, stream.data and the directory images to the data directory in the project directory. Open the editor for media.qrc and add all files in the images directory.
 
 You're done! The next time the application is compiled the initial data will be baked in.
+
+#### Quirks when testing on iOS Simulator ####
+
+There is a setting in iOS Simulator to reset the device's stored data and settings, at least for this application that feature does not work. To manually remove those files have a look in the following directories:
+
+    /Users/$USER/Library/Application Support/iPhone Simulator/2.2/Library/Application Support/EPSCOR/Macroinvertebrates
+
+    /Users/$USER/Library/Application Support/iPhone Simulator/2.2/Library/Preferences
+
+Your mileage may vary with these paths depending on the version of the iOS Simulator.
