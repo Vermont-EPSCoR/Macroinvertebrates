@@ -63,13 +63,15 @@
        <height>400</height>
       </size>
      </property>
+     <property name="uniformItemSizes">
+      <bool>true</bool>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
   </layout>
-  <zorder>streamSearch</zorder>
-  <zorder>listWidget</zorder>
-  <zorder>label</zorder>
-  <zorder>horizontalSpacer</zorder>
  </widget>
  <resources/>
  <connections/>
