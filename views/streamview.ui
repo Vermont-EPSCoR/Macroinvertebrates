@@ -57,11 +57,20 @@
    </item>
    <item>
     <widget class="QListWidget" name="listWidget">
+     <property name="autoScroll">
+      <bool>true</bool>
+     </property>
      <property name="iconSize">
       <size>
        <width>400</width>
        <height>400</height>
       </size>
+     </property>
+     <property name="verticalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
      </property>
      <property name="uniformItemSizes">
       <bool>true</bool>
