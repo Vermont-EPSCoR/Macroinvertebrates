@@ -35,11 +35,12 @@
 
 class Application : public QApplication
 {
+    static const int application_version = 8;
     QPointer<WebDataSynchronizer> syncer;
     QMap<QString, Invertebrate> invertebrates;
     QMap<QString, Stream> streams;
     QMutex mutex;
-    bool isSyncingNow = false;
+    bool isUpgrade = false;
     SyncStatus syncStatus = SyncStatus::READY_TO_SYNC;
 
     QString dataPath;

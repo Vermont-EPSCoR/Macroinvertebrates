@@ -128,7 +128,6 @@ void Application::startSync()
         }
 
         // Start the sync process
-        isSyncingNow = true;
         syncer = new WebDataSynchronizer();
         syncer->setData(&mutex, &invertebrates, &streams);
 
@@ -205,6 +204,16 @@ void Application::performSetUp()
     setOrganizationName("EPSCOR");
     setApplicationName("Macroinvertebrates");
 
+    QSettings settings;
+    QVariant version = settings.value("version");
+    if(version.isNull() || version.toInt() < application_version) {
+        isUpgrade = true;
+        qDebug() << "Setting application version to " << application_version;
+        qDebug() << "This is an upgrade";
+        settings.setValue("version", application_version);
+    }
+    SyncOptions option = (SyncOptions)settings.value("syncingPreference").toInt();
+
     setStyle("fusion");
     QFile file(":/styles/app.css");
     file.open(QFile::ReadOnly);
@@ -222,8 +231,6 @@ void Application::performSetUp()
     connect(&watcher, &QFileSystemWatcher::fileChanged, this, &Application::reloadStyles);
 #endif
 
-    QSettings settings;
-    SyncOptions option = (SyncOptions)settings.value("syncingPreference").toInt();
     loadDataFromDisk();
     if(option != SyncOptions::MANUAL_ONLY) {
         if(option == SyncOptions::ON_STARTUP) {
@@ -268,7 +275,6 @@ void Application::stopSync()
     if(syncer) {
         connect(syncer.data(), &WebDataSynchronizer::destroyed, [&]() {
             syncStatus = SyncStatus::READY_TO_SYNC;
-            isSyncingNow = false;
 
             // If we're on the sync view
             if(!settings.isNull()) {
@@ -279,7 +285,6 @@ void Application::stopSync()
         syncer->stop();
     } else {
         syncStatus = SyncStatus::READY_TO_SYNC;
-        isSyncingNow = false;
     }
 }
 
