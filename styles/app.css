@@ -4,16 +4,18 @@ QMainWindow {
   background-position: top center;
   background-color: white; }
 
+* {
+  font-size: 3em; }
+
 #titleLabel, #streamNameLabel {
-  font-size: 30px;
+  font-size: 3em;
   font-weight: bold; }
 
 #AboutView #label {
-  font-size: 30px; }
+  font-size: 3em; }
 
 QListView {
-  background-color: transparent;
-  font-size: 30px; }
+  background-color: transparent; }
 
 #StreamView {
   background-color: #E6E6E6; }
@@ -34,12 +36,9 @@ QListView {
     background-color: #EDEDED;
     border-radius: 10px; }
 
-#SettingsView QLabel {
-  font-size: 30px; }
-
 QPushButton {
-  min-width: 100px;
-  min-height: 50px;
+  min-width: 3em;
+  min-height: 2em;
   border-radius: 10px;
   color: #355797;
   background-color: #FFFFFF;
@@ -79,7 +78,6 @@ QComboBox, QPushButton {
   padding-right: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
-  font-size: 30px;
   font-weight: bold;
   max-height: 30px; }
 
@@ -129,9 +127,6 @@ QScrollArea:scrollAreaWidgetContents {
 QLabel#label_title, QLabel#streamName, #StreamView > #label {
   font-size: 30px; }
 
-#scrollAreaWidgetContents QLabel {
-  font-size: 30px; }
-
 QLabel#label_image {
   border: 2px solid #355797;
   padding: 0px;
@@ -139,3 +134,5 @@ QLabel#label_image {
 
 AboutView QLabel#label {
   font-size: 14px; }
+
+/*# sourceMappingURL=app.css.map */
