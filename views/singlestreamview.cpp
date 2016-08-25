@@ -22,7 +22,9 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
         QListWidgetItem *item;
 
         if(invertebrate.imageIsReady == ImageStatus::READY) {
-            item = new QListWidgetItem(QIcon(invertebrate.imageFileLocal), invertebrate.name);
+            QPixmap pixmap(invertebrate.imageFileLocal);
+            QSize new_size = pixmap.size() * 0.45;
+            item = new QListWidgetItem(QIcon(pixmap.scaled(new_size, Qt::KeepAspectRatio)), invertebrate.name);
         } else if(invertebrate.imageIsReady == ImageStatus::QUEUED_FOR_DOWNLOAD) {
             item = new QListWidgetItem(QIcon(":/media/placeholder-queued.png"), invertebrate.name);
         } else {

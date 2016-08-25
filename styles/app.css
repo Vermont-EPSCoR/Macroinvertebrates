@@ -8,11 +8,7 @@ QMainWindow {
   font-size: 3em; }
 
 #titleLabel, #streamNameLabel {
-  font-size: 3em;
   font-weight: bold; }
-
-#AboutView #label {
-  font-size: 3em; }
 
 QListView {
   background-color: transparent; }
@@ -29,12 +25,16 @@ QListView {
 #SingleStreamView {
   background-color: transparent; }
   #SingleStreamView ::item {
-    padding: 15px;
-    height: 275px;
-    width: 230px;
+    height: 11em;
+    width: 9.7em;
     border: 2px solid #355797;
     background-color: #EDEDED;
-    border-radius: 10px; }
+    border-radius: .4em;
+    margin-left: auto;
+    padding-top: .25em; }
+
+#scrollAreaWidgetContents #imageLabel {
+  margin: -1px; }
 
 QPushButton {
   min-width: 3em;
@@ -131,8 +131,5 @@ QLabel#label_image {
   border: 2px solid #355797;
   padding: 0px;
   margin: 0px; }
-
-AboutView QLabel#label {
-  font-size: 14px; }
 
 /*# sourceMappingURL=app.css.map */

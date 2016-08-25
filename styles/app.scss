@@ -10,23 +10,17 @@ QMainWindow {
   background-color: rgb(255, 255, 255);
 }
 
+// Unless we say something else specifically use the std_font_size
 * {
   font-size: $std_font_size;
 }
 
 #titleLabel, #streamNameLabel {
-  font-size: $std_font_size;
   font-weight: bold;
-}
-
-// Keep this separate from the titleLabel and streamNameLabels because we don't need this to be bold
-#AboutView #label {
-  font-size: $std_font_size;
 }
 
 QListView {
   background-color: transparent;
-  // font-size: $std_font_size;
 }
 
 #StreamView {
@@ -43,20 +37,21 @@ QListView {
 #SingleStreamView {
   background-color: transparent;
   ::item {
-    padding: 15px;
-    height: 275px;
-    width: 230px;
+    height: 11em;
+    width: 9.7em;
     border: $std_border;
     background-color: #EDEDED;
-    border-radius: 10px;
+    border-radius: .4em;
+    margin-left: auto;  // Less optimal for tablets, but better for phones
+    padding-top: .25em;
   }
 }
 
-// #SettingsView {
-//   QLabel {
-//     font-size: $std_font_size;
-//   }
-// }
+#scrollAreaWidgetContents {
+  #imageLabel {
+    margin: -1px; // To stop the horizontal scroll in the InvertebrateView
+  }
+}
 
 QPushButton {
   min-width: 3em;
@@ -108,7 +103,6 @@ QComboBox, QPushButton {
   padding-right: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
-  // font-size: $std_font_size;
   font-weight: bold;
   max-height: 30px;
 }
@@ -175,17 +169,8 @@ QLabel#label_title, QLabel#streamName, #StreamView > #label {
   font-size: 30px;
 }
 
-// #scrollAreaWidgetContents QLabel {
-//   font-size: 2em;
-// }
-
 QLabel#label_image {
   border: $std_border;
   padding: 0px;
   margin: 0px;
 }
-
-AboutView QLabel#label {
-  font-size: 14px;
-}
-
