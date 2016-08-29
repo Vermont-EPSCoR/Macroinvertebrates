@@ -41,16 +41,13 @@
                         <dict>
                                 <key>CFBundleIconFiles</key>
                                 <array>
-                                    <string>assets/icon_16x16.png</string>
-                                    <string>assets/icon_16x16@2x.png</string>
-                                    <string>assets/icon_32x32.png</string>
-                                    <string>assets/icon_32x32@2x.png</string>
-                                    <string>assets/icon_128x128.png</string>
-                                    <string>assets/icon_128x128@2x.png</string>
-                                    <string>assets/icon_256x256.png</string>
-                                    <string>assets/icon_256x256@2x.png</string>
-                                    <string>assets/icon_512x512.png</string>
-                                    <string>assets/icon_512x512@2x.png</string>
+                                    <string>assets/iPhone App Icon iOS 5,6.png</string>
+                                    <string>assets/iPhone App Icon iOS 5,6@2x.png</string>
+                                    <string>assets/iPhone App Icon iOS 7,9@2x.png</string>
+                                    <string>assets/iPhone App Icon iOS 7,9@3x.png</string>
+                                    <string>assets/iPhone Spotlight iOS 7,9.png</string>
+                                    <string>assets/iPhone Spotlight iOS 7,9@2x.png</string>
+                                    <string>assets/iPhone Spotlight iOS 7,9@3x.png</string>
                                 </array>
                         </dict>
                 </dict>
