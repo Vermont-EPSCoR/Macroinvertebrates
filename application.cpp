@@ -205,6 +205,14 @@ void Application::performSetUp()
     setApplicationName("Macroinvertebrates");
 
     QSettings settings;
+    QSize screen_size = screens().first()->availableSize();
+    QSize size_height_major = screen_size;
+    if(screen_size.height() < screen_size.width()) {
+        size_height_major.setHeight(screen_size.width());
+        size_height_major.setWidth(screen_size.height());
+    }
+
+    settings.setValue("screen_size", size_height_major);
     QVariant version = settings.value("version");
     if(version.isNull() || version.toInt() < application_version) {
         isUpgrade = true;
@@ -215,7 +223,15 @@ void Application::performSetUp()
     SyncOptions option = (SyncOptions)settings.value("syncingPreference").toInt();
 
     setStyle("fusion");
+
+#ifdef IOS_SPECIFIC
+    QFile file(":/styles/ios.css");
+#elif ANDROID_SPECIFIC
+    QFile file(":/styles/android.css");
+#else
     QFile file(":/styles/app.css");
+#endif
+
     file.open(QFile::ReadOnly);
     setStyleSheet(file.readAll());
     file.close();

@@ -1,0 +1,19 @@
+@import "common";
+
+#SingleStreamView {
+  background-color: transparent;
+  ::item {
+    // height: 7.7em;
+    // width: 6em;
+    
+    border: $std_border;
+    background-color: #EDEDED;
+    border-radius: .4em;
+    margin-left: auto;  // Less optimal for tablets, but better for phones
+    padding: .25em;
+
+    QLabel {
+      padding: 1em;
+    }
+  }
+}

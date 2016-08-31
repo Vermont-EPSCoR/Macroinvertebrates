@@ -5,7 +5,7 @@ QMainWindow {
   background-color: white; }
 
 * {
-  font-size: 3em; }
+  font-size: 4em; }
 
 #titleLabel, #streamNameLabel {
   font-weight: bold; }
@@ -21,17 +21,6 @@ QListView {
     background-color: #E6E6E6;
     min-height: 50px;
     min-width: 250px; }
-
-#SingleStreamView {
-  background-color: transparent; }
-  #SingleStreamView ::item {
-    height: 6em;
-    width: 6em;
-    border: 2px solid #355797;
-    background-color: #EDEDED;
-    border-radius: .4em;
-    margin-left: auto;
-    padding-top: .25em; }
 
 #scrollAreaWidgetContents #imageLabel {
   margin: -1px; }
@@ -132,4 +121,16 @@ QLabel#label_image {
   padding: 0px;
   margin: 0px; }
 
-/*# sourceMappingURL=app.css.map */
+#SingleStreamView {
+  background-color: transparent; }
+  #SingleStreamView ::item {
+    height: 8em;
+    width: 6.5em;
+    border: 2px solid #355797;
+    background-color: #EDEDED;
+    border-radius: .4em;
+    margin-left: auto;
+    margin-right: .1em collapse;
+    padding-top: .25em; }
+
+/*# sourceMappingURL=ios.css.map */

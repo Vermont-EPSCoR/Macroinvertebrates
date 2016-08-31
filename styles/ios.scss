@@ -1,0 +1,16 @@
+@import "common";
+
+#SingleStreamView {
+  background-color: transparent;
+  ::item {
+    height: 8em;
+    width: 6.5em;
+    
+    border: $std_border;
+    background-color: #EDEDED;
+    border-radius: .4em;
+    margin-left: auto;  // Less optimal for tablets, but better for phones
+    margin-right: .1em collapse;
+    padding-top: .25em;
+  }
+}

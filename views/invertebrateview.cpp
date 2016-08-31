@@ -73,9 +73,9 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, const QString &
             break;
     }
 
-#ifdef ON_IOS
+//#ifdef IOS_SPECIFC
     pixmap = pixmap.scaledToWidth(qApp->primaryScreen()->geometry().size().width() * 0.85);
-#endif
+//#endif
     image = pixmap;
     ui->imageLabel->setPixmap(pixmap);
 }

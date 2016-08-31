@@ -1,7 +1,8 @@
 $std_blue: #355797;
 $std_border: 2px solid $std_blue;
 $mercury_white: #E6E6E6;
-$std_font_size: 3em;
+// $std_font_size: 3em;
+$std_font_size: 4em;
 
 QMainWindow {
   background-repeat: no-repeat;
@@ -32,20 +33,6 @@ QListView {
     min-width: 250px;
   }
   background-color: $mercury_white;
-}
-
-#SingleStreamView {
-  background-color: transparent;
-  ::item {
-    height: 6em;
-    width: 6em;
-    
-    border: $std_border;
-    background-color: #EDEDED;
-    border-radius: .4em;
-    margin-left: auto;  // Less optimal for tablets, but better for phones
-    padding-top: .25em;
-  }
 }
 
 #scrollAreaWidgetContents {

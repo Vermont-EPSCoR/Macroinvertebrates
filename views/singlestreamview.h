@@ -6,6 +6,7 @@
 #include <QIcon>
 #include <QList>
 #include <QScroller>
+#include <QSettings>
 
 #include <vector>
 

@@ -9,6 +9,24 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
     ui->streamNameLabel->setText(streamName);
     this->streamName = streamName;
 
+    double the_golden_ratio  = 1.618;
+    double desired_ratio;
+    QSettings settings;
+    QSize screen_size = settings.value("screen_size").toSize();
+    QSize icon_size;
+
+#ifdef ANDROID_SPECIFIC
+    desired_ratio = 0.3 * the_golden_ratio;
+    icon_size = screen_size * desired_ratio;
+    icon_size.setWidth(icon_size.width() / the_golden_ratio );
+    ui->listWidget->setIconSize(icon_size);
+#elif IOS_SPECIFIC
+    desired_ratio = 0.33 * the_golden_ratio;
+    icon_size = screen_size * desired_ratio;
+    icon_size.setWidth(icon_size.width() / the_golden_ratio );
+    ui->listWidget->setIconSize(icon_size);
+#endif
+
     // Allow inertial scrolling
     QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
     QScrollerProperties ScrollerProperties = QScroller::scroller(ui->listWidget->viewport())->scrollerProperties();
@@ -17,14 +35,14 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
     QScroller::scroller(ui->listWidget->viewport())->setScrollerProperties(ScrollerProperties);
     QScroller::grabGesture(ui->listWidget->viewport(), QScroller::LeftMouseButtonGesture);
 
-
     for(const Invertebrate& invertebrate: invertebratesList) {
         QListWidgetItem *item;
 
         if(invertebrate.imageIsReady == ImageStatus::READY) {
-            QPixmap pixmap(invertebrate.imageFileLocal);
-            QSize new_size = pixmap.size() * 0.45;
-            item = new QListWidgetItem(QIcon(pixmap.scaled(new_size, Qt::KeepAspectRatio)), invertebrate.name);
+//            QPixmap pixmap(invertebrate.imageFileLocal);
+//            QSize new_size = pixmap.size() * 0.45;
+//            item = new QListWidgetItem(QIcon(pixmap.scaled(new_size, Qt::KeepAspectRatio)), invertebrate.name);
+            item = new QListWidgetItem(QIcon(invertebrate.imageFileLocal), invertebrate.name);
         } else if(invertebrate.imageIsReady == ImageStatus::QUEUED_FOR_DOWNLOAD) {
             item = new QListWidgetItem(QIcon(":/media/placeholder-queued.png"), invertebrate.name);
         } else {

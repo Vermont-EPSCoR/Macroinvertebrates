@@ -241,27 +241,7 @@ DISTFILES += \
     android/res/drawable-mdpi/splash.png \
     data/images/86576546d6e2a31acd0d0a51d1eba0cd5269a72b756e64638b354ae4af17b35b.png \
     data/images/f78a4ad81e8d08f18828d5ffbf8d7ce73e60b7f63040889135f3ba60c3001957.png \
-#    media/Android/icon_hdpi.png \
-#    media/Android/icon_mdpi.png \
-#    media/Android/icon_xhdpi.png \
-#    media/Android/icon_xxhdpi.png \
-#    media/Android/icon_xxxhdpi.png \
-#    media/Android/play_store.png \
-#    media/iOS/icon_128x128.png \
-#    media/iOS/icon_128x128@2x.png \
-#    media/iOS/icon_16x16.png \
-#    media/iOS/icon_16x16@2x.png \
-#    media/iOS/icon_256x256.png \
-#    media/iOS/icon_256x256@2x.png \
-#    media/iOS/icon_32x32.png \
-#    media/iOS/icon_32x32@2x.png \
-#    media/iOS/icon_512x512.png \
-#    media/iOS/icon_512x512@2x.png \
-    media/Android/Icon \
-    styles/app.css.map \
-    styles/app.scss \
-    LICENSE.txt \
-    README.md \
+    media/Android/Icon
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
@@ -273,18 +253,22 @@ ios {
     ios_icon.files = $$files($$PWD/media/iOS/iPhone*.png)
     ios_icon.path = assets
     QMAKE_BUNDLE_DATA += ios_icon
-    DEFINES += "ON_IOS"
+    DEFINES += "IOS_SPECIFIC"
 }
 
 macx {
 # For reloading of the stylesheet during development
-    message("Adding file system watcher")
+    message("* Adding file system watcher")
     DEFINES += "ADD_FS_WATCHER"
 }
 
 !macx: {
 #    These settings will remove qDebug statements and other statements that take too long for mobile processors
-    message("Using settings for Mobile.")
+    message("* Using settings for Mobile.")
     DEFINES += "MOBILE_DEPLOYMENT"
 }
 
+android {
+    message("* Using settings for Android.")
+    DEFINES += ANDROID_SPECIFIC
+}
