@@ -14,20 +14,23 @@ HomeView::HomeView(QWidget* parent):
 void HomeView::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
-    QSize desktopSize = qApp->desktop()->size();
+    QSize viewDimensions = qApp->screens().first()->availableSize();
+    qDebug() << viewDimensions;
 
-    if( !(desktopSize.width() > 500 && desktopSize.height() > 500) ) {
-        QRect rect = geometry();
+    int taken_space = ui->syncButton->sizeHint().height() + (ui->startButton->sizeHint().height() * 2);
+    bool mustResizeLogo = ((viewDimensions.height() - taken_space) <= epscorLogoHeight || viewDimensions.width() <= epscorLogoWidth) ? true : false;
+
+    if( mustResizeLogo ) {
         QPixmap scaled_pixmap;
         QSettings settings;
 
-        bool is_wide = (rect.width() > rect.height()) ? true : false;
+        bool is_wide = (viewDimensions.width() > viewDimensions.height()) ? true : false;
         if (is_wide) {
             QVariant data = settings.value("epscor_logo_wide");
 
             if (data.isNull()) {
-//                qDebug() << "Generating the wide version";
-                scaled_pixmap = QPixmap::fromImage(QImage(":/media/logo.png")).scaled(rect.width() * 0.25, rect.height() * 0.25, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                qDebug() << "Generating the wide version";
+                scaled_pixmap = QPixmap::fromImage(QImage(":/media/logo.png")).scaled(viewDimensions.width() * 0.25, viewDimensions.height() * 0.25, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
                 QByteArray byteArray;
                 QBuffer buffer(&byteArray);
@@ -36,15 +39,15 @@ void HomeView::resizeEvent(QResizeEvent* event)
 
                 settings.setValue("epscor_logo_wide", byteArray);
             } else {
-//                qDebug() << "Using stored wide version";
+                qDebug() << "Using stored wide version";
                 scaled_pixmap.loadFromData(data.toByteArray(), "PNG");
             }
         } else {
             QVariant data = settings.value("epscor_logo_tall");
 
             if(data.isNull()) {
-//                qDebug() << "Generating tall version";
-                scaled_pixmap = QPixmap::fromImage(QImage(":/media/logo.png")).scaled(rect.width() * 0.85, rect.height() * 0.85, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                qDebug() << "Generating tall version";
+                scaled_pixmap = QPixmap::fromImage(QImage(":/media/logo.png")).scaled(viewDimensions.width() * 0.85, viewDimensions.height() * 0.85, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
                 QByteArray byteArray;
                 QBuffer buffer(&byteArray);
@@ -53,14 +56,14 @@ void HomeView::resizeEvent(QResizeEvent* event)
 
                 settings.setValue("epscor_logo_tall", byteArray);
             } else {
-//                qDebug() << "Using stored tall version";
+                qDebug() << "Using stored tall version";
                 scaled_pixmap.loadFromData(data.toByteArray(), "PNG");
             }
         }
 
         ui->label->setPixmap(scaled_pixmap);
     } else {
-//        qDebug() << "Full size image";
+        qDebug() << "Full size image";
         ui->label->setPixmap(QPixmap::fromImage(QImage(":/media/logo.png")));
     }
 }
