@@ -17,6 +17,8 @@ class HomeView;
 class HomeView : public QWidget
 {
     Q_OBJECT
+    const int epscorLogoHeight = 365;
+    const int epscorLogoWidth = 600;
 
 #ifdef MOBILE_DEPLOYMENT
   void resizeEvent(QResizeEvent *event);
