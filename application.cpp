@@ -2,6 +2,8 @@
 
 Application::Application(int argc, char *argv[]): QApplication(argc, argv)
 {
+    // If the orientation mask isn't set then the application only ever reports being in portrait
+    screens().first()->setOrientationUpdateMask(Qt::PortraitOrientation| Qt::LandscapeOrientation | Qt::InvertedLandscapeOrientation | Qt::InvertedPortraitOrientation);
 }
 
 void Application::transitionToAllStreams()

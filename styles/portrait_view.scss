@@ -1,0 +1,12 @@
+@import "includes";
+
+#SingleStreamView {
+  background-color: red !important;
+  ::item {
+    // border: $std_border;
+    // background-color: #EDEDED;
+    // border-radius: .4em;
+    // margin-left: collapse;
+    // padding: .1em;
+  }
+}

@@ -9,18 +9,13 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
     ui->streamNameLabel->setText(streamName);
     this->streamName = streamName;
 
-    double the_golden_ratio  = 1.618;
+    const double the_golden_ratio  = 1.618;
     double desired_ratio = 1.0;
     QSettings settings;
     QSize screen_size = settings.value("screen_size").toSize();
     QSize icon_size;
 
-#ifdef ANDROID_SPECIFIC
     desired_ratio = 0.3 * the_golden_ratio;
-#elif IOS_SPECIFIC
-    desired_ratio = 0.33 * the_golden_ratio;
-#endif
-
     icon_size = screen_size * desired_ratio;
     icon_size.setWidth(icon_size.width() / the_golden_ratio );
     ui->listWidget->setIconSize(icon_size);
@@ -47,6 +42,11 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
         item->setTextAlignment(Qt::AlignCenter);
         ui->listWidget->addItem(item);
     }
+
+    QFile css_file(":/styles/portrait_view.css");
+    if(css_file.open(QFile::ReadOnly | QFile::Text)) {
+        portrait_css = css_file.readAll();
+    }
 }
 
 SingleStreamView::~SingleStreamView()
@@ -62,4 +62,17 @@ void SingleStreamView::on_backButton_pressed()
 void SingleStreamView::on_listWidget_itemClicked(QListWidgetItem *item)
 {
     emit invertebrateDoubleClicked(item->text(), streamName);
+}
+
+void SingleStreamView::resizeEvent(QResizeEvent *event)
+{
+#ifdef IOS_SPECIFIC
+    Q_UNUSED(event);
+    Qt::ScreenOrientation orientation = qApp->screens().first()->orientation();
+    if(orientation == Qt::PortraitOrientation || orientation == Qt::InvertedPortraitOrientation) {
+        setStyleSheet(portrait_css);
+    } else {
+        setStyleSheet("/**/");
+    }
+#endif
 }

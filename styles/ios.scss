@@ -3,14 +3,9 @@
 #SingleStreamView {
   background-color: transparent;
   ::item {
-    // height: 8em;
-    // width: 7em;
-    
     border: $std_border;
     background-color: #EDEDED;
     border-radius: .4em;
-    margin-left: auto;  // Less optimal for tablets, but better for phones
-    margin-right: .1em collapse;
-    padding: .25em;
+    padding: .1em;
   }
 }

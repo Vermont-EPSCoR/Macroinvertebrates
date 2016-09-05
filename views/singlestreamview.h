@@ -7,6 +7,8 @@
 #include <QList>
 #include <QScroller>
 #include <QSettings>
+#include <QScreen>
+#include <QFile>
 
 #include <vector>
 
@@ -20,9 +22,12 @@ class SingleStreamView : public QWidget
 {
     Q_OBJECT
     QString streamName;
+    QString portrait_css;
 public:
     explicit SingleStreamView(const std::vector<Invertebrate> &invertebratesList, const QString &streamName, QWidget *parent = 0);
     ~SingleStreamView();
+
+    void resizeEvent(QResizeEvent *event);
 signals:
     void backButtonClicked(const QString& streamName);
     void invertebrateDoubleClicked(const QString &invertebrate, const QString &streamName);

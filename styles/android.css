@@ -1,11 +1,11 @@
+* {
+  font-size: 4em; }
+
 QMainWindow {
   background-repeat: no-repeat;
   border-image: url(:/media/background-plain.png);
   background-position: top center;
   background-color: white; }
-
-* {
-  font-size: 4em; }
 
 #titleLabel, #streamNameLabel {
   font-weight: bold; }

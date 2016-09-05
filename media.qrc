@@ -3,12 +3,12 @@
         <file>media/splash.png</file>
         <file>media/background-logo.png</file>
         <file>media/background-plain.png</file>
-        <file>styles/app.css</file>
         <file>media/placeholder-queued.png</file>
         <file>media/placeholder-unavailable.png</file>
         <file>media/logo.png</file>
         <file>styles/android.css</file>
         <file>styles/ios.css</file>
+        <file>styles/portrait_view.css</file>
     </qresource>
     <qresource prefix="/initial_data">
         <file>data/invertebrate.data</file>

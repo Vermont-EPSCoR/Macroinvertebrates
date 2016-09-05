@@ -1,11 +1,11 @@
+* {
+  font-size: 4em; }
+
 QMainWindow {
   background-repeat: no-repeat;
   border-image: url(:/media/background-plain.png);
   background-position: top center;
   background-color: white; }
-
-* {
-  font-size: 4em; }
 
 #titleLabel, #streamNameLabel {
   font-weight: bold; }
@@ -127,8 +127,6 @@ QLabel#label_image {
     border: 2px solid #355797;
     background-color: #EDEDED;
     border-radius: .4em;
-    margin-left: auto;
-    margin-right: .1em collapse;
-    padding: .25em; }
+    padding: .1em; }
 
 /*# sourceMappingURL=ios.css.map */

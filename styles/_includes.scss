@@ -1,0 +1,9 @@
+$std_blue: #355797;
+$std_border: 2px solid $std_blue;
+$mercury_white: #E6E6E6;
+$std_font_size: 4em;
+
+// Unless we say something else specifically use the std_font_size
+* {
+  font-size: $std_font_size;
+}
