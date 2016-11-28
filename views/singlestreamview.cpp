@@ -6,6 +6,15 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
     ui(new Ui::SingleStreamView)
 {
     ui->setupUi(this);
+
+// In iOS setting a grid size creates a nice grid.
+#ifdef IOS_SPECIFIC
+    ui->listWidget->setGridSize(QSize(140, 152));
+// In Android setting the grid size makes this unreadably small.
+#else
+    ui->listWidget->setGridSize(QSize());
+#endif
+
     ui->streamNameLabel->setText(streamName);
     this->streamName = streamName;
 
