@@ -17,7 +17,7 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
 
     desired_ratio = 0.3 * the_golden_ratio;
     icon_size = screen_size * desired_ratio;
-    icon_size.setWidth(icon_size.width() / the_golden_ratio );
+    icon_size.setWidth(static_cast<int>(icon_size.width() / the_golden_ratio ));
     ui->listWidget->setIconSize(icon_size);
 
     // Allow inertial scrolling

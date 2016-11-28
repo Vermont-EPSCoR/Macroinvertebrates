@@ -83,6 +83,12 @@
      <property name="spacing">
       <number>20</number>
      </property>
+     <property name="gridSize">
+      <size>
+       <width>140</width>
+       <height>152</height>
+      </size>
+     </property>
      <property name="viewMode">
       <enum>QListView::IconMode</enum>
      </property>

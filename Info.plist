@@ -27,7 +27,7 @@
 		</dict>
 	</dict>
 	<key>CFBundleIdentifier</key>
-	<string>edu.uvm.epscor.MacroinvertebrateFieldGuide</string>
+        <string>edu.uvm.epscor.macroinvertebrate</string>
 	<key>CFBundleName</key>
 	<string>MacroinvertebrateFieldGuide</string>
 	<key>CFBundlePackageType</key>
