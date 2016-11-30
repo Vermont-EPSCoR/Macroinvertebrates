@@ -6,6 +6,7 @@ StreamView::StreamView(const std::vector<QString> &streamList, QWidget *parent) 
     ui(new Ui::StreamView)
 {
     ui->setupUi(this);
+    QFont default_font = qApp->font();
 
     QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
     QScrollerProperties ScrollerProperties = QScroller::scroller(ui->listWidget->viewport())->scrollerProperties();
@@ -15,7 +16,9 @@ StreamView::StreamView(const std::vector<QString> &streamList, QWidget *parent) 
     QScroller::grabGesture(ui->listWidget->viewport(), QScroller::LeftMouseButtonGesture);
 
     for(const QString& stream: streamList) {
-        ui->listWidget->addItem(stream);
+        QListWidgetItem* item = new QListWidgetItem(stream);
+        item->setFont(default_font);  // Android resizes fonts in QListWidgetItems if font isn't explicitly set
+        ui->listWidget->addItem(item);
     }
 }
 
