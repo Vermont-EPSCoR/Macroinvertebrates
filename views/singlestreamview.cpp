@@ -9,7 +9,35 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
 
 // In iOS setting a grid size creates a nice grid.
 #ifdef IOS_SPECIFIC
-    ui->listWidget->setGridSize(QSize(140, 152));
+    // not using availableGeometry because it changes depending on what orientation we're in.
+    QSize available_geometry = qApp->desktop()->geometry().size();  // ->availableGeometry().size();
+//    qDebug() << available_geometry;
+
+    int grid_x_available = std::min(available_geometry.width(), available_geometry.height());
+    int grid_y_available = std::max(available_geometry.width(), available_geometry.height());
+
+
+    double number_rows = (grid_y_available < 650) ? 3.0 : 3.3;
+    double number_columns = (grid_x_available < 650) ? 1.8: 3.0;
+
+//    qDebug() << "NumRows: " << number_rows;
+//    qDebug() << "NumCols: " << number_columns;
+
+    int grid_x = static_cast<int>(
+        (grid_x_available * 0.8) / number_columns
+    );
+    int grid_y = static_cast<int>(
+        (grid_y_available * 0.8) / number_rows
+    );
+
+//    qDebug() << "grid_x: " << grid_x;
+//    qDebug() << "grid_y: " << grid_y;
+
+    // Set up for elided strings (ellipsis usage)
+    QFont default_font = qApp->font();
+    QFontMetrics metrics(default_font);
+
+    ui->listWidget->setGridSize(QSize(grid_x, grid_y));
 // In Android setting the grid size makes this unreadably small.
 #else
     ui->listWidget->setGridSize(QSize());
@@ -40,21 +68,29 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
     for(const Invertebrate& invertebrate: invertebratesList) {
         QListWidgetItem *item = nullptr;
 
+        QString invert_name = metrics.elidedText(invertebrate.name, Qt::ElideRight, grid_x - 15);
         if(invertebrate.imageIsReady == ImageStatus::READY) {
-            item = new QListWidgetItem(QIcon(invertebrate.imageFileLocal), invertebrate.name);
+            QPixmap local_image(invertebrate.imageFileLocal);
+            QSize local_image_size = local_image.size();
+
+            // Note: ideally this calculation could be carried out in the data synchronizer to prevent having to resize at run time.
+            if(local_image_size.height() > grid_y || local_image_size.width() > grid_x) {
+                int new_max_side = static_cast<int>(std::min(grid_x, grid_y) * 0.8);
+                local_image = local_image.scaled(new_max_side, new_max_side, Qt::KeepAspectRatio, Qt::FastTransformation);
+            }
+
+            item = new QListWidgetItem(QIcon(local_image), invert_name);
+
+
         } else if(invertebrate.imageIsReady == ImageStatus::QUEUED_FOR_DOWNLOAD) {
-            item = new QListWidgetItem(QIcon(":/media/placeholder-queued.png"), invertebrate.name);
+            item = new QListWidgetItem(QIcon(":/media/placeholder-queued.png"), invert_name);
         } else {
-            item = new QListWidgetItem(QIcon(":/media/placeholder-unavailable.png"), invertebrate.name);
+            item = new QListWidgetItem(QIcon(":/media/placeholder-unavailable.png"), invert_name);
         }
 
         item->setTextAlignment(Qt::AlignCenter);
+        item->setSizeHint(QSize(grid_x - 5, grid_y - 5));
         ui->listWidget->addItem(item);
-    }
-
-    QFile css_file(":/styles/portrait_view.css");
-    if(css_file.open(QFile::ReadOnly | QFile::Text)) {
-        portrait_css = css_file.readAll();
     }
 }
 

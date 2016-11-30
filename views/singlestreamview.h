@@ -9,6 +9,8 @@
 #include <QSettings>
 #include <QScreen>
 #include <QFile>
+#include <QDesktopWidget>
+#include <QFontMetrics>
 
 #include <vector>
 
