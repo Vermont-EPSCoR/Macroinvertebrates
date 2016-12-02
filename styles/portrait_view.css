@@ -1,5 +1,6 @@
 * {
-  font-size: 4em; }
+  font-size: 4em;
+  font-weight: bold; }
 
 #SingleStreamView {
   background-color: red !important; }

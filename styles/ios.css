@@ -1,5 +1,6 @@
 * {
-  font-size: 4em; }
+  font-size: 4em;
+  font-weight: bold; }
 
 QMainWindow {
   background-repeat: no-repeat;
@@ -120,6 +121,9 @@ QLabel#label_image {
   border: 2px solid #355797;
   padding: 0px;
   margin: 0px; }
+
+#HomeView QLabel#versionLabel {
+  font-size: 12px; }
 
 #SingleStreamView {
   background-color: transparent; }

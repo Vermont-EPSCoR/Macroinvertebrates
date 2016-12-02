@@ -9,6 +9,7 @@
 #include <QSettings>
 #include <QByteArray>
 #include <QBuffer>
+#include <QResizeEvent>
 
 namespace Ui {
 class HomeView;

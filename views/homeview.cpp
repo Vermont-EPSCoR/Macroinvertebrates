@@ -13,8 +13,7 @@ HomeView::HomeView(QWidget* parent):
 #ifdef MOBILE_DEPLOYMENT
 void HomeView::resizeEvent(QResizeEvent* event)
 {
-    Q_UNUSED(event);
-    QSize viewDimensions = qApp->screens().first()->availableSize();
+    QSize viewDimensions = event->size();
 
     int taken_space = ui->syncButton->sizeHint().height() + (ui->startButton->sizeHint().height() * 2);
     bool mustResizeLogo = ((viewDimensions.height() - taken_space) <= epscorLogoHeight || viewDimensions.width() <= epscorLogoWidth) ? true : false;

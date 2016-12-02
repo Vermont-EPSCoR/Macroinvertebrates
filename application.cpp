@@ -189,12 +189,15 @@ Application::~Application() {
 
 void Application::reloadStyles()
 {
-    QFile styles("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
+    qDebug() << "Reloading styles";
+    QFile styles("/Users/morganrodgers/Desktop/Macroinvertebrate-Field-Guide/styles/app.css");
     if(styles.open(QFile::ReadOnly)) {
         setStyleSheet("/* /");
         QString loadedStyles = styles.readAll();
         qDebug() << loadedStyles;
         setStyleSheet(loadedStyles);
+    } else {
+        qDebug() << "Unable to reload styles. Did the file path change?";
     }
 }
 
@@ -222,7 +225,7 @@ void Application::performSetUp()
         qDebug() << "This is an upgrade";
         settings.setValue("version", application_version);
     }
-    SyncOptions option = (SyncOptions)settings.value("syncingPreference").toInt();
+    SyncOptions option = static_cast<SyncOptions>(settings.value("syncingPreference").toInt());
 
     setStyle("fusion");
 
@@ -245,7 +248,8 @@ void Application::performSetUp()
     imagePath = QString("%1%2%3").arg(dataPath, QDir::separator(), "images");
 
 #ifdef ADD_FS_WATCHER
-    watcher.addPath("/Users/morganrodgers/Desktop/MacroinvertebratesV3/styles/app.css");
+    qDebug() << "Adding watcher";
+    watcher.addPath("/Users/morganrodgers/Desktop/Macroinvertebrate-Field-Guide/styles/app.css");
     connect(&watcher, &QFileSystemWatcher::fileChanged, this, &Application::reloadStyles);
 #endif
 

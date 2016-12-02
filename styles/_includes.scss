@@ -6,4 +6,5 @@ $std_font_size: 4em;
 // Unless we say something else specifically use the std_font_size
 * {
   font-size: $std_font_size;
+  font-weight: bold;
 }

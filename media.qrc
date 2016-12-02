@@ -9,6 +9,7 @@
         <file>styles/android.css</file>
         <file>styles/ios.css</file>
         <file>styles/portrait_view.css</file>
+        <file>styles/app.css</file>
     </qresource>
     <qresource prefix="/initial_data">
         <file>data/invertebrate.data</file>
