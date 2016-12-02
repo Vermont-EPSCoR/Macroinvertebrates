@@ -122,9 +122,6 @@ QLabel#label_image {
   padding: 0px;
   margin: 0px; }
 
-#HomeView QLabel#versionLabel {
-  font-size: 12px; }
-
 #SingleStreamView {
   background-color: transparent; }
   #SingleStreamView ::item {
@@ -135,5 +132,8 @@ QLabel#label_image {
     padding: .25em; }
     #SingleStreamView ::item QLabel {
       padding: 1em; }
+
+#HomeView QLabel#versionLabel {
+  font-size: 2em; }
 
 /*# sourceMappingURL=android.css.map */
