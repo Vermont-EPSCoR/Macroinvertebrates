@@ -8,7 +8,7 @@ QT       += core gui network xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = MacroinvertebrateV3
+TARGET = Macroinvertebrates
 TEMPLATE = app
 
 
