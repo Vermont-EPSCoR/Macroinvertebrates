@@ -123,8 +123,8 @@ void Application::startSync()
             QMessageBox msgBox;
             msgBox.setText("Welcome new user!");
             msgBox.setInformativeText("This app has been preloaded with some initial data. This data may be out of date and from time to time you should sync with the remote server. Would you like to sync now?");
-            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-            if(msgBox.exec() == QMessageBox::Cancel) {
+            msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::No);
+            if(msgBox.exec() == QMessageBox::No) {
                 return;
             }
         }

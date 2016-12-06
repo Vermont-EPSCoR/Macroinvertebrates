@@ -249,8 +249,10 @@ ICON = media/OSX.icns
 
 ios {
     QMAKE_INFO_PLIST = Info.plist
-    ios_icon.files = $$files($$PWD/media/iOS/iPhone*.png)
-    ios_icon.path = assets
+    ios_icon.files += $$files($$PWD/media/iOS/iPhone*.png)
+    ios_icon.files += $$files($$PWD/media/iOS/LaunchImage*.png)
+    ios_icon.files += $$PWD/views/Launch_Screen.storyboard
+#    ios_icon.path = assets
     QMAKE_BUNDLE_DATA += ios_icon
     DEFINES += "IOS_SPECIFIC"
 }
