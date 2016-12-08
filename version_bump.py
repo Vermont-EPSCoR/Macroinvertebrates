@@ -28,7 +28,7 @@ def main():
         data = input_file.read()
 
     if not data:
-        print('Unable to open application.h. Exiting 1.')
+        print('Unable to open android/AndroidManifest.xml. Exiting 1.')
         exit(1)
 
     version_numbers = re.findall(
@@ -49,6 +49,7 @@ def main():
         build_version
     )
 
+    print('Running perl pie.')
     try:
         perl_pie(
             version_number_ui_chunk % version_name_pattern,
@@ -70,6 +71,10 @@ def main():
     except:
         print('One or more of the perl pies failed. Exiting 1.')
         exit(1)
+
+    print('Removing backup files')
+    os.unlink('views/homeview.ui.bak')
+    os.unlink('android/AndroidManifest.xml.bak')
 
     print('Fin')
     exit(0)
