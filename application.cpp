@@ -219,11 +219,11 @@ void Application::performSetUp()
 
     settings.setValue("screen_size", size_height_major);
     QVariant version = settings.value("version");
-    if(version.isNull() || version.toInt() < application_version) {
+    if(version.isNull() || version.toInt() < application_data_version) {
         isUpgrade = true;
-        qDebug() << "Setting application version to " << application_version;
+        qDebug() << "Setting application version to " << application_data_version;
         qDebug() << "This is an upgrade";
-        settings.setValue("version", application_version);
+        settings.setValue("version", application_data_version);
     }
     SyncOptions option = static_cast<SyncOptions>(settings.value("syncingPreference").toInt());
 

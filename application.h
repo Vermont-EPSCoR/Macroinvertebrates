@@ -35,7 +35,7 @@
 
 class Application : public QApplication
 {
-    static const int application_version = 8;
+    static const int application_data_version = 8;
     QPointer<WebDataSynchronizer> syncer;
     QMap<QString, Invertebrate> invertebrates;
     QMap<QString, Stream> streams;
