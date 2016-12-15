@@ -43,6 +43,10 @@ SOURCES += application.cpp \
 
 
 HEADERS  += application.h \
+    deps/gumbo-parser/tag_enum.h \
+    deps/gumbo-parser/tag_gperf.h \
+    deps/gumbo-parser/tag_sizes.h \
+    deps/gumbo-parser/tag_strings.h \
     deps/gumbo-parser/attribute.h \
     deps/gumbo-parser/char_ref.h \
     deps/gumbo-parser/char_ref.rl \

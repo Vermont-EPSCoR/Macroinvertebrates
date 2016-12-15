@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <functional>
-#include <gumbo.h>
+#include "deps/gumbo-parser/gumbo.h"
 #include "HtmlTag.h"
 
 class QString;

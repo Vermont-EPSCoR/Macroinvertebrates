@@ -2,7 +2,7 @@
 #define QGUMBODOCUMENT_H
 
 #include <QByteArray>
-#include <gumbo.h>
+#include "deps/gumbo-parser/gumbo.h"
 
 class QString;
 class QGumboNode;
