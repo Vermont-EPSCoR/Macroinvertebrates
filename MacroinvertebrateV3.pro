@@ -254,7 +254,7 @@ ICON = media/OSX.icns
 ios {
     QMAKE_INFO_PLIST = Info.plist
     # ios_icon.files += $$files($$PWD/media/iOS/iPhone*.png)
-    # ios_icon.files += $$files($$PWD/media/iOS/LaunchImage*.png)
+     ios_icon.files += $$files($$PWD/media/iOS/LaunchImage*.png)
     ios_xcassets.files = $$files($$PWD/media/iOS/*.xcassets)
 #    QMAKE_ASSET_CATALOGS += ios_xcassets
     ios_icon.files += $$PWD/views/Launch_Screen.storyboard
