@@ -253,10 +253,10 @@ ICON = media/OSX.icns
 
 ios {
     QMAKE_INFO_PLIST = Info.plist
-    # ios_icon.files += $$files($$PWD/media/iOS/iPhone*.png)
+    # ios_icon.files += $$files($$PWD/media/iOS/iPhone*.png)  # Handled by ios_xcassets
      ios_icon.files += $$files($$PWD/media/iOS/LaunchImage*.png)
     ios_xcassets.files = $$files($$PWD/media/iOS/*.xcassets)
-#    QMAKE_ASSET_CATALOGS += ios_xcassets
+#    QMAKE_ASSET_CATALOGS += ios_xcassets  # There's a warning about this, but no documentation on how to use it yet.
     ios_icon.files += $$PWD/views/Launch_Screen.storyboard
     QMAKE_BUNDLE_DATA += ios_icon
     QMAKE_BUNDLE_DATA += ios_xcassets
