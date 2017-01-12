@@ -31,7 +31,7 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
         if(match.hasMatch()) {
             invertebrate.description = match.captured(1).trimmed().replace(tooMuchWhiteSpace, " ");
         } else {
-            qDebug() << "Something went wrong with the match: " << infoBox;
+//            qDebug() << "Something went wrong with the match: " << infoBox;
         }
     }
 
@@ -51,7 +51,7 @@ void InvertebrateHandler::parseInfoboxToInvertebrate(const QString &infoBox, Inv
                 invertebrate.commonName = naiveStringToTitleCase(value);
             } else if(key == "|family") {
                 invertebrate.family = naiveStringToTitleCase(value);
-            } else if(key == "|fly name") {
+            } else if(key == "|tied fly name") {
                 invertebrate.flyName = naiveStringToTitleCase(value);
             } else if(key == "|genus") {
                 invertebrate.genus = naiveStringToTitleCase(value);
@@ -104,7 +104,7 @@ bool InvertebrateHandler::validate(const Invertebrate &invertebrate)
     }
 
     if(nullAttributes.count() > 0) {
-        qDebug() << "INVALID INVERTEBRATE: " << invertebrate.name << " IS MISSING: " << nullAttributes;
+//        qDebug() << "INVALID INVERTEBRATE: " << invertebrate.name << " IS MISSING: " << nullAttributes;
         return false;
     }
 

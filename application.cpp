@@ -10,7 +10,7 @@ void Application::transitionToAllStreams()
 {
     std::vector<QString> streamList;
     QMutexLocker locker(&mutex);
-    streamList.reserve(streams.size());
+    streamList.reserve(static_cast<size_t>(streams.size()));
     for(const Stream& stream: streams.values()) {
         if(!stream.title.isEmpty()) {
             streamList.push_back(stream.title);
@@ -53,7 +53,7 @@ void Application::transitionToSingleStream(const QString &streamName)
     std::vector<Invertebrate> invertebratesList;
     QMutexLocker locker(&mutex);
     Stream &stream = streams[streamName];
-    invertebratesList.reserve(stream.invertebrateList.length());
+    invertebratesList.reserve(static_cast<size_t>(stream.invertebrateList.length()));
 
     for(QString &invertebrateName: stream.invertebrateList) {
         Invertebrate invertebrate = invertebrates[invertebrateName];
@@ -100,9 +100,13 @@ void Application::loadDataFromDisk()
     loadVariableFromDisk(needToSync, "invertebrate");
     loadVariableFromDisk(needToSync, "stream");
 
-    if(needToSync) {
+    // If we need to sync let's stage stored data.
+    // Likewise if this is an upgrade there's likely new data to be staged.
+    if(needToSync || isUpgrade) {
         stageBundledData();
+    }
 
+    if(needToSync) {
         loadVariableFromDisk(needToSync, "invertebrate");
         loadVariableFromDisk(needToSync, "stream");
 
@@ -189,15 +193,15 @@ Application::~Application() {
 
 void Application::reloadStyles()
 {
-    qDebug() << "Reloading styles";
+//    qDebug() << "Reloading styles";
     QFile styles("/Users/morganrodgers/Desktop/Macroinvertebrate-Field-Guide/styles/app.css");
     if(styles.open(QFile::ReadOnly)) {
         setStyleSheet("/* /");
         QString loadedStyles = styles.readAll();
-        qDebug() << loadedStyles;
+//        qDebug() << loadedStyles;
         setStyleSheet(loadedStyles);
     } else {
-        qDebug() << "Unable to reload styles. Did the file path change?";
+//        qDebug() << "Unable to reload styles. Did the file path change?";
     }
 }
 
@@ -248,7 +252,7 @@ void Application::performSetUp()
     imagePath = QString("%1%2%3").arg(dataPath, QDir::separator(), "images");
 
 #ifdef ADD_FS_WATCHER
-    qDebug() << "Adding watcher";
+//    qDebug() << "Adding watcher";
     watcher.addPath("/Users/morganrodgers/Desktop/Macroinvertebrate-Field-Guide/styles/app.css");
     connect(&watcher, &QFileSystemWatcher::fileChanged, this, &Application::reloadStyles);
 #endif
@@ -258,27 +262,6 @@ void Application::performSetUp()
         if(option == SyncOptions::ON_STARTUP) {
             startSync();
         }
-
-//        // ELSE TEST FOR WIRELESS
-//        QNetworkConfigurationManager ncm;
-//        auto nc = ncm.allConfigurations();
-
-//        for (auto &x : nc) {
-//            qDebug() << x.name();
-//            qDebug() << x.bearerTypeName();
-//            qDebug() << x.bearerTypeFamily();
-//            qDebug() << x.state();
-//            qDebug() << x.state().testFlag(QNetworkConfiguration::Active);
-//            qDebug() << x.isValid();
-
-//            if(x.isValid() && x.state().testFlag(QNetworkConfiguration::Active)) {
-//                mainWindow->statusBar()->showMessage("We're actively connected to some kind of internets", 10000);
-//                qDebug() << "Should be showing";
-//                QMessageBox box;
-//                box.setText(x.name() + " " + x.bearerTypeName() + " " + x.bearerTypeFamily());
-//                box.exec();
-//            }
-//        }
     }
 }
 
@@ -345,8 +328,26 @@ void Application::stageBundledData() {
     QString invertebrateDataPath = QString("%1%2%3").arg(dataPath, dir.separator(), "invertebrate.data");
 
     dir.setPath(":/initial_data/data");
-    QFile::copy(":/initial_data/data/stream.data", streamDataPath);
-    QFile::copy(":/initial_data/data/invertebrate.data", invertebrateDataPath);
+    bool success;
+    success = QFile::copy(":/initial_data/data/stream.data", streamDataPath);
+//    qDebug() << "Copy of stream.data returned: " << success;
+
+    success = QFile::setPermissions(
+        streamDataPath,
+        QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+        QFileDevice::ReadGroup | QFileDevice::ReadOther
+    );
+//    qDebug() << "Set permissions on stream.data returned " << success;
+
+    success = QFile::copy(":/initial_data/data/invertebrate.data", invertebrateDataPath);
+//    qDebug() << "Copy of invertebrate.data returned: " << success;
+
+    success = QFile::setPermissions(
+        invertebrateDataPath,
+        QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+        QFileDevice::ReadGroup | QFileDevice::ReadOther
+    );
+//    qDebug() << "Set permissions on invertebrate.data returned " << success;
 
     dir.setPath(":/initial_data/data/images");
     QFileInfoList fileList = dir.entryInfoList();
