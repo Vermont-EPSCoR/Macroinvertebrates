@@ -2,25 +2,26 @@
 #define APPLICATION_H
 
 #include <QApplication>
-#include <QObject>
-#include <QFont>
-#include <QDir>
 #include <QDebug>
+#include <QDir>
+#include <QFont>
 #include <QMap>
-#include <QPointer>
-#include <QString>
-#include <QSettings>
+#include <QMessageBox>
 #include <QMessageBox>
 #include <QMutex>
-#include <QThreadPool>
-#include <QMessageBox>
-#include <QStatusBar>
+#include <QObject>
+#include <QPointer>
+#include <QSettings>
 #include <QSplashScreen>
+#include <QStatusBar>
+#include <QString>
+#include <QThreadPool>
 
 #ifdef ADD_FS_WATCHER
 #include <QFileSystemWatcher>
 #endif
 
+#include <list>
 #include <vector>
 
 #include "webdatasynchronizer.h"
@@ -52,6 +53,8 @@ class Application : public QApplication
     void loadVariableFromDisk(bool &needToSync, QString variable);
     void stageBundledData();
 
+    std::list<int> view_index_stack;
+
 #ifdef ADD_FS_WATCHER
     QFileSystemWatcher watcher;
 #endif
@@ -59,6 +62,9 @@ public:
     Application(int argc, char *argv[]);
     void performSetUp();
     ~Application();
+
+    int last_view_index();
+    void set_last_view_index(int index);
 
 private slots:
     void transitionToAllStreams();

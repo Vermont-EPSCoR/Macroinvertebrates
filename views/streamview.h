@@ -9,6 +9,7 @@
 
 #include <vector>
 
+#include "application.h"
 #include "../models/stream.h"
 
 namespace Ui {

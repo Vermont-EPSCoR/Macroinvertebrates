@@ -4,8 +4,6 @@
 #include <QMainWindow>
 #include <QKeyEvent>
 
-#include <QDebug>
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT

@@ -355,3 +355,22 @@ void Application::stageBundledData() {
         QFile::copy(entry.filePath(), QString("%1%2%3").arg(imagePath, dir.separator(), entry.fileName()));
     }
 }
+
+void Application::set_last_view_index(int index) {
+    view_index_stack.push_back(index);
+}
+
+int Application::last_view_index() {
+    if(view_index_stack.empty()) {
+        return -1;
+    }
+
+    int last = view_index_stack.back();
+
+    // Once we've set the index for the stream of interest keep it until it's changed
+    if(view_index_stack.size() > 1) {
+        view_index_stack.pop_back();
+    }
+
+    return last;
+}

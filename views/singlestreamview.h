@@ -14,6 +14,7 @@
 
 #include <vector>
 
+#include "application.h"
 #include "../models/invertebrate.h"
 
 namespace Ui {

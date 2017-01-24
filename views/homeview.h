@@ -11,6 +11,8 @@
 #include <QBuffer>
 #include <QResizeEvent>
 
+#include "application.h"
+
 namespace Ui {
 class HomeView;
 }

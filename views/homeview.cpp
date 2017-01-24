@@ -74,6 +74,7 @@ void HomeView::resizeEvent(QResizeEvent* event)
 
 HomeView::~HomeView()
 {
+    static_cast<Application *>(qApp)->set_last_view_index(-1);
     delete ui;
 }
 

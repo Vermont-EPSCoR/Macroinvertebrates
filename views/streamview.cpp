@@ -20,10 +20,16 @@ StreamView::StreamView(const std::vector<QString> &streamList, QWidget *parent) 
         item->setFont(default_font);  // Android resizes fonts in QListWidgetItems if font isn't explicitly set
         ui->listWidget->addItem(item);
     }
+
+    int list_view_last_index = static_cast<Application *>(qApp)->last_view_index();
+    if(list_view_last_index != -1) {
+        ui->listWidget->setCurrentRow(list_view_last_index);
+    }
 }
 
 StreamView::~StreamView()
 {
+    static_cast<Application *>(qApp)->set_last_view_index(ui->listWidget->currentRow());
     delete ui;
 }
 
