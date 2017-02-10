@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if "$HOME/Qt5.8.0/5.8/ios/bin/qmake" -spec macx-ios-clang CONFIG+=iphonesimulator CONFIG+=simulator MacroinvertebrateV3.pro CONFIG+=qml_debug; then
+if "$HOME/Qt/5.8/ios/bin/qmake" -spec macx-ios-clang CONFIG+=iphonesimulator CONFIG+=simulator MacroinvertebrateV3.pro CONFIG+=qml_debug; then
 	say 'QMake complete.'
 else
 	say 'QMake failed.'
