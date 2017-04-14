@@ -6,9 +6,6 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
     ui(new Ui::SingleStreamView)
 {
     ui->setupUi(this);
-    // Set up for elided strings (ellipsis usage)
-    QFont default_font = qApp->font();
-    QFontMetrics metrics(default_font);
     QSettings settings;
     QSize screen_size = settings.value("screen_size").toSize();
     int grid_x_available = std::min(screen_size.width(), screen_size.height());
@@ -66,46 +63,10 @@ SingleStreamView::SingleStreamView(const std::vector<Invertebrate> &invertebrate
     ui->listWidget->setIconSize(icon_size);
 
     // Allow inertial scrolling
-    QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
-    QScrollerProperties ScrollerProperties = QScroller::scroller(ui->listWidget->viewport())->scrollerProperties();
-    ScrollerProperties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, OvershootPolicy);
-    ScrollerProperties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, OvershootPolicy);
-    QScroller::scroller(ui->listWidget->viewport())->setScrollerProperties(ScrollerProperties);
-    QScroller::grabGesture(ui->listWidget->viewport(), QScroller::LeftMouseButtonGesture);
+    setup_scrolling();
 
     // Add invertebrates to list
-    int invert_name_width = grid_x - 15;
-    for(const Invertebrate& invertebrate: invertebratesList) {
-        QListWidgetItem *item = nullptr;
-
-        QString invert_name = metrics.elidedText(invertebrate.name, Qt::ElideRight, invert_name_width);
-        if(invertebrate.imageIsReady == ImageStatus::READY) {
-            QPixmap local_image(invertebrate.imageFileLocal);
-            QSize local_image_size = local_image.size();
-
-            // Note: ideally this calculation could be carried out in the data synchronizer to prevent having to resize at run time.
-            if(local_image_size.height() > grid_y || local_image_size.width() > grid_x) {
-                int new_max_side = static_cast<int>(std::min(grid_x, grid_y) * 0.8);
-                local_image = local_image.scaled(new_max_side, new_max_side, Qt::KeepAspectRatio, Qt::FastTransformation);
-            }
-
-            item = new QListWidgetItem(QIcon(local_image), invert_name);
-        } else if(invertebrate.imageIsReady == ImageStatus::QUEUED_FOR_DOWNLOAD) {
-            item = new QListWidgetItem(QIcon(":/media/placeholder-queued.png"), invert_name);
-        } else {
-            item = new QListWidgetItem(QIcon(":/media/placeholder-unavailable.png"), invert_name);
-        }
-
-        item->setTextAlignment(Qt::AlignCenter);
-        item->setSizeHint(QSize(grid_x - 5, grid_y - 5));
-        item->setFont(default_font);  // Android resizes fonts in QListWidgetItems if font isn't explicitly set
-        ui->listWidget->addItem(item);
-    }
-
-    int list_view_last_index = static_cast<Application *>(qApp)->last_view_index();
-    if(list_view_last_index != -1) {
-        ui->listWidget->setCurrentRow(list_view_last_index);
-    }
+    setup_invertebrates(grid_x, grid_y, invertebratesList);
 }
 
 SingleStreamView::~SingleStreamView()
@@ -121,7 +82,10 @@ void SingleStreamView::on_backButton_pressed()
 
 void SingleStreamView::on_listWidget_itemClicked(QListWidgetItem *item)
 {
-    emit invertebrateDoubleClicked(item->text(), streamName);
+    emit invertebrateDoubleClicked(
+        static_cast<InvertebrateItemModel *>(item)->key(),
+        streamName
+    );
 }
 
 void SingleStreamView::resizeEvent(QResizeEvent *event)
@@ -135,4 +99,54 @@ void SingleStreamView::resizeEvent(QResizeEvent *event)
         setStyleSheet("/**/");
     }
 #endif
+}
+
+void SingleStreamView::setup_scrolling()
+{
+    QVariant OvershootPolicy = QVariant::fromValue<QScrollerProperties::OvershootPolicy>(QScrollerProperties::OvershootAlwaysOff);
+    QScrollerProperties ScrollerProperties = QScroller::scroller(ui->listWidget->viewport())->scrollerProperties();
+    ScrollerProperties.setScrollMetric(QScrollerProperties::VerticalOvershootPolicy, OvershootPolicy);
+    ScrollerProperties.setScrollMetric(QScrollerProperties::HorizontalOvershootPolicy, OvershootPolicy);
+    QScroller::scroller(ui->listWidget->viewport())->setScrollerProperties(ScrollerProperties);
+    QScroller::grabGesture(ui->listWidget->viewport(), QScroller::LeftMouseButtonGesture);
+}
+
+void SingleStreamView::setup_invertebrates(int grid_x, int grid_y, const std::vector<Invertebrate> &invertebratesList)
+{
+    // Set up for elided strings (ellipsis usage)
+    QFont default_font = qApp->font();
+    QFontMetrics metrics(default_font);
+
+    int invert_name_width = grid_x - 15;
+    for(const Invertebrate& invertebrate: invertebratesList) {
+        InvertebrateItemModel *item = nullptr;
+
+        QString invert_name = metrics.elidedText(invertebrate.name, Qt::ElideRight, invert_name_width);
+        if(invertebrate.imageIsReady == ImageStatus::READY) {
+            QPixmap local_image(invertebrate.imageFileLocal);
+            QSize local_image_size = local_image.size();
+
+            // Note: ideally this calculation could be carried out in the data synchronizer to prevent having to resize at run time.
+            if(local_image_size.height() > grid_y || local_image_size.width() > grid_x) {
+                int new_max_side = static_cast<int>(std::min(grid_x, grid_y) * 0.8);
+                local_image = local_image.scaled(new_max_side, new_max_side, Qt::KeepAspectRatio, Qt::FastTransformation);
+            }
+
+            item = new InvertebrateItemModel(QIcon(local_image), invert_name, invertebrate.name);
+        } else if(invertebrate.imageIsReady == ImageStatus::QUEUED_FOR_DOWNLOAD) {
+            item = new InvertebrateItemModel(QIcon(":/media/placeholder-queued.png"), invert_name, invertebrate.name);
+        } else {
+            item = new InvertebrateItemModel(QIcon(":/media/placeholder-unavailable.png"), invert_name, invertebrate.name);
+        }
+
+        item->setTextAlignment(Qt::AlignCenter);
+        item->setSizeHint(QSize(grid_x - 5, grid_y - 5));
+        item->setFont(default_font);  // Android resizes fonts in QListWidgetItems if font isn't explicitly set
+        ui->listWidget->addItem(item);
+    }
+
+    int list_view_last_index = static_cast<Application *>(qApp)->last_view_index();
+    if(list_view_last_index != -1) {
+        ui->listWidget->setCurrentRow(list_view_last_index);
+    }
 }

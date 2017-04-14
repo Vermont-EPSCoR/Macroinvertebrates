@@ -39,7 +39,8 @@ SOURCES += application.cpp \
     views/singlestreamview.cpp \
     views/streamview.cpp \
     webdatasynchronizer.cpp \
-    views/mainwindow.cpp
+    views/mainwindow.cpp \
+    models/invertebrateitemmodel.cpp
 
 
 HEADERS  += application.h \
@@ -77,7 +78,8 @@ HEADERS  += application.h \
     views/singlestreamview.h \
     views/streamview.h \
     webdatasynchronizer.h \
-    views/mainwindow.h
+    views/mainwindow.h \
+    models/invertebrateitemmodel.h
 
 FORMS    += \
     views/aboutview.ui \

@@ -16,6 +16,7 @@
 
 #include "application.h"
 #include "../models/invertebrate.h"
+#include "../models/invertebrateitemmodel.h"
 
 namespace Ui {
 class SingleStreamView;
@@ -26,6 +27,10 @@ class SingleStreamView : public QWidget
     Q_OBJECT
     QString streamName;
     QString portrait_css;
+
+    void setup_scrolling();
+    void setup_invertebrates(int grid_x, int grid_y, const std::vector<Invertebrate> &invertebratesList);
+
 public:
     explicit SingleStreamView(const std::vector<Invertebrate> &invertebratesList, const QString &streamName, QWidget *parent = 0);
     ~SingleStreamView();
