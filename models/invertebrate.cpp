@@ -33,6 +33,7 @@ QDataStream &operator<<(QDataStream &ds, const Invertebrate &obj) {
     ds  << obj.commonName
         << obj.description
         << obj.family
+        << obj.order
         << obj.flyName
         << obj.genus
         << imageFileLocal
@@ -52,6 +53,7 @@ QDataStream &operator>>(QDataStream &ds, Invertebrate &obj) {
     ds >> obj.commonName;
     ds >> obj.description;
     ds >> obj.family;
+    ds >> obj.order;
     ds >> obj.flyName;
     ds >> obj.genus;
     QString imageFileLocal;
