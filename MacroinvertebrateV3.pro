@@ -259,8 +259,8 @@ ios {
     ios_xcassets.files = $$files($$PWD/media/iOS/*.xcassets)
     QMAKE_ASSET_CATALOGS += $$files($$PWD/media/iOS/*.xcassets)  # There's a warning about this, but no documentation on how to use it yet.
     ios_icon.files += $$PWD/views/Launch_Screen.storyboard
-#    QMAKE_BUNDLE_DATA += ios_icon
-#    QMAKE_BUNDLE_DATA += ios_xcassets
+    QMAKE_BUNDLE_DATA += ios_icon
+    QMAKE_BUNDLE_DATA += ios_xcassets
     DEFINES += "IOS_SPECIFIC"
 }
 
