@@ -41,7 +41,7 @@ void WebDataSynchronizer::syncStreams()
         return;
     }
 
-    QUrl url("http://wikieducator.org/api.php");
+    QUrl url("https://wikieducator.org/api.php");
     QUrlQuery query;
     query.addQueryItem("action", "query");
     query.addQueryItem("list", "categorymembers");
@@ -89,7 +89,7 @@ void WebDataSynchronizer::handleNetworkReplyForStreamList(QNetworkReply *reply)
     auto end = std::unique(streamTitles.begin(), streamTitles.end());
     streamTitles.erase(end, streamTitles.end());
 
-    QUrl url("http://wikieducator.org/api.php");
+    QUrl url("https://wikieducator.org/api.php");
     QUrlQuery query;
     query.addQueryItem("action", "query");
     query.addQueryItem("export", "");
@@ -151,7 +151,7 @@ void WebDataSynchronizer::syncInvertebrates()
         return;
     }
 
-    QUrl url("http://wikieducator.org/api.php");
+    QUrl url("https://wikieducator.org/api.php");
     QUrlQuery query;
     query.addQueryItem("action", "query");
     query.addQueryItem("list", "categorymembers");
@@ -207,7 +207,7 @@ void WebDataSynchronizer::handleNetworkReplyForInvertebrateList(QNetworkReply *r
     auto end = std::unique(invertebrateTitles.begin(), invertebrateTitles.end());
     invertebrateTitles.erase(end, invertebrateTitles.end());
 
-    QUrl url("http://wikieducator.org/api.php");
+    QUrl url("https://wikieducator.org/api.php");
     QUrlQuery query;
     query.addQueryItem("action", "query");
     query.addQueryItem("export", "");
@@ -280,7 +280,7 @@ void WebDataSynchronizer::syncImages()
     auto end = std::unique(titles.begin(), titles.end());
     titles.erase(end, titles.end());
 
-    QUrl url("http://wikieducator.org/api.php");
+    QUrl url("https://wikieducator.org/api.php");
     QUrlQuery query;
     query.addQueryItem("action", "query");
     query.addQueryItem("iiurlwidth", "400");
@@ -323,6 +323,10 @@ void WebDataSynchronizer::syncImages()
 
         query.removeAllQueryItems("titles");
         query.addQueryItem("titles", imageTitlesBatch.join("|"));
+
+        //sje 1-14-2020 needed to  add &* to end of query string to make compatible with changes with wikieducator.org.
+        query.addQueryItem("&", "*");
+
         url.setQuery(query);
 
         QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(url, &ok));
@@ -535,7 +539,7 @@ void WebDataSynchronizer::syncAbout()
     }
 
     bool ok;
-    QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(QUrl("http://wikieducator.org/api.php?action=parse&page=AboutStreamsApp&format=xml"), &ok));
+    QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> reply(synchronouslyGetUrl(QUrl("https://wikieducator.org/api.php?action=parse&page=AboutStreamsApp&format=xml"), &ok));
     if(ok) {
         handleNetworkReplyForAbout(reply.data());
     }

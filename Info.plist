@@ -35,7 +35,6 @@
 			</array>
 		</dict>
 	</dict>
-
 	<key>UILaunchImages</key>
 	<array>
 		<dict>
@@ -102,7 +101,6 @@
 			<string>{320, 480}</string>
 		</dict>
 	</array>
-	
 	<key>CFBundleIdentifier</key>
 	<string>edu.uvm.epscor.macroinvertebrates</string>
 	<key>CFBundleName</key>
@@ -110,11 +108,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.16</string>
+	<string>2.21</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>2.16</string>
+	<string>2.21</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
