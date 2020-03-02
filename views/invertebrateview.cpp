@@ -33,7 +33,8 @@ void InvertebrateView::setInfo(const Invertebrate &invertebrate, const QString &
     this->originStream = streamName;
     ui->titleLabel->setText(invertebrate.name);
 
-    bool viewIsNarrow = (qApp->desktop()->availableGeometry().size().width() < 400);
+//    bool viewIsNarrow = (qApp->desktop()->availableGeometry().size().width() < 400);
+    bool viewIsNarrow = (QGuiApplication::primaryScreen()->availableGeometry().size().width() < 400);
 
     int row = 0;
     if(!invertebrate.commonName.isEmpty()) {

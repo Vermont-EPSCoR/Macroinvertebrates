@@ -37,7 +37,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="streamTitleLabel">
        <property name="text">
         <string>Streams</string>
        </property>

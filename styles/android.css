@@ -8,7 +8,7 @@ QMainWindow {
   background-position: top center;
   background-color: white; }
 
-#titleLabel, #streamNameLabel {
+#titleLabel, #streamNameLabel, #streamTitleLabel {
   font-weight: bold; }
 
 QListView {

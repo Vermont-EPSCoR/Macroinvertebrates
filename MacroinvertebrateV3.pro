@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network xml
+QT       += core gui network xml svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -94,7 +94,7 @@ INCLUDEPATH += "$$PWD/deps/QGumboParser"
 
 QMAKE_LFLAGS += -v
 
-CONFIG += c++11
+CONFIG += c++11               # For QGumbo
 QMAKE_CXXFLAGS += -O3
 QMAKE_CFLAGS += -std=c99 -O3  # For Gumbo
 CONFIG += mobility
@@ -104,6 +104,7 @@ RESOURCES += \
     media.qrc
 
 DISTFILES += \
+    android/gradle/wrapper/gradle-wrapper.properties \
     deps/gumbo-parser/tag.in \
     android/AndroidManifest.xml \
     android/gradle/wrapper/gradle-wrapper.jar \
@@ -278,5 +279,9 @@ macx {
 
 android {
     message("* Using settings for Android.")
+#   Need this next line?
+#    ANDROID_ABIS = arm64-v8a armeabi-v7a x86_64 x86
     DEFINES += ANDROID_SPECIFIC
 }
+
+include(../android_openssl/openssl.pri)
