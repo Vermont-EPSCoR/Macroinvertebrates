@@ -27,3 +27,7 @@ There is a setting in iOS Simulator to reset the device's stored data and settin
     /Users/$USER/Library/Application Support/iPhone Simulator/2.2/Library/Preferences
 
 Your mileage may vary with these paths depending on the version of the iOS Simulator.
+
+#### Android Signing Key ####
+
+Pat has the Android signing key. Ask him if you want to post a new version to Google Play. Password is in KeePass.
